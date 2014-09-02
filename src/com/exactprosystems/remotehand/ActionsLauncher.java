@@ -11,6 +11,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.exactprosystems.remotehand.webelements.WebLocator;
 
@@ -64,39 +66,58 @@ public class ActionsLauncher
 			webDriver.quit();
 	}
 
-	private static WebDriver getWebDriver()
+	private static RemoteWebDriver getWebDriver()
 	{
-		switch (Configuration.getInstance().getBrowserToUse())
+		Configuration c = Configuration.getInstance();
+		String httpProxy = c.getHttpProxySetting(),
+		sslProxy = c.getSslProxySetting(),
+		ftpProxy = c.getFtpProxySetting(),
+		socksProxy = c.getSocksProxySetting(),
+		noProxy = c.getNoProxySetting();
+		DesiredCapabilities dc;
+		if ((!httpProxy.isEmpty()) || (!sslProxy.isEmpty()) || (!ftpProxy.isEmpty()) || (!socksProxy.isEmpty()) || (!noProxy.isEmpty()))
 		{
-		case IE :
-		{
-			System.setProperty("webdriver.ie.driver", Configuration.getInstance().getIeDriverFileName());
-			return new InternetExplorerDriver();
-		}
-		case CHROME :
-		{
-			System.setProperty("webdriver.chrome.driver", Configuration.getInstance().getChromeDriverFileName());
-			return new ChromeDriver();
-		}
-		default :
-			Configuration c = Configuration.getInstance();
-			String httpProxy = c.getHttpProxySetting(),
-			sslProxy = c.getSslProxySetting(),
-			ftpProxy = c.getFtpProxySetting(),
-			socksProxy = c.getSocksProxySetting(),
-			noProxy = c.getNoProxySetting();
-			if ((httpProxy.isEmpty()) && (sslProxy.isEmpty()) && (ftpProxy.isEmpty()) && (socksProxy.isEmpty()) && (noProxy.isEmpty()))
-				return new FirefoxDriver();
-
 			Proxy proxy = new Proxy();
 			proxy.setHttpProxy(httpProxy);
 			proxy.setSslProxy(sslProxy);
 			proxy.setFtpProxy(ftpProxy);
 			proxy.setSocksProxy(socksProxy);
 			proxy.setNoProxy(noProxy);
-			DesiredCapabilities dc = new DesiredCapabilities();
+			dc = new DesiredCapabilities();
 			dc.setCapability(CapabilityType.PROXY, proxy);
-			return new FirefoxDriver(dc);
 		}
+		else
+			dc = null;
+		
+		RemoteWebDriver driver;
+		switch (Configuration.getInstance().getBrowserToUse())
+		{
+		case IE :
+		{
+			System.setProperty("webdriver.ie.driver", Configuration.getInstance().getIeDriverFileName());
+			if (dc!=null)
+				driver = new InternetExplorerDriver(dc);
+			else
+				driver = new InternetExplorerDriver();
+			break;
+		}
+		case CHROME :
+		{
+			System.setProperty("webdriver.chrome.driver", Configuration.getInstance().getChromeDriverFileName());
+			if (dc!=null)
+				driver = new ChromeDriver(dc);
+			else
+				driver = new ChromeDriver();
+			break;
+		}
+		default :
+			if (dc!=null)
+				driver = new FirefoxDriver(dc);
+			else
+				driver = new FirefoxDriver();
+			break;
+		}
+		driver.setFileDetector(new LocalFileDetector());
+		return driver;
 	}
 }
