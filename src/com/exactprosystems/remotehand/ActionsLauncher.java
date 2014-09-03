@@ -11,8 +11,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.LocalFileDetector;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.exactprosystems.remotehand.webelements.WebLocator;
 
@@ -66,7 +64,7 @@ public class ActionsLauncher
 			webDriver.quit();
 	}
 
-	private static RemoteWebDriver getWebDriver()
+	private static WebDriver getWebDriver()
 	{
 		Configuration c = Configuration.getInstance();
 		String httpProxy = c.getHttpProxySetting(),
@@ -89,7 +87,7 @@ public class ActionsLauncher
 		else
 			dc = null;
 		
-		RemoteWebDriver driver;
+		WebDriver driver;
 		switch (Configuration.getInstance().getBrowserToUse())
 		{
 		case IE :
@@ -117,7 +115,6 @@ public class ActionsLauncher
 				driver = new FirefoxDriver();
 			break;
 		}
-		driver.setFileDetector(new LocalFileDetector());
 		return driver;
 	}
 }
