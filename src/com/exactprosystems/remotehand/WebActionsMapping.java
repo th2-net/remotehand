@@ -1,5 +1,6 @@
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.remotehand.actions.ClearElement;
 import com.exactprosystems.remotehand.actions.Click;
 import com.exactprosystems.remotehand.actions.GetDynamicTable;
 import com.exactprosystems.remotehand.actions.GetElement;
@@ -23,7 +24,7 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetLocationOnScreen, GetDynamicTable, PageSource, Refresh;
+		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetLocationOnScreen, GetDynamicTable, PageSource, Refresh, ClearElement;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -50,7 +51,8 @@ public class WebActionsMapping
 		case GetDynamicTable :     return new GetDynamicTable();
 		case PageSource :          return new PageSource();
 		case Refresh :             return new Refresh();
-		default : throw new ScriptCompileException("Internal error. Class not found for action name '" + actionName + "'");
+		case ClearElement :        return new ClearElement();
+		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
 }
