@@ -3,6 +3,7 @@ package com.exactprosystems.remotehand.actions;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -35,9 +36,11 @@ public class SendKeys extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input = webDriver.findElement(webLocator);
-		input.sendKeys(params.get(ActionParams.text.toString()));
-
-		logger.info("Send text to: " + webLocator);
+		String text = params.get(ActionParams.text.toString());
+		if (text.endsWith("\\r\\n"))
+			text = text.subSequence(0, text.length()-4)+Keys.RETURN.toString();
+		input.sendKeys(text);
+		logger.info("Sent text to: " + webLocator);
 
 		return null;
 	}
