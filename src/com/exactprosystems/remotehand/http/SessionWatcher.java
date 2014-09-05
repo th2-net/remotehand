@@ -8,13 +8,10 @@ import com.exactprosystems.remotehand.Logger;
 
 public class SessionWatcher implements Runnable
 {
-	private Logger logger = Logger.getLogger();
-
+	private static final Logger logger = Logger.getLogger();
 	private static final int SESSION_EXPIRY_TIME = Configuration.getInstance().getSessionExpiryTimeMs();
-
 	private static volatile SessionWatcher watcher = null;
-
-	private static volatile Map<SessionHandler, Long> timeSessions = new HashMap<SessionHandler, Long>();
+	private static volatile Map<SessionHandler, long[]> timeSessions = new HashMap<SessionHandler, long[]>();
 
 	public static SessionWatcher getWatcher()
 	{
@@ -64,18 +61,17 @@ public class SessionWatcher implements Runnable
 		for (SessionHandler session : timeSessions.keySet())
 		{
 			final Long currentTime = System.currentTimeMillis();
-			final Long sessionStartAt = timeSessions.get(session);
-			final Long sessionEndAt = sessionStartAt + SESSION_EXPIRY_TIME;
-			final Long timeToEndSession = sessionEndAt - currentTime;
+			final Long sessionLastAction = timeSessions.get(session)[1];
+			final Long sessionEnd = sessionLastAction + SESSION_EXPIRY_TIME;
+			final Long timeToEndSession = sessionEnd - currentTime;
 
-			if (sessionEndAt < currentTime)
+			if (timeToEndSession < 0)
 			{
 				if (session != null)
 				{
-					logger.warn("Working time for session " + session.getId() + " is up. It will be closed");
+					logger.warn("Session " + session.getId() + " is inactive more than "+SESSION_EXPIRY_TIME+". It will be closed due to timeout");
 					session.close();
 				}
-				timeSessions.remove(session);
 			}
 			else if (timeToNextSessionEnd > timeToEndSession)
 				timeToNextSessionEnd = timeToEndSession;
@@ -85,11 +81,20 @@ public class SessionWatcher implements Runnable
 
 	public void addSession(SessionHandler session)
 	{
-		timeSessions.put(session, System.currentTimeMillis());
+		long start = System.currentTimeMillis();
+		timeSessions.put(session, new long[] { start, start });
 	}
 
 	public void removeSession(SessionHandler session)
 	{
 		timeSessions.remove(session);
+	}
+	
+	public void updateSession(SessionHandler session)
+	{
+		synchronized (session)
+		{
+			timeSessions.get(session)[1] = System.currentTimeMillis();
+		}
 	}
 }

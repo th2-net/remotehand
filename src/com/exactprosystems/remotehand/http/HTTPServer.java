@@ -30,7 +30,7 @@ public class HTTPServer
 			catch (IOException ex)
 			{
 				logger.error(String.format("Could not create HTTP Server on port <%s>", HTTP_SRV_PORT));
-				logger.getLogger().error(ex);
+				logger.error(ex);
 			}
 
 		return server;

@@ -28,6 +28,7 @@ public class SessionHandler implements HttpHandler
 	@Override
 	public void handle(HttpExchange exchanger) throws IOException
 	{
+		SessionWatcher.getWatcher().updateSession(this);
 		final String method = exchanger.getRequestMethod();
 		if (method.equalsIgnoreCase("POST"))
 		{
@@ -36,9 +37,7 @@ public class SessionHandler implements HttpHandler
 			String line = "";
 			StringBuffer buff = new StringBuffer();
 			while ((line = in.readLine()) != null)
-			{
 				buff.append(line);
-			}
 			in.close();
 
 			final String body = buff.toString();
@@ -54,7 +53,7 @@ public class SessionHandler implements HttpHandler
 		{
 			if (scriptProcessor == null)
 			{
-				sendIncorrectRequestMessage(exchanger, "No results. No one script has been passed.");
+				sendIncorrectRequestMessage(exchanger, "No results. No scripts have been passed.");
 				return;
 			}
 
@@ -70,17 +69,15 @@ public class SessionHandler implements HttpHandler
 				sendMessage(exchanger, scriptProcessor.getResult());
 			else
 				sendMessage(exchanger, "");
-
-			;
 		}
 		else if (method.equals("DELETE"))
 		{
 			if (scriptProcessor == null)
 			{
-				sendIncorrectRequestMessage(exchanger, "No results. No one script has been passed.");
+				sendIncorrectRequestMessage(exchanger, "No results. No scripts have been passed.");
 				return;
 			}
-			logger.info("Session <" + id + ">. Request for close session");
+			logger.info("Session <" + id + ">. Request for session close");
 
 			this.close();
 
