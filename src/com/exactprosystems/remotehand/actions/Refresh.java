@@ -10,11 +10,18 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class Refresh extends WebAction
 {
-	public Refresh()
+	@Override
+	public boolean isNeedLocator()
 	{
-		super.needLocator = false;
+		return false;
 	}
-
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return false;
+	}
+	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{

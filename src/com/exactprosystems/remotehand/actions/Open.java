@@ -10,29 +10,30 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class Open extends WebAction
 {
-	private static Logger logger = Logger.getLogger();
-
-	private static enum ActionParams
-	{
-		url
-	};
-
+	private static final Logger logger = Logger.getLogger();
+	private static final String PARAM_URL = "url";
+	
 	public Open()
 	{
-		super.needLocator = false;
+		super.mandatoryParams = new String[]{PARAM_URL};
+	}
 
-		String[] result = new String[ActionParams.values().length];
-		for (int inx = 0; inx < result.length; inx++)
-		{
-			result[inx] = ActionParams.values()[inx].toString();
-		}
-		super.mandatoryParams = result;
+	@Override
+	public boolean isNeedLocator()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return false;
 	}
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params)
 	{
-		final String url = params.get(ActionParams.url.toString());
+		final String url = params.get(PARAM_URL);
 
 		webDriver.get(url);
 		webDriver.manage().window().maximize();

@@ -16,34 +16,36 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class WaitForNew extends WebAction
 {
-	private static Logger logger = Logger.getLogger();
-
-	private static enum ActionParams
-	{
-		expiredSeconds, checkEveryMSecs
-	};
-
+	private static final Logger logger = Logger.getLogger();
+	private static final String PARAM_SECONDS = "seconds", 
+			PARAM_CHECKMILLIS = "checkmillis";
+	
 	public WaitForNew()
 	{
-		super.needLocator = true;
-
-		String[] result = new String[ActionParams.values().length];
-		for (int inx = 0; inx < result.length; inx++)
-		{
-			result[inx] = ActionParams.values()[inx].toString();
-		}
-		super.mandatoryParams = result;
+		super.mandatoryParams = new String[]{PARAM_SECONDS, PARAM_CHECKMILLIS};
+	}
+	
+	@Override
+	public boolean isNeedLocator()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return false;
 	}
 
 	@Override
 	public String run(WebDriver webDriver, final By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		final int expSecs = parseToInt(params.get(ActionParams.expiredSeconds.toString()), ActionParams.expiredSeconds.toString()), 
-				checkSecs = parseToInt(params.get(ActionParams.checkEveryMSecs.toString()), ActionParams.checkEveryMSecs.toString());
+		final int seconds = getIntegerParam(params, PARAM_SECONDS), 
+				checkMillis = getIntegerParam(params, PARAM_CHECKMILLIS);
 
 		try
 		{
-			(new WebDriverWait(webDriver, expSecs)).until(new ExpectedCondition<Boolean>()
+			(new WebDriverWait(webDriver, seconds)).until(new ExpectedCondition<Boolean>()
 			{
 				List<WebElement> previusElements = null;
 
@@ -60,7 +62,7 @@ public class WaitForNew extends WebAction
 						if (!foundEquals)
 							try
 							{
-								Thread.sleep(checkSecs);
+								Thread.sleep(checkMillis);
 							}
 							catch (InterruptedException e)
 							{
@@ -78,24 +80,9 @@ public class WaitForNew extends WebAction
 		}
 		catch (TimeoutException ex)
 		{
-			throw new ScriptExecuteException("Timed out after " + expSecs + " seconds waiting for '" + webLocator.toString());
+			throw new ScriptExecuteException("Timed out after " + seconds + " seconds waiting for '" + webLocator.toString() + "'");
 		}
 
 		return null;
-	}
-
-	private int parseToInt(String str, String param) throws ScriptExecuteException
-	{
-		int num;
-		try
-		{
-			num = Integer.parseInt(str);
-		}
-		catch (NumberFormatException ex)
-		{
-			throw new ScriptExecuteException("Error while parsing parameter '" + param + "' = '" + str + "'. It must to be numeric.");
-		}
-
-		return num;
 	}
 }

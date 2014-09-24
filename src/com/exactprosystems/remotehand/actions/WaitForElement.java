@@ -16,42 +16,31 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class WaitForElement extends WebAction
 {
-	private final static Logger logger = Logger.getLogger();
-
-	private static enum ActionParams
-	{
-		seconds
-	};
+	private static final Logger logger = Logger.getLogger();
+	private static final String PARAM_SECONDS = "seconds";
 
 	public WaitForElement()
 	{
-		super.needLocator = true;
-
-		String[] result = new String[ActionParams.values().length];
-		for (int inx = 0; inx < result.length; inx++)
-		{
-			result[inx] = ActionParams.values()[inx].toString();
-		}
-		super.mandatoryParams = result;
+		super.mandatoryParams = new String[]{PARAM_SECONDS};
 	}
-
+	
 	@Override
-	public String run(WebDriver webDriver, final By webLocator, Map<String, String> params) throws ScriptExecuteException
+	public boolean isNeedLocator()
 	{
-		int secs = 0;
+		return true;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return false;
+	}
+	
+	public static void waitForElement(final By webLocator, WebDriver webDriver, int seconds) throws ScriptExecuteException
+	{
 		try
 		{
-			secs = Integer.parseInt(params.get(ActionParams.seconds.toString()));
-		}
-		catch (NumberFormatException ex)
-		{
-			throw new ScriptExecuteException("Error while parsing parameter '" + ActionParams.seconds.toString() + 
-					"' = '" + params.get(ActionParams.seconds.toString()) + "'. It must to be numeric.");
-		}
-
-		try
-		{
-			(new WebDriverWait(webDriver, secs)).until(new ExpectedCondition<Boolean>()
+			(new WebDriverWait(webDriver, seconds)).until(new ExpectedCondition<Boolean>()
 			{
 				@Override
 				public Boolean apply(WebDriver driver)
@@ -66,8 +55,16 @@ public class WaitForElement extends WebAction
 		}
 		catch (TimeoutException ex)
 		{
-			throw new ScriptExecuteException("Timed out after " + secs + " seconds waiting for '" + webLocator.toString());
+			throw new ScriptExecuteException("Timed out after " + seconds + " seconds waiting for '" + webLocator.toString() + "'");
 		}
+	}
+	
+
+	@Override
+	public String run(WebDriver webDriver, final By webLocator, Map<String, String> params) throws ScriptExecuteException
+	{
+		int seconds = getIntegerParam(params, PARAM_SECONDS);
+		waitForElement(webLocator, webDriver, seconds);
 
 		return null;
 	}

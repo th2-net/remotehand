@@ -41,7 +41,7 @@ public class ActionsLauncher
 				webLocator = locator.getWebLocator(webDriver, params);
 			}
 
-			final String actionResult = action.run(webDriver, webLocator, params);
+			final String actionResult = action.execute(webDriver, webLocator, params);
 			if (actionResult != null)
 			{
 				if (result==null)

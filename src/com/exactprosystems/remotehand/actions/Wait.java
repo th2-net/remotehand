@@ -14,32 +14,30 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class Wait extends WebAction
 {
-	private final static Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger();
+	private static final String PARAM_SECONDS = "seconds";
 	
-	private static enum ActionParams
-	{
-		seconds
-	};
-
 	public Wait()
 	{
-		super.needLocator = false;
+		super.mandatoryParams = new String[]{PARAM_SECONDS};
 	}
 
 	@Override
+	public boolean isNeedLocator()
+	{
+		return false;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return false;
+	}
+	
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		int secs = 0;
-		try
-		{
-			secs = Integer.parseInt(params.get(ActionParams.seconds.toString()));
-		}
-		catch (NumberFormatException ex)
-		{
-			throw new ScriptExecuteException("Error while parsing parameter '" + 
-					ActionParams.seconds.toString() + "' = '" + params.get(ActionParams.seconds.toString()) + "'. It must to be numeric.");
-		}
-		
+		int secs = getIntegerParam(params, PARAM_SECONDS);
 		logger.info("Pause for "+secs+" second(s)");
 
 		try
@@ -60,5 +58,4 @@ public class Wait extends WebAction
 
 		return null;
 	}
-
 }

@@ -4,30 +4,34 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
 
-public class ClearElement extends WebAction
+public class Output extends WebAction
 {
+	private static final String PARAM_TEXT = "text";
+	
+	public Output()
+	{
+		super.mandatoryParams = new String[]{PARAM_TEXT};
+	}
+	
 	@Override
 	public boolean isNeedLocator()
 	{
-		return true;
+		return false;
 	}
-	
+
 	@Override
 	public boolean isCanWait()
 	{
-		return true;
+		return false;
 	}
-	
+
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement element = webDriver.findElement(webLocator);
-		element.clear();
-		return null;
+		return params.get(PARAM_TEXT);
 	}
 }

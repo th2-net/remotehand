@@ -17,15 +17,21 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class GetDynamicTable extends WebAction
 {
+	private static final Logger logger = Logger.getLogger();
 	private static final int EXPIRED_TIME = 100; // seconds
-
+	
 	private int count = 0;
-
-	private static Logger logger = Logger.getLogger();
-
-	public GetDynamicTable()
+	
+	@Override
+	public boolean isNeedLocator()
 	{
-		super.needLocator = true;
+		return true;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return true;
 	}
 
 	@Override

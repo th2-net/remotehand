@@ -24,7 +24,7 @@ public class WebLocatorsMapping
 				if (name.toString().equalsIgnoreCase(label))
 					return name;
 
-			throw new ScriptCompileException("Web locator '" + label + "' not found in the locator list");
+			throw new ScriptCompileException("Web locator '" + label + "' not found in locators list");
 		}
 	};
 
@@ -35,11 +35,11 @@ public class WebLocatorsMapping
 
 		switch (WebLocatorName.getByLabel(locatorName))
 		{
-		case cssSelector : return new CSSSelector();
+		case cssSelector : return new CssSelector();
 		case tagName :     return new TagName();
 		case id :          return new Id();
 		case xpath :       return new XPath();
-		default : throw new ScriptCompileException("Internal error. Class not found for locator name '" + locatorName + "'");
+		default : throw new ScriptCompileException("Unknown locator name '" + locatorName + "'");
 		}
 	}
 }

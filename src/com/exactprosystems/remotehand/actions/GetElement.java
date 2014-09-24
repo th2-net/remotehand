@@ -12,11 +12,18 @@ import com.exactprosystems.remotehand.WebAction;
 
 public class GetElement extends WebAction
 {
-	private static Logger logger = Logger.getLogger();
-
-	public GetElement()
+	private static final Logger logger = Logger.getLogger();
+	
+	@Override
+	public boolean isNeedLocator()
 	{
-		super.needLocator = true;
+		return true;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return true;
 	}
 
 	@Override

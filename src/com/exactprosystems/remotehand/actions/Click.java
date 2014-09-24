@@ -7,24 +7,32 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import com.exactprosystems.remotehand.Logger;
+import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
 
 public class Click extends WebAction
 {
-	private static Logger logger = Logger.getLogger();
-
-	public Click()
+	private static final Logger logger = Logger.getLogger();
+	
+	@Override
+	public boolean isNeedLocator()
 	{
-		super.needLocator = true;
+		return true;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return true;
 	}
 
 	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params)
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = webDriver.findElement(webLocator);
 		element.click();
 
-		logger.info("Clicked on: '" + element.toString());
+		logger.info("Clicked on: '" + element.toString() + "'");
 
 		return null;
 	}

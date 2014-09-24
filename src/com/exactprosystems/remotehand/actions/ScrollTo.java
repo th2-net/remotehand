@@ -11,13 +11,20 @@ import com.exactprosystems.remotehand.Logger;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
 
-public class GetLocationOnScreen extends WebAction
+public class ScrollTo extends WebAction
 {
-	private static Logger logger = Logger.getLogger();
-
-	public GetLocationOnScreen()
+	private static final Logger logger = Logger.getLogger();
+	
+	@Override
+	public boolean isNeedLocator()
 	{
-		super.needLocator = true;
+		return true;
+	}
+	
+	@Override
+	public boolean isCanWait()
+	{
+		return true;
 	}
 
 	@Override

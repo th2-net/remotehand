@@ -5,7 +5,7 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class CSSSelector extends WebLocator
+public class CssSelector extends WebLocator
 {
 	@Override
 	public By getWebLocator(WebDriver webDrv, Map<String, String> params)

@@ -1,0 +1,99 @@
+1. List of actions
+Here is the list of currently supported actions of RemoteHand with possible parameters and descriptions.
+Some useful info can be found below the list.
+
+
+#action,#url
+Open,url
+
+Opens resource at <url>.
+
+
+#action,#wait,#locator,#matcher
+Click,5,locator,matcher
+
+Optionally waits <wait> seconds for element specified by <matcher> and clicks on it. Element is found using <locator>.
+
+
+#action,#wait,#locator,#matcher,#text
+SendKeys,5,locator,matcher,text
+
+Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
+You can force pressing RETURN key by ending <text> with "\r\n".
+
+
+#action,#seconds,#locator,#matcher
+WaitForElement,5,locator,matcher
+
+Waits <seconds> seconds for element specified by <matcher>, element is found using <locator>.
+Useful to make sure that certain element has appeared (page has been loaded till this element) before doing something on the page.
+
+
+#action,#seconds,#checkmillis,#locator,#matcher
+WaitForNew,5,300,locator,matcher
+
+Waits <seconds> seconds for new elements specified by <matcher> to appear, elements are found using <locator>.
+Check for new elements is performed every <checkmillis> milliseconds.
+
+
+#action,#seconds
+Wait,5
+
+Makes a pause in execution for <seconds> seconds. 
+Good to use this actions when you're not sure which element to wait for and just want to give a page more time to be downloaded.
+
+
+#action,#wait,#locator,#matcher
+GetElement,5,locator,matcher
+
+Optionally waits <wait> seconds for element specified by <matcher> and prints value of its outerHTML. Element is found using <locator>.
+
+
+#action,#wait,#locator,#matcher
+GetDynamicTable,5,locator,matcher
+
+Optionally waits <wait> seconds for table element specified by <matcher> and prints its contents as <tbody>, <tr> and <td> tags. Table element is found using <locator>.
+If possible, action scrolls the table down to force it to be loaded completelly if lazy loading is enabled for the table.
+
+
+#action,#wait,#locator,#matcher
+ScrollTo,5,locator,matcher
+
+Optionally waits <wait> seconds for element specified by <matcher> and scrolls browser window to it. Element is found using <locator>.
+
+
+#action
+PageSource
+
+Prints current URL, title and source code of the page.
+Useful for debugging, because source code of the page will contain elements seen only in browser window, JavaScript, Firebug, but not seen when the page is saved.
+
+
+#action
+Refresh
+
+Refreshes current page, loading it again. Useful to collapse all tree nodes and other elements, which state is affected by page refresh.
+
+
+#action,#wait,#locator,#matcher
+ClearElement,5,locator,matcher
+
+Optionally waits <wait> seconds for element specified by <matcher> and clears its value. Element is found using <locator>.
+Useful for input controls.
+
+
+#action,#text
+Output,text
+
+Prints <text> to script output. Useful to divide outputs of actions like GetElement, GetDynamicTable etc.
+
+
+
+2. Notes
+All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException is no element had appeared in time.
+
+Possible <locator> values:
+1. cssSelector - in this case <matcher> should contain CSS path to the element like this: div.v-button.v-widget.default.v-button-default;
+2. xpath - <matcher> should contain XPath to the element, for example: //button[contains(@class, 'v-nativebutton v-widget')];
+3. tagName - in this case <matcher> is a tag name of the element;
+4. id - then <matcher> contains id of the element.
