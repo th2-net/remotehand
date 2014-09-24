@@ -16,27 +16,27 @@ public class Configuration
 	public static final String CONFIG_FILE_NAME = "config.ini";
 	public static final int DEF_SRV_PORT = 8000;
 	public static final char DEF_DELIMITER = ',';
-	public static final int DEF_SESSION_EXPIRY_TIME = 1000 * 60 * 60; // 1 hour
+	public static final int DEF_SESSION_EXPIRE = 60; // 1 hour
 	public static final Browser DEF_BROWSER = Browser.FIREFOX;
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe", 
 			DEF_CHROMEDRIVER_PATH = "chromedriver.exe", 
 			DEF_PROXY = "";
 
-	public static final String port = "Port", 
-			delimiter = "Delimiter", 
-			sessionExpiryTime = "SessionExpiryTime", 
-			browser = "Browser", 
-			ieDriverPath = "IEDriverPath",
-			chromeDriverPath = "ChromeDriverPath", 
-			httpProxy = "HttpProxy", 
-			sslProxy = "SslProxy", 
-			ftpProxy = "FtpProxy", 
-			socksProxy = "SocksProxy", 
-			noProxy = "NoProxy";
+	public static final String PARAM_PORT = "Port", 
+			PARAM_DELIMITER = "Delimiter", 
+			PARAM_SESSIONEXPIRE = "SessionExpire", 
+			PARAM_BROWSER = "Browser", 
+			PARAM_IEDRIVERPATH = "IEDriverPath",
+			PARAM_CHROMEDRIVERPATH = "ChromeDriverPath", 
+			PARAM_HTTPPROXY = "HttpProxy", 
+			PARAM_SSLPROXY = "SslProxy", 
+			PARAM_FTPPROXY = "FtpProxy", 
+			PARAM_SOCKSPROXY = "SocksProxy", 
+			PARAM_NOPROXY = "NoProxy";
 
 	private volatile int httpServerPort;
 	private volatile char scriptDelimiter;
-	private volatile int sessionExpiryTimeMs;
+	private volatile int sessionExpire;
 	private volatile Browser browserToUse;
 	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, ftpProxySetting, socksProxySetting, noProxySetting;
 
@@ -44,16 +44,16 @@ public class Configuration
 	{
 		Properties defProperties = new Properties();
 
-		defProperties.setProperty(port, String.valueOf(DEF_SRV_PORT));
-		defProperties.setProperty(delimiter, String.valueOf(DEF_DELIMITER));
-		defProperties.setProperty(sessionExpiryTime, String.valueOf(DEF_SESSION_EXPIRY_TIME));
-		defProperties.setProperty(browser, DEF_BROWSER.getLabel());
-		defProperties.setProperty(ieDriverPath, DEF_IEDRIVER_PATH);
-		defProperties.setProperty(httpProxy, DEF_PROXY);
-		defProperties.setProperty(sslProxy, DEF_PROXY);
-		defProperties.setProperty(ftpProxy, DEF_PROXY);
-		defProperties.setProperty(socksProxy, DEF_PROXY);
-		defProperties.setProperty(noProxy, DEF_PROXY);
+		defProperties.setProperty(PARAM_PORT, String.valueOf(DEF_SRV_PORT));
+		defProperties.setProperty(PARAM_DELIMITER, String.valueOf(DEF_DELIMITER));
+		defProperties.setProperty(PARAM_SESSIONEXPIRE, String.valueOf(DEF_SESSION_EXPIRE));
+		defProperties.setProperty(PARAM_BROWSER, DEF_BROWSER.getLabel());
+		defProperties.setProperty(PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
+		defProperties.setProperty(PARAM_HTTPPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_SSLPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_FTPPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_SOCKSPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 
 		properties = new Properties(defProperties);
 
@@ -70,86 +70,86 @@ public class Configuration
 
 		try
 		{
-			httpServerPort = Integer.parseInt(properties.getProperty(port));
+			httpServerPort = Integer.parseInt(properties.getProperty(PARAM_PORT));
 		}
 		catch (Exception ex)
 		{
-			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", port, DEF_SRV_PORT));
+			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_PORT, DEF_SRV_PORT));
 			httpServerPort = DEF_SRV_PORT;
 		}
 
-		final String delim = getProperty(delimiter);
+		final String delim = getProperty(PARAM_DELIMITER);
 		if (!delim.isEmpty())
 			scriptDelimiter = delim.charAt(0);
 		else
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, delimiter, String.valueOf(DEF_DELIMITER)));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_DELIMITER, String.valueOf(DEF_DELIMITER)));
 			scriptDelimiter = DEF_DELIMITER;
 		}
 
 		try
 		{
-			sessionExpiryTimeMs = Integer.parseInt(properties.getProperty(sessionExpiryTime));
+			sessionExpire = Integer.parseInt(properties.getProperty(PARAM_SESSIONEXPIRE));
 		}
 		catch (Exception ex)
 		{
-			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", sessionExpiryTime, DEF_SESSION_EXPIRY_TIME));
+			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", sessionExpire, DEF_SESSION_EXPIRE));
 			httpServerPort = DEF_SRV_PORT;
 		}
 
-		browserToUse = Browser.valueByLabel(properties.getProperty(browser));
+		browserToUse = Browser.valueByLabel(properties.getProperty(PARAM_BROWSER));
 		if (browserToUse == Browser.INVALID)
 		{
-			logger.warn(String.format("Property '%s' is not set or has invalid value. Using default value = '%s'", browser, DEF_BROWSER.getLabel()));
+			logger.warn(String.format("Property '%s' is not set or has invalid value. Using default value = '%s'", PARAM_BROWSER, DEF_BROWSER.getLabel()));
 			browserToUse = DEF_BROWSER;
 		}
 
-		ieDriverFileName = properties.getProperty(ieDriverPath);
+		ieDriverFileName = properties.getProperty(PARAM_IEDRIVERPATH);
 		if ((ieDriverFileName == null) || (ieDriverFileName.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, ieDriverPath, DEF_IEDRIVER_PATH));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH));
 			ieDriverFileName = DEF_IEDRIVER_PATH;
 		}
 
-		chromeDriverFileName = properties.getProperty(chromeDriverPath);
+		chromeDriverFileName = properties.getProperty(PARAM_CHROMEDRIVERPATH);
 		if ((chromeDriverFileName == null) || (chromeDriverFileName.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, chromeDriverPath, DEF_CHROMEDRIVER_PATH));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH));
 			chromeDriverFileName = DEF_CHROMEDRIVER_PATH;
 		}
 
-		httpProxySetting = properties.getProperty(httpProxy);
+		httpProxySetting = properties.getProperty(PARAM_HTTPPROXY);
 		if ((httpProxySetting == null) || (httpProxySetting.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, httpProxy, DEF_PROXY));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_HTTPPROXY, DEF_PROXY));
 			httpProxySetting = DEF_PROXY;
 		}
 
-		sslProxySetting = properties.getProperty(sslProxy);
+		sslProxySetting = properties.getProperty(PARAM_SSLPROXY);
 		if ((sslProxySetting == null) || (sslProxySetting.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, sslProxy, DEF_PROXY));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_SSLPROXY, DEF_PROXY));
 			sslProxySetting = DEF_PROXY;
 		}
 
-		ftpProxySetting = properties.getProperty(ftpProxy);
+		ftpProxySetting = properties.getProperty(PARAM_FTPPROXY);
 		if ((ftpProxySetting == null) || (ftpProxySetting.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, ftpProxy, DEF_PROXY));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_FTPPROXY, DEF_PROXY));
 			ftpProxySetting = DEF_PROXY;
 		}
 
-		socksProxySetting = properties.getProperty(socksProxy);
+		socksProxySetting = properties.getProperty(PARAM_SOCKSPROXY);
 		if ((socksProxySetting == null) || (socksProxySetting.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, socksProxy, DEF_PROXY));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_SOCKSPROXY, DEF_PROXY));
 			socksProxySetting = DEF_PROXY;
 		}
 
-		noProxySetting = properties.getProperty(noProxy);
+		noProxySetting = properties.getProperty(PARAM_NOPROXY);
 		if ((noProxySetting == null) || (noProxySetting.isEmpty()))
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, noProxy, DEF_PROXY));
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_NOPROXY, DEF_PROXY));
 			noProxySetting = DEF_PROXY;
 		}
 	}
@@ -184,9 +184,9 @@ public class Configuration
 		return httpServerPort;
 	}
 
-	public int getSessionExpiryTimeMs()
+	public int getSessionExpire()
 	{
-		return sessionExpiryTimeMs;
+		return sessionExpire;
 	}
 
 	public Browser getBrowserToUse()

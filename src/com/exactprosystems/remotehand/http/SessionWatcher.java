@@ -9,7 +9,7 @@ import com.exactprosystems.remotehand.Logger;
 public class SessionWatcher implements Runnable
 {
 	private static final Logger logger = Logger.getLogger();
-	private static final int SESSION_EXPIRY_TIME = Configuration.getInstance().getSessionExpiryTimeMs();
+	private static final long SESSION_EXPIRE = Configuration.getInstance().getSessionExpire()*60*1000;  //In configuration it is set in minutes, we need it in milliseconds 
 	private static volatile SessionWatcher watcher = null;
 	private static volatile Map<SessionHandler, long[]> timeSessions = new HashMap<SessionHandler, long[]>();
 
@@ -31,18 +31,17 @@ public class SessionWatcher implements Runnable
 	@Override
 	public void run()
 	{
-		if (SESSION_EXPIRY_TIME == 0)
+		if (SESSION_EXPIRE == 0)
 		{
-			logger.info("Session watcher is not executed due session expiry time equals 0");
+			logger.info("Session watcher is not executed due to session expiry time equals 0");
 			return;
 		}
 
-		logger.info("Session watcher is executed. " + Configuration.sessionExpiryTime + "=" + SESSION_EXPIRY_TIME);
+		logger.info("Session watcher is executed. " + Configuration.PARAM_SESSIONEXPIRE + "=" + SESSION_EXPIRE);
 
 		while (HTTPServer.getServer() != null)
 		{
-			final Long remainTime = closeHTTPSessionIfTimeOver();
-
+			long remainTime = closeHttpSessionIfTimeOver();
 			try
 			{
 				Thread.sleep(remainTime);
@@ -54,22 +53,22 @@ public class SessionWatcher implements Runnable
 		}
 	}
 
-	public long closeHTTPSessionIfTimeOver()
+	public long closeHttpSessionIfTimeOver()
 	{
-		long timeToNextSessionEnd = SESSION_EXPIRY_TIME;
+		long timeToNextSessionEnd = SESSION_EXPIRE;
 
 		for (SessionHandler session : timeSessions.keySet())
 		{
-			final Long currentTime = System.currentTimeMillis();
-			final Long sessionLastAction = timeSessions.get(session)[1];
-			final Long sessionEnd = sessionLastAction + SESSION_EXPIRY_TIME;
-			final Long timeToEndSession = sessionEnd - currentTime;
+			long currentTime = System.currentTimeMillis();
+			long sessionLastAction = timeSessions.get(session)[1];
+			long sessionEnd = sessionLastAction + SESSION_EXPIRE;
+			long timeToEndSession = sessionEnd - currentTime;
 
 			if (timeToEndSession < 0)
 			{
 				if (session != null)
 				{
-					logger.warn("Session " + session.getId() + " is inactive more than "+SESSION_EXPIRY_TIME+". It will be closed due to timeout");
+					logger.warn("Session " + session.getId() + " is inactive more than "+SESSION_EXPIRE+" milliseconds. It will be closed due to timeout");
 					session.close();
 				}
 			}
