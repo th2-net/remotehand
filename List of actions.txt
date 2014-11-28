@@ -19,7 +19,15 @@ Optionally waits <wait> seconds for element specified by <matcher> and clicks on
 SendKeys,5,locator,matcher,text
 
 Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
-You can force pressing RETURN key by ending <text> with "\r\n".
+You can tell RemoteHand to press arrow keys or Enter key by using the following key codes:
+#up#
+#down#
+#left#
+#right#
+#return#
+
+This example writes "text" in a field, then presses Down arrow to select something in dropdown list, then presses Enter key to confirm the selection:
+text#down##return#
 
 
 #action,#seconds,#locator,#matcher
