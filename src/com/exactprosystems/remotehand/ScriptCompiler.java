@@ -21,7 +21,8 @@ public class ScriptCompiler
 
 	// csv
 	private static final char DELIMITER = Configuration.getInstance().getDelimiter();
-	private static final String HEADER_DELIM = "#";
+	private static final String HEADER_DELIMITER = "#", 
+			COMMENT_INDICATOR = "//";
 
 	// script action elements
 	public static final String WEB_ACTION = "action";
@@ -67,8 +68,10 @@ public class ScriptCompiler
 			while (reader.readRecord())
 			{
 				String[] values = reader.getValues();
-
-				if (values[0].startsWith(HEADER_DELIM))
+				
+				if (values[0].startsWith(COMMENT_INDICATOR))
+					continue;
+				if (values[0].startsWith(HEADER_DELIMITER))
 					header = parseValues(values);
 				else
 				{
@@ -108,8 +111,8 @@ public class ScriptCompiler
 		for (int inx = 0; inx < rowValues.length; inx++)
 		{
 			String rowValue = rowValues[inx];
-			if (rowValue.startsWith(HEADER_DELIM))
-				rowValue = rowValue.substring(HEADER_DELIM.length());
+			if (rowValue.startsWith(HEADER_DELIMITER))
+				rowValue = rowValue.substring(HEADER_DELIMITER.length());
 			result[inx] = rowValue;
 		}
 
