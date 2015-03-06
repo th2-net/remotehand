@@ -27,6 +27,9 @@ public class ScriptCompiler
 	// script action elements
 	public static final String WEB_ACTION = "action";
 	public static final String WEB_LOCATOR = "locator";
+	public static final String WEB_ID = "webId";
+	
+	private static WebElementsDictionary dictionary;
 
 	public List<ScriptAction> build(File scriptFile) throws IOException, ScriptCompileException
 	{
@@ -121,28 +124,45 @@ public class ScriptCompiler
 
 	private ScriptAction generateAction(String[] header, String[] values, int lineNumber) throws ScriptCompileException
 	{
-		WebAction webAction = null;
+		WebAction webAction;
 		WebLocator webLocator = null;
 		Map<String, String> params = new HashMap<String, String>();
-
+		
+		if (header.length > values.length)
+			logger.warn("Line <" + lineNumber + ">: " + header.length + " columns in header, " + values.length + " columns in values. Considering missing values empty by default");
+		
 		for (int inx = 0; inx < header.length; inx++)
 		{
 			final String head = header[inx], headLow = head.toLowerCase(), value = (inx < values.length ? values[inx] : null);
-
-			if (value == null)
-			{
-				final String mess = "Line <" + lineNumber + ">: " + header.length + " columns in header, " + values.length + " columns in values. Considering missing values empty by default";
-				logger.warn(mess);
-			}
-
-			if (headLow.equals(WEB_ACTION))
-				webAction = WebActionsMapping.getInstance().getByName(value);
-			else if (headLow.equals(WEB_LOCATOR))
-				webLocator = WebLocatorsMapping.getInstance().getByName(value);
-			else
-				params.put(head, value);
+			params.put(head, value);
+		}
+		
+		if (params.containsKey(WEB_ID))
+		{
+			if (params.containsKey(WEB_LOCATOR) || params.containsKey("matcher"))
+				throw new ScriptCompileException("Web action '" + params.get(WEB_ACTION) + "' have incompatible params: 'webId' and 'locator' / 'matcher'. Use only 'webId' or 'locator' and 'matcher'.");
+			updateParamsByDictionary(params, params.get(WEB_ID));
 		}
 
+		webAction = WebActionsMapping.getInstance().getByName(params.get(WEB_ACTION));
+		if (params.get(WEB_LOCATOR) != null)
+			webLocator = WebLocatorsMapping.getInstance().getByName(params.get(WEB_LOCATOR));
+		params.remove(WEB_ACTION);
+		params.remove(WEB_LOCATOR);
+
 		return new ScriptAction(webAction, webLocator, params);
+	}
+	
+	private void updateParamsByDictionary(Map<String, String> params, String id) throws ScriptCompileException
+	{
+		if (dictionary == null)
+			dictionary = new WebElementsDictionary("webdictionary.csv");
+		WebElementProperties properties = dictionary.getProperties(id);
+		
+		if (properties == null)
+			throw new ScriptCompileException("Unable to find web element properties by ID: " + id);
+		params.put("locator", properties.locator);
+		params.put("matcher", properties.matcher);
+		params.remove(WEB_ID);
 	}
 }
