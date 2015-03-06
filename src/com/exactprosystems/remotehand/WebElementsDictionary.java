@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class WebElementsDictionary
 {
-	private static final String ID      = "#id";
+	private static final String ID      = "#webId";
 	private static final String LOCATOR = "#locator";
 	private static final String MATCHER = "#matcher";
 	private static final String TYPE    = "#type";
