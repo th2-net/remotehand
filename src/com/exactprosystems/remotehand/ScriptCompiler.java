@@ -140,7 +140,7 @@ public class ScriptCompiler
 		if (params.containsKey(WEB_ID))
 		{
 			if (params.containsKey(WEB_LOCATOR) || params.containsKey("matcher"))
-				throw new ScriptCompileException("Web action '" + params.get(WEB_ACTION) + "' have incompatible params: 'webId' and 'locator' / 'matcher'. Use only 'webId' or 'locator' and 'matcher'.");
+				throw new ScriptCompileException("Web action '" + params.get(WEB_ACTION) + "' has incompatible parameters: 'webId' and 'locator' + 'matcher' are present in one action. Use only 'webId' or 'locator' + 'matcher'.");
 			updateParamsByDictionary(params, params.get(WEB_ID));
 		}
 
