@@ -33,8 +33,8 @@
 				<attribute name="Rsrc-Main-Class" value="com.exactprosystems.remotehand.Starter"/>
 				<attribute name="Rsrc-Class-Path" value="./
 					lib/commons-cli-1.2.jar
-					lib/selenium-java-2.41.0.jar
-					lib/selenium-server-standalone-2.41.0.jar
+					lib/selenium-java-2.45.0.jar
+					lib/selenium-server-standalone-2.45.0.jar
 					lib/javacsv.jar" />
 			</manifest>
 			<zipfileset src="jar-in-jar-loader.zip"/>
