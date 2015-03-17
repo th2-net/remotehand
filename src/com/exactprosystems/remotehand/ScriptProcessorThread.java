@@ -19,10 +19,16 @@ public class ScriptProcessorThread implements Runnable
 			lastResult = null;
 
 	private ActionsLauncher launcher = new ActionsLauncher(this);
+	private WebElementsDictionary webDictionary = null;
 
 	public ScriptProcessorThread(SessionHandler session)
 	{
 		this.parentSession = session;
+	}
+
+	public void setWebDictionary(String webDictionary)
+	{
+		this.webDictionary = new WebElementsDictionary(webDictionary, false);
 	}
 
 	@Override
@@ -61,6 +67,7 @@ public class ScriptProcessorThread implements Runnable
 		try
 		{
 			ScriptCompiler compiler = new ScriptCompiler();
+			compiler.setDictionary(webDictionary);			
 			final List<ScriptAction> actions = compiler.build(script);
 
 			result = launcher.runActions(actions);

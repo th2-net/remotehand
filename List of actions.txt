@@ -106,9 +106,9 @@ Possible <locator> values:
 3. tagName - in this case <matcher> is a tag name of the element;
 4. id - then <matcher> contains id of the element.
 
-Remote Hand can use web element dictionary (webdictionary.csv), which contains list of web elements by tags: #id,#locator,#matcher,#type,#desc.
+Remote Hand can use web element dictionary, which contains list of web elements by tags: #webId,#locator,#matcher,#type,#desc.
 Example:
-#id,#locator,#matcher,#type,#desc
+#webId,#locator,#matcher,#type,#desc
 click1,xpath,<matcher>,button,some button...
 click2,cssSelector,<matcher>,link,some link...
 //you can specify comment

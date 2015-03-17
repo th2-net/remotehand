@@ -15,6 +15,8 @@ public class SessionHandler implements HttpHandler
 	private static final Logger logger = new Logger();
 
 	private final String id;
+	
+	private String webDictContent;
 
 	private ScriptProcessorThread scriptProcessor = null;
 
@@ -41,6 +43,13 @@ public class SessionHandler implements HttpHandler
 			in.close();
 
 			final String body = buff.toString();
+			
+			if (body.contains("#type") || body.contains("#desc"))
+			{
+				webDictContent = body;
+				sendMessage(exchanger, "Dictionary received.");
+				return;
+			}
 
 			sendMessage(exchanger, "OK");
 
@@ -110,6 +119,8 @@ public class SessionHandler implements HttpHandler
 		if (scriptProcessor == null)
 		{
 			scriptProcessor = new ScriptProcessorThread(this);
+			if (webDictContent != null)
+				scriptProcessor.setWebDictionary(webDictContent);
 			final Thread webThread = new Thread(scriptProcessor);
 			webThread.start();
 		}

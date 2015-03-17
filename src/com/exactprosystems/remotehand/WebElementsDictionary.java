@@ -2,8 +2,12 @@ package com.exactprosystems.remotehand;
 
 import com.csvreader.CsvReader;
 
+import static com.exactprosystems.remotehand.ScriptCompiler.*;
+
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,23 +25,43 @@ public class WebElementsDictionary
 	
 	private Map<String, WebElementProperties> storage = new HashMap<String, WebElementProperties>();
 	
-	public WebElementsDictionary(String fileName)
+	public WebElementsDictionary(String dictionary, boolean isFile)
+	{
+		CsvReader reader;
+		if (!isFile)
+		{
+			dictionary = dictionary.replace("&#13", System.getProperty(LINE_SEPARATOR));
+			reader = new CsvReader(new ByteArrayInputStream(dictionary.getBytes()), Charset.defaultCharset());
+			processDictionary(reader);
+		}
+		else
+		{
+			try
+			{
+				reader = new CsvReader(dictionary);
+				processDictionary(reader);
+			}
+			catch (FileNotFoundException e)
+			{
+				logger.error("Error during web dictionary opening. File " + dictionary + " is not found.");
+			}
+		}
+	}
+	
+	private void processDictionary(CsvReader reader)
 	{
 		int rowNumber = 0;
-		CsvReader reader = null;
 		try
 		{
-			reader = new CsvReader(fileName);
-
 			rowNumber++;
 			reader.readHeaders();
 
 			rowNumber++;
 			while (reader.readRecord())
 			{
-				if(reader.get(0).startsWith("//"))
+				if(reader.get(0).startsWith(COMMENT_INDICATOR))
 					continue;
-				
+
 				String elementId = reader.get(ID);
 				String locator = reader.get(LOCATOR);
 				String matcher = reader.get(MATCHER);
@@ -53,8 +77,8 @@ public class WebElementsDictionary
 					emptyParams.add(MATCHER);
 				if (!emptyParams.isEmpty())
 				{
-					logger.error(String.format("Error during web element dictionary reading. The following required parameters are empty: %s. File '%s', row %d",
-							emptyParams.toString(), fileName, rowNumber));
+					logger.error(String.format("Error during web element dictionary reading. The following required parameters are empty: %s. Row %d",
+							emptyParams.toString(), rowNumber));
 					continue;
 				}
 
@@ -63,14 +87,10 @@ public class WebElementsDictionary
 				properties.matcher = matcher;
 				properties.type = type;
 				properties.desc = desc;
-				
+
 				storage.put(elementId, properties);
 				rowNumber++;
 			}
-		}
-		catch (FileNotFoundException e)
-		{
-			logger.error("Error during web elements dictionary opening. File " + fileName + " is not found.");
 		}
 		catch (IOException e)
 		{

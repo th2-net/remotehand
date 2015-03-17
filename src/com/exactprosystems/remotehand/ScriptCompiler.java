@@ -21,15 +21,29 @@ public class ScriptCompiler
 
 	// csv
 	private static final char DELIMITER = Configuration.getInstance().getDelimiter();
-	private static final String HEADER_DELIMITER = "#", 
-			COMMENT_INDICATOR = "//";
+	private static final String HEADER_DELIMITER = "#";
+	public static final String COMMENT_INDICATOR = "//";
 
+	public static final String LINE_SEPARATOR = "line.separator";
+	
 	// script action elements
 	public static final String WEB_ACTION = "action";
 	public static final String WEB_LOCATOR = "locator";
-	public static final String WEB_ID = "webId";
+	public static final String WEB_MATCHER = "matcher";
+	public static final String WEB_ID = "webid";
 	
-	private static WebElementsDictionary dictionary;
+	public static final String DEFAULT_DICT_NAME = "webdictionary.csv"; 
+			
+	private WebElementsDictionary dictionary;
+	
+	private boolean findLocalDict = true;
+	
+	public void setDictionary(WebElementsDictionary dictionary)
+	{
+		if (dictionary == null)
+			findLocalDict = false;
+		this.dictionary = dictionary;
+	}
 
 	public List<ScriptAction> build(File scriptFile) throws IOException, ScriptCompileException
 	{
@@ -40,7 +54,7 @@ public class ScriptCompiler
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
-				sb.append(line).append(System.getProperty("line.separator"));
+				sb.append(line).append(System.getProperty(LINE_SEPARATOR));
 			}
 		}
 		finally
@@ -58,7 +72,7 @@ public class ScriptCompiler
 	{
 		logger.info("Compiling script...");
 
-		script = script.replace("&#13", System.getProperty("line.separator"));
+		script = script.replace("&#13", System.getProperty(LINE_SEPARATOR));
 
 		CsvReader reader = new CsvReader(new ByteArrayInputStream(script.getBytes()), Charset.defaultCharset());
 		reader.setDelimiter(DELIMITER);
@@ -134,13 +148,14 @@ public class ScriptCompiler
 		for (int inx = 0; inx < header.length; inx++)
 		{
 			final String head = header[inx], headLow = head.toLowerCase(), value = (inx < values.length ? values[inx] : null);
-			params.put(head, value);
+			params.put(headLow, value);
 		}
 		
 		if (params.containsKey(WEB_ID))
 		{
-			if (params.containsKey(WEB_LOCATOR) || params.containsKey("matcher"))
-				throw new ScriptCompileException("Web action '" + params.get(WEB_ACTION) + "' has incompatible parameters: 'webId' and 'locator' + 'matcher' are present in one action. Use only 'webId' or 'locator' + 'matcher'.");
+			if (params.containsKey(WEB_LOCATOR) || params.containsKey(WEB_MATCHER))
+				throw new ScriptCompileException(String.format("Web action '%s' has incompatible parameters: '%s' and '%s' + '%s'", 
+						params.get(WEB_ACTION), WEB_ID, WEB_LOCATOR, WEB_MATCHER));
 			updateParamsByDictionary(params, params.get(WEB_ID));
 		}
 
@@ -156,13 +171,23 @@ public class ScriptCompiler
 	private void updateParamsByDictionary(Map<String, String> params, String id) throws ScriptCompileException
 	{
 		if (dictionary == null)
-			dictionary = new WebElementsDictionary("webdictionary.csv");
+		{
+			if (!findLocalDict)
+				throw new ScriptCompileException("Web dictionary has not been sent. Script cannot be processed.");
+			
+			File dict = new File(DEFAULT_DICT_NAME);
+			if (dict.exists())
+				dictionary = new WebElementsDictionary(DEFAULT_DICT_NAME, true);
+			else
+				throw new ScriptCompileException("Web dictionary " + DEFAULT_DICT_NAME + " is not found. Script cannot be processed.");
+		}
+
 		WebElementProperties properties = dictionary.getProperties(id);
 		
 		if (properties == null)
-			throw new ScriptCompileException("Unable to find web element properties by ID: " + id);
-		params.put("locator", properties.locator);
-		params.put("matcher", properties.matcher);
+			throw new ScriptCompileException(String.format("Unable to find web element properties by %s: %s", WEB_ID, id));
+		params.put(WEB_LOCATOR, properties.locator);
+		params.put(WEB_MATCHER, properties.matcher);
 		params.remove(WEB_ID);
 	}
 }
