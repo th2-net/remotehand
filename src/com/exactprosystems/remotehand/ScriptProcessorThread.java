@@ -13,10 +13,11 @@ import java.util.List;
 
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionHandler;
+import org.apache.log4j.Logger;
 
 public class ScriptProcessorThread implements Runnable
 {
-	private Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(ScriptProcessorThread.class);
 
 	private SessionHandler parentSession = null;
 

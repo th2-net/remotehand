@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.Logger;
+import org.apache.log4j.Logger;
 
 public class SessionWatcher implements Runnable
 {
-	private static final Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(SessionWatcher.class);
 	private static final long SESSION_EXPIRE = Configuration.getInstance().getSessionExpire()*60*1000;  //In configuration it is set in minutes, we need it in milliseconds 
 	private static volatile SessionWatcher watcher = null;
 	private static volatile Map<SessionHandler, long[]> timeSessions = new HashMap<SessionHandler, long[]>();

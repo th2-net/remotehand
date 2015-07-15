@@ -11,19 +11,19 @@ package com.exactprosystems.remotehand.actions;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.exactprosystems.remotehand.Logger;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
 
 public class Wait extends WebAction
 {
-	private static final Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(Wait.class);
 	private static final String PARAM_SECONDS = "seconds";
 	
 	public Wait()

@@ -35,12 +35,16 @@
 					lib/commons-cli-1.2.jar
 					lib/selenium-java-2.45.0.jar
 					lib/selenium-server-standalone-2.45.0.jar
+					lib/log4j-1.2.16.jar
+					lib/slf4j-api-1.6.4.jar
+					lib/slf4j-log4j12-1.6.4.jar
 					lib/javacsv.jar" />
 			</manifest>
 			<zipfileset src="jar-in-jar-loader.zip"/>
 			<zipfileset dir="${lib}" prefix="lib/" />
 		</jar>
 		<copy file="config.ini" todir="${release}" />
+        <copy file="log4j.properties" todir="${release}" />
 		
 		<delete dir="${build}" />
 	</target>

@@ -13,15 +13,15 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.Logger;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.log4j.Logger;
 
 public class HTTPServer
 {
 	private final static int HTTP_SRV_PORT = Configuration.getInstance().getHttpServerPort();
 	private final static String LOGIN_LISTENER = "/login";
 
-	private static final Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(HTTPServer.class);
 	private static volatile HttpServer server = null;
 
 	public static HttpServer getServer()
@@ -38,8 +38,7 @@ public class HTTPServer
 			}
 			catch (IOException ex)
 			{
-				logger.error(String.format("Could not create HTTP Server on port <%s>", HTTP_SRV_PORT));
-				logger.error(ex);
+				logger.error(String.format("Could not create HTTP Server on port <%s>", HTTP_SRV_PORT), ex);
 			}
 
 		return server;

@@ -9,6 +9,8 @@
 
 package com.exactprosystems.remotehand;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -18,7 +20,7 @@ public class TextFileWriter
 {
 	private static TextFileWriter writer = new TextFileWriter();
 
-	private static Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(TextFileWriter.class);
 
 	private String content;
 
@@ -48,8 +50,7 @@ public class TextFileWriter
 		}
 		catch (IOException e)
 		{
-			logger.error("File " + file.getName() + " does not exist.");
-			logger.error(e);
+			logger.error("File " + file.getName() + " does not exist.", e);
 		}
 		finally
 		{
@@ -64,8 +65,7 @@ public class TextFileWriter
 			}
 			catch (IOException e)
 			{
-				logger.error("Error while closing file " + file.getName());
-				logger.error(e);
+				logger.error("Error while closing file " + file.getName(), e);
 			}
 		}
 	}

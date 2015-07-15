@@ -13,19 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.exactprosystems.remotehand.Logger;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
 import com.exactprosystems.remotehand.actions.helpers.KeyCode;
 
 public class SendKeys extends WebAction
 {
-	private static final Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(SendKeys.class);
 	private static final String PARAM_TEXT = "text",
 			KEY_SIGN = "#";
 

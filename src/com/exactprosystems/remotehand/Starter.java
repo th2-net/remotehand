@@ -26,14 +26,18 @@ import org.apache.commons.io.FileUtils;
 
 import com.exactprosystems.remotehand.http.HTTPServer;
 import com.exactprosystems.remotehand.http.SessionWatcher;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 public class Starter
 {
-	static Logger logger = Logger.getLogger();
+	static org.apache.log4j.Logger logger = Logger.getLogger(Starter.class);
 
 	@SuppressWarnings("static-access")
 	public static void main(String[] args)
 	{
+		PropertyConfigurator.configureAndWatch("log4j.properties");
+		
 		logger.info("Application started");
 
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),

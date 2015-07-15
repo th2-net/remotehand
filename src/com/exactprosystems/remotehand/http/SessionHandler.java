@@ -14,14 +14,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
-import com.exactprosystems.remotehand.Logger;
 import com.exactprosystems.remotehand.ScriptProcessorThread;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.log4j.Logger;
 
 public class SessionHandler implements HttpHandler
 {
-	private static final Logger logger = new Logger();
+	private static final Logger logger = Logger.getLogger(SessionHandler.class);
 
 	private final String id;
 	

@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand;
 import com.csvreader.CsvReader;
 
 import static com.exactprosystems.remotehand.ScriptCompiler.*;
+import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -29,8 +30,8 @@ public class WebElementsDictionary
 	private static final String MATCHER = "#matcher";
 	private static final String TYPE    = "#type";
 	private static final String DESC    = "#desc";
-	
-	private final static Logger logger = Logger.getLogger();
+
+	private static final Logger logger = Logger.getLogger(WebElementsDictionary.class);
 	
 	private Map<String, WebElementProperties> storage = new HashMap<String, WebElementProperties>();
 	

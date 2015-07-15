@@ -12,13 +12,13 @@ package com.exactprosystems.remotehand.http;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.exactprosystems.remotehand.Logger;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.log4j.Logger;
 
 public class LoginHandler implements HttpHandler
 {
-	private static final Logger logger = new Logger();
+	private static final Logger logger = Logger.getLogger(LoginHandler.class);
 	private static final LoginHandler handler = new LoginHandler();
 
 	public static LoginHandler getHandler()

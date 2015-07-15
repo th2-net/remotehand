@@ -23,10 +23,11 @@ import java.util.Map;
 import com.csvreader.CsvReader;
 import com.exactprosystems.remotehand.webelements.WebLocator;
 import com.exactprosystems.remotehand.webelements.WebLocatorsMapping;
+import org.apache.log4j.Logger;
 
 public class ScriptCompiler
 {
-	private final static Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(ScriptCompiler.class);
 
 	// csv
 	private static final char DELIMITER = Configuration.getInstance().getDelimiter();

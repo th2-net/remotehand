@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand.actions;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -20,13 +21,12 @@ import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.exactprosystems.remotehand.Logger;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
 
 public class GetDynamicTable extends WebAction
 {
-	private static final Logger logger = Logger.getLogger();
+	private static final Logger logger = Logger.getLogger(GetDynamicTable.class);
 	private static final int EXPIRED_TIME = 100; // seconds
 	
 	private int count = 0;
