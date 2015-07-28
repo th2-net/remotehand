@@ -42,7 +42,7 @@
 			<zipfileset dir="${lib}" prefix="lib/" />
 		</jar>
 		<copy file="config.ini" todir="${release}" />
-        <copy file="log4j.properties" todir="${release}" />
+		<copy file="log4j.properties" todir="${release}" />
 		
 		<delete dir="${build}" />
 	</target>
