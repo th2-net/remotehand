@@ -31,7 +31,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class Starter
 {
-	static org.apache.log4j.Logger logger = Logger.getLogger(Starter.class);
+	private static final Logger logger = Logger.getLogger(Starter.class);
 
 	@SuppressWarnings("static-access")
 	public static void main(String[] args)

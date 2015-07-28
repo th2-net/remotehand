@@ -18,10 +18,10 @@ import org.apache.log4j.Logger;
 
 public class HTTPServer
 {
-	private final static int HTTP_SRV_PORT = Configuration.getInstance().getHttpServerPort();
-	private final static String LOGIN_LISTENER = "/login";
-
 	private static final Logger logger = Logger.getLogger(HTTPServer.class);
+	private static final int HTTP_SRV_PORT = Configuration.getInstance().getHttpServerPort();
+	private static final String LOGIN_LISTENER = "/login";
+
 	private static volatile HttpServer server = null;
 
 	public static HttpServer getServer()

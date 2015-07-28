@@ -18,9 +18,9 @@ import java.io.IOException;
 
 public class TextFileWriter
 {
-	private static TextFileWriter writer = new TextFileWriter();
-
 	private static final Logger logger = Logger.getLogger(TextFileWriter.class);
+	
+	private static TextFileWriter writer = new TextFileWriter();
 
 	private String content;
 

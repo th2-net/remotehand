@@ -25,13 +25,13 @@ import java.util.Map;
 
 public class WebElementsDictionary
 {
+	private static final Logger logger = Logger.getLogger(WebElementsDictionary.class);
+	
 	private static final String ID      = "#webId";
 	private static final String LOCATOR = "#locator";
 	private static final String MATCHER = "#matcher";
 	private static final String TYPE    = "#type";
 	private static final String DESC    = "#desc";
-
-	private static final Logger logger = Logger.getLogger(WebElementsDictionary.class);
 	
 	private Map<String, WebElementProperties> storage = new HashMap<String, WebElementProperties>();
 	
