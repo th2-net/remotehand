@@ -48,7 +48,7 @@ Check for new elements is performed every <checkmillis> milliseconds.
 Wait,5
 
 Makes a pause in execution for <seconds> seconds. 
-Good to use this actions when you're not sure which element to wait for and just want to give a page more time to be downloaded.
+Good to use this action when you're not sure which element to wait for and just want to give a page more time to be downloaded.
 
 
 #action,#wait,#locator,#matcher
@@ -106,7 +106,7 @@ Possible <locator> values:
 3. tagName - in this case <matcher> is a tag name of the element;
 4. id - then <matcher> contains id of the element.
 
-Remote Hand can use web element dictionary, which contains list of web elements by tags: #webId,#locator,#matcher,#type,#desc.
+RemoteHand can use web element dictionary, which contains list of web elements by tags: #webId,#locator,#matcher,#type,#desc.
 Example:
 #webId,#locator,#matcher,#type,#desc
 click1,xpath,<matcher>,button,some button...
@@ -114,4 +114,4 @@ click2,cssSelector,<matcher>,link,some link...
 //you can specify comment
 sendKeys1,xpath,<matcher>,input,some input...
 
-You can use in script the parameter 'webId', Remote Hand will replace it with 'locator' and 'matcher'. But these parameters can not be used together!
+You can use in script the parameter 'webId', RemoteHand will replace it with 'locator' and 'matcher'. But these parameters can not be used together!
