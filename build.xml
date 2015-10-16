@@ -5,7 +5,35 @@
 	<property name="lib" location="lib" />
 	<property name="jar" location="${release}/remotehand.jar" />
 	
-	<target name="Release">
+	<target name="CheckSvnRevision">
+		<path id="svnant.libs.path">
+			<fileset dir="lib_for_build">
+				<include name="svnant.jar"/>
+				<include name="svnClientAdapter.jar"/>
+				<include name="svnjavahl.jar"/>
+			</fileset>
+		</path>
+		
+		<!-- Load SvnAnt -->
+		<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.libs.path" />    
+		<!-- Find head revision number from the local repository. -->
+		<svn username="" password="" javahl="false" svnkit="false">
+			<info target="." />
+		</svn>
+		
+		<condition property="svn.info.lastRev" value="local_build">
+			<not>
+				<isset property="svn.info.lastRev"/>
+			</not>
+		</condition>
+		
+		<echo>Revision found: ${svn.info.lastRev}</echo>
+		<tstamp>
+			<format property="DSTAMP_UK" pattern="dd/MM/yyyy" locale="en,UK"/>
+		</tstamp>
+	</target>
+	
+	<target name="Release" depends="CheckSvnRevision">
 		<delete dir="${build}" />
 		<mkdir dir="${build}" />
 
@@ -32,11 +60,15 @@
 				<attribute name="Class-Path" value="."/>
 				<attribute name="Rsrc-Main-Class" value="com.exactprosystems.remotehand.Starter"/>
 				<attribute name="Rsrc-Class-Path" value="./
-					lib/commons-cli-1.2.jar
-					lib/selenium-java-2.47.0.jar
-					lib/selenium-server-standalone-2.47.0.jar
-					lib/log4j-1.2.16.jar
-					lib/javacsv.jar" />
+						lib/commons-cli-1.2.jar
+						lib/selenium-java-2.47.0.jar
+						lib/selenium-server-standalone-2.47.0.jar
+						lib/log4j-1.2.16.jar
+						lib/javacsv.jar" />
+				<attribute name="Implementation-Title" value="RemoteHand" />
+				<attribute name="Implementation-Vendor" value="Exactpro Systems" />
+				<attribute name="Implementation-Vendor-Id" value="com.exactprosystems" />
+				<attribute name="Implementation-Version" value="${svn.info.lastRev}" />
 			</manifest>
 			<zipfileset src="jar-in-jar-loader.zip"/>
 			<zipfileset dir="${lib}" prefix="lib/" />

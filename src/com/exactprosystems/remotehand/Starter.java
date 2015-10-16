@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -26,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.exactprosystems.remotehand.http.HTTPServer;
 import com.exactprosystems.remotehand.http.SessionWatcher;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -36,9 +39,22 @@ public class Starter
 	@SuppressWarnings("static-access")
 	public static void main(String[] args)
 	{
+		Manifest mf = null;
+		String version = null;
+		try
+		{
+			mf = new Manifest(Thread.currentThread().getContextClassLoader().getResourceAsStream(JarFile.MANIFEST_NAME));
+			version = mf.getMainAttributes().getValue("Implementation-Version");
+		}
+		catch (Exception e)
+		{
+			version = "local_build";
+			logger.warn("Error while reading MANIFEST.MF file. Using '" + version + "' as version value", e);
+		}
+		
 		PropertyConfigurator.configureAndWatch("log4j.properties");
 		
-		logger.info("Application started");
+		logger.info("Started RemoteHand "+version);
 
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
