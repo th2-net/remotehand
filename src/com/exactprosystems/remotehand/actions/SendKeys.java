@@ -70,21 +70,29 @@ public class SendKeys extends WebAction
 				input.sendKeys(s);
 			else
 			{
-				Keys k;
-				switch (KeyCode.codeByLabel(s.substring(1)))
-				{
-				case UP : k = Keys.UP; break;
-				case DOWN : k = Keys.DOWN; break;
-				case LEFT : k = Keys.LEFT; break;
-				case RIGHT : k = Keys.RIGHT; break;
-				case RETURN : k = Keys.RETURN; break;
-				default : k = null;
-				}
+				CharSequence k = getKeysByLevel(s.substring(1));
 				if (k != null)
 					input.sendKeys(k);
 			}
 		logger.info("Sent text to: " + webLocator);
 
 		return null;
+	}
+
+	public CharSequence getKeysByLevel(String label)
+	{
+		switch (KeyCode.codeByLabel(label))
+		{
+			case UP:        return Keys.UP;
+			case DOWN:      return Keys.DOWN;
+			case LEFT:      return Keys.LEFT;
+			case RIGHT:     return Keys.RIGHT;
+			case RETURN:    return Keys.RETURN;
+			case SPACE:     return Keys.SPACE;
+			case HASH:      return Keys.chord(Keys.SHIFT, "3");
+			case DOLLAR:    return Keys.chord(Keys.SHIFT, "4");
+			case PERCENT:   return Keys.chord(Keys.SHIFT, "5");
+			default :       return null;
+		}
 	}
 }

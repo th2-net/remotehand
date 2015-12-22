@@ -16,6 +16,10 @@ public enum KeyCode
 	LEFT("left"),
 	RIGHT("right"),
 	RETURN("return"),
+	SPACE("space"),
+	HASH("hash"),
+	DOLLAR("dollar"),
+	PERCENT("percent"),
 	INVALID("");
 	
 	private final String label;
