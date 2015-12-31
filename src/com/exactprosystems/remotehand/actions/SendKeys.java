@@ -10,6 +10,7 @@
 package com.exactprosystems.remotehand.actions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,6 @@ import org.openqa.selenium.WebElement;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
-import com.exactprosystems.remotehand.actions.helpers.KeyCode;
 
 public class SendKeys extends WebAction
 {
@@ -70,7 +70,7 @@ public class SendKeys extends WebAction
 				input.sendKeys(s);
 			else
 			{
-				CharSequence k = getKeysByLevel(s.substring(1));
+				CharSequence k = getKeysByLabel(s.substring(1));
 				if (k != null)
 					input.sendKeys(k);
 			}
@@ -79,20 +79,55 @@ public class SendKeys extends WebAction
 		return null;
 	}
 
-	public CharSequence getKeysByLevel(String label)
+	public CharSequence getKeysByLabel(String label)
 	{
-		switch (KeyCode.codeByLabel(label))
+		if (label.contains("+"))
 		{
-			case UP:        return Keys.UP;
-			case DOWN:      return Keys.DOWN;
-			case LEFT:      return Keys.LEFT;
-			case RIGHT:     return Keys.RIGHT;
-			case RETURN:    return Keys.RETURN;
-			case SPACE:     return Keys.SPACE;
-			case HASH:      return Keys.chord(Keys.SHIFT, "3");
-			case DOLLAR:    return Keys.chord(Keys.SHIFT, "4");
-			case PERCENT:   return Keys.chord(Keys.SHIFT, "5");
-			default :       return null;
+			String[] src = label.split("\\+");
+			int size = src.length;
+			CharSequence[] res = new CharSequence[size];
+			for (int i = 0; i < size; i++)
+			{
+				CharSequence c = KEYS.get(src[i].toLowerCase());
+				res[i] = c == null ? src[i] : c;
+			}
+			return Keys.chord(res);
 		}
+		else
+			return KEYS.get(label.toLowerCase());
 	}
+
+	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
+		put("up", Keys.UP);
+		put("down", Keys.DOWN);
+		put("left", Keys.LEFT);
+		put("right", Keys.RIGHT);
+		put("return", Keys.RETURN);
+		put("space", Keys.SPACE);
+		put("hash", Keys.chord(Keys.SHIFT, "3"));
+		put("dollar", Keys.chord(Keys.SHIFT, "4"));
+		put("percent", Keys.chord(Keys.SHIFT, "5"));
+		put("tab", Keys.TAB);
+		put("enter", Keys.ENTER);
+		put("shift", Keys.SHIFT);
+		put("ctrl", Keys.CONTROL);
+		put("alt", Keys.ALT);
+		put("esc", Keys.ESCAPE);
+		put("end", Keys.END);
+		put("home", Keys.HOME);
+		put("insert", Keys.INSERT);
+		put("delete", Keys.DELETE);
+		put("f1", Keys.F1);
+		put("f2", Keys.F2);
+		put("f3", Keys.F3);
+		put("f4", Keys.F4);
+		put("f5", Keys.F5);
+		put("f6", Keys.F6);
+		put("f7", Keys.F7);
+		put("f8", Keys.F8);
+		put("f9", Keys.F9);
+		put("f10", Keys.F10);
+		put("f11", Keys.F11);
+		put("f12", Keys.F12);
+	}};
 }
