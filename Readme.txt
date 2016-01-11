@@ -19,15 +19,32 @@ Optionally waits <wait> seconds for element specified by <matcher> and clicks on
 SendKeys,5,locator,matcher,text
 
 Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
-You can tell RemoteHand to press arrow keys or Enter key by using the following key codes:
-#up#
-#down#
-#left#
-#right#
-#return#
+You can tell RemoteHand to press the following special keys by specifying corresponding codes:
+1. Up arrow - #up#
+2. Down arrow - #down#
+3. Left arrow - #left#
+4. Right arrow - #right#
+5. Enter - #return# or #enter#
+6. Space - #space#
+7. "#" char (Shift+3) - #hash#
+8. "$" char (Shift+4) - #dollar#
+9. "%" char (Shift+5) - #percent#
+10. Tab - #tab#
+11. Shift - #shift#
+12. Ctrl - #ctrl#
+13. Alt - #alt#
+14. Escape - #esc#
+15. End (for example, to move to the end of the line) - #end#
+16. Home (for example, to move to the start of the line) - #home#
+17. Insert - #insert#
+18. Delete - #delete#
+19. Functional keys, i.e. F1, F2 etc. - #f1#, #f2# etc.
 
-This example writes "text" in a field, then presses Down arrow to select something in dropdown list, then presses Enter key to confirm the selection:
+The following example writes "text" in a field, then presses Down arrow to select something in a dropdown list, then presses Enter key to confirm the selection:
 text#down##return#
+
+The keys and special codes can be combined in order to press a combination of keys. The combination is specified in "#" chars with keys delimited by "+". For example, to simulate input of '(' char you can use the following:
+#shift+9#
 
 
 #action,#seconds,#locator,#matcher
