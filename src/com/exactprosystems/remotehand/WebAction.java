@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand;
 import java.util.Map;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 import com.exactprosystems.remotehand.actions.WaitForElement;
@@ -38,7 +39,12 @@ public abstract class WebAction
 	public abstract boolean isNeedLocator();
 	public abstract boolean isCanWait();
 	public abstract String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException;
-	
+
+
+	public boolean isCanSwitchPage()
+	{
+		return false;
+	}
 	
 	public String execute(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
@@ -47,6 +53,9 @@ public abstract class WebAction
 			if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
 				WaitForElement.waitForElement(webLocator, webDriver, getIntegerParam(params, PARAM_WAIT));
 		}
+
+		if (isCanSwitchPage())
+			disableLeavePageAlert(webDriver);
 		
 		return run(webDriver, webLocator, params);
 	}
@@ -54,5 +63,10 @@ public abstract class WebAction
 	public String[] getMandatoryParams() throws ScriptCompileException
 	{
 		return mandatoryParams;
-	};
+	}
+
+	public void disableLeavePageAlert(WebDriver webDriver)
+	{
+		((JavascriptExecutor)webDriver).executeScript("window.onbeforeunload = function(e){};");
+	}
 }

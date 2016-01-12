@@ -36,6 +36,12 @@ public class Click extends WebAction
 	}
 
 	@Override
+	public boolean isCanSwitchPage()
+	{
+		return true;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = webDriver.findElement(webLocator);

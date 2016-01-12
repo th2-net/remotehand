@@ -40,6 +40,12 @@ public class Open extends WebAction
 	}
 
 	@Override
+	public boolean isCanSwitchPage()
+	{
+		return true;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params)
 	{
 		final String url = params.get(PARAM_URL);
