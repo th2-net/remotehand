@@ -9,19 +9,7 @@
 
 package com.exactprosystems.remotehand;
 
-import com.exactprosystems.remotehand.actions.ClearElement;
-import com.exactprosystems.remotehand.actions.Click;
-import com.exactprosystems.remotehand.actions.GetDynamicTable;
-import com.exactprosystems.remotehand.actions.GetElement;
-import com.exactprosystems.remotehand.actions.ScrollTo;
-import com.exactprosystems.remotehand.actions.Open;
-import com.exactprosystems.remotehand.actions.Output;
-import com.exactprosystems.remotehand.actions.PageSource;
-import com.exactprosystems.remotehand.actions.Refresh;
-import com.exactprosystems.remotehand.actions.SendKeys;
-import com.exactprosystems.remotehand.actions.Wait;
-import com.exactprosystems.remotehand.actions.WaitForElement;
-import com.exactprosystems.remotehand.actions.WaitForNew;
+import com.exactprosystems.remotehand.actions.*;
 
 public class WebActionsMapping
 {
@@ -34,7 +22,7 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output;
+		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -63,6 +51,7 @@ public class WebActionsMapping
 		case Refresh :             return new Refresh();
 		case ClearElement :        return new ClearElement();
 		case Output :              return new Output();
+		case SelectFrame: 			return new SelectFrame();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
