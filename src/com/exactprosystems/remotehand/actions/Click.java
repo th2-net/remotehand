@@ -12,9 +12,7 @@ package com.exactprosystems.remotehand.actions;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.WebAction;
@@ -45,7 +43,15 @@ public class Click extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = webDriver.findElement(webLocator);
-		element.click();
+		try {
+			element.click();
+		} catch (ElementNotVisibleException e) {
+			logger.error("Element is not visible" ,e);
+
+			JavascriptExecutor js = (JavascriptExecutor) webDriver;
+			js.executeScript("arguments[0].click();", element);
+
+		}
 
 		logger.info("Clicked on: '" + element.toString() + "'");
 
