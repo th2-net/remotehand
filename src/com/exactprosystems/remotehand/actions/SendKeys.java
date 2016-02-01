@@ -113,6 +113,7 @@ public class SendKeys extends WebAction
 		put("hash", Keys.chord(Keys.SHIFT, "3"));
 		put("dollar", Keys.chord(Keys.SHIFT, "4"));
 		put("percent", Keys.chord(Keys.SHIFT, "5"));
+		put("openbracket", Keys.chord(Keys.SHIFT, "9"));
 		put("tab", Keys.TAB);
 		put("enter", Keys.ENTER);
 		put("shift", Keys.SHIFT);
