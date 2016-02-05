@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.exactprosystems.remotehand.http.LoginHandler;
+import com.exactprosystems.remotehand.web.WebScriptAction;
+import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -37,7 +40,7 @@ public class Starter
 	private static final Logger logger = Logger.getLogger(Starter.class);
 
 	@SuppressWarnings("static-access")
-	public static void main(String[] args)
+	public static void main(String[] args, IRemoteHandManager manager)
 	{
 		Manifest mf = null;
 		String version = null;
@@ -55,6 +58,8 @@ public class Starter
 		PropertyConfigurator.configureAndWatch("log4j.properties");
 		
 		logger.info("Started RemoteHand "+version);
+
+		manager.createConfiguration();
 
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
@@ -92,8 +97,10 @@ public class Starter
 			closeApp();
 		}
 
+
 		if (serverMode)
 		{
+			LoginHandler.getHandler().setRhManager(manager);
 			// starting HTTP Server
 			if (HTTPServer.getServer() == null)
 				logger.info("Application stopped with error");
@@ -113,7 +120,7 @@ public class Starter
 			if (dynInput != null)
 				logger.info("Dynamic input file: '" + dynInput + "'");
 
-			ActionsLauncher launcher = processAllScriptsFromDirectory(input, output, null);
+			ActionsLauncher launcher = processAllScriptsFromDirectory(input, output, null, manager);
 			if (dynInput != null)
 			{
 				File dynFile = new File(dynInput);
@@ -123,7 +130,7 @@ public class Starter
 					if (dynFile.exists())
 					{
 						firstWait = true;
-						processAllScriptsFromDirectory(dynInput, output, launcher);
+						processAllScriptsFromDirectory(dynInput, output, launcher, manager);
 
 						if (dynFile.isFile())
 						{
@@ -161,14 +168,16 @@ public class Starter
 					}
 				}
 			}
-			if (launcher != null)
-				launcher.close();
+			if (manager != null)
+				manager.close();
 
 			logger.info("Application stopped");
 		}
 	}
 
-	private static ActionsLauncher processAllScriptsFromDirectory(String input, String output, ActionsLauncher launcher)
+	private static ActionsLauncher processAllScriptsFromDirectory(String input, String output,
+																  ActionsLauncher launcher,
+																  IRemoteHandManager manager)
 	{
 		File[] fileList = null;
 		File inputFile = new File(input), 
@@ -198,11 +207,11 @@ public class Starter
 		{
 			try
 			{
-				ScriptCompiler compiler = new ScriptCompiler();
+				ScriptCompiler compiler = manager.createScriptCompiler();
 				final List<ScriptAction> actions = compiler.build(scriptFile);
 
 				if (launcher == null)
-					launcher = new ActionsLauncher(null);
+					launcher = manager.createActionsLauncher(null);
 				String result = launcher.runActions(actions);
 
 				TextFileWriter.getInstance().setContent(result);

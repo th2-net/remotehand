@@ -46,7 +46,7 @@ public class SessionWatcher implements Runnable
 			return;
 		}
 
-		logger.info("Session watcher is executed. " + Configuration.PARAM_SESSIONEXPIRE + "=" + SESSION_EXPIRE);
+		logger.info("Session watcher is executed. SessionExpire=" + SESSION_EXPIRE);
 
 		while (HTTPServer.getServer() != null)
 		{

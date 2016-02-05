@@ -9,11 +9,11 @@
 
 package com.exactprosystems.remotehand;
 
-import java.util.List;
-
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionHandler;
 import org.apache.log4j.Logger;
+
+import java.util.List;
 
 public class ScriptProcessorThread implements Runnable
 {
@@ -28,18 +28,21 @@ public class ScriptProcessorThread implements Runnable
 	private String script = null, 
 			lastResult = null;
 
-	private ActionsLauncher launcher = new ActionsLauncher(this);
-	private WebElementsDictionary webDictionary = null;
+	private ActionsLauncher launcher = null;
+	private IRemoteHandManager rhmanager = null;
+//	private WebElementsDictionary webDictionary = null;
 
-	public ScriptProcessorThread(SessionHandler session)
+	public ScriptProcessorThread(SessionHandler session, IRemoteHandManager rhmanager)
 	{
 		this.parentSession = session;
+		this.rhmanager = rhmanager;
+		this.launcher = rhmanager.createActionsLauncher(this);
 	}
 
-	public void setWebDictionary(String webDictionary)
-	{
-		this.webDictionary = new WebElementsDictionary(webDictionary, false);
-	}
+//	public void setWebDictionary(String webDictionary)
+//	{
+//		this.webDictionary = new WebElementsDictionary(webDictionary, false);
+//	}
 
 	@Override
 	public void run()
@@ -76,8 +79,7 @@ public class ScriptProcessorThread implements Runnable
 		String result = null;
 		try
 		{
-			ScriptCompiler compiler = new ScriptCompiler();
-			compiler.setDictionary(webDictionary);			
+			ScriptCompiler compiler = this.rhmanager.createScriptCompiler();
 			final List<ScriptAction> actions = compiler.build(script);
 
 			result = launcher.runActions(actions);
@@ -99,7 +101,7 @@ public class ScriptProcessorThread implements Runnable
 
 	private void closeThread()
 	{
-		launcher.close();
+		this.rhmanager.close();
 		switchOn = false;
 	}
 

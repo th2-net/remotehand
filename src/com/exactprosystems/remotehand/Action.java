@@ -6,21 +6,14 @@
 //  This is unpublished, licensed software, confidential and proprietary
 //  information which is the property of Exactpro Systems or its licensors.
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.exactprosystems.remotehand;
 
+
 /**
- * Created by alexey.karpukhin on 2/2/16.
+ * Created by alexey.karpukhin on 2/1/16.
  */
-public abstract class ScriptAction {
+public interface Action {
 
-	protected Action action;
-
-	protected ScriptAction (Action action) {
-		this.action = action;
-	}
-
-	public Action getAction() {
-		return action;
-	}
-
+	String execute(ScriptAction parameters) throws ScriptExecuteException;
 }

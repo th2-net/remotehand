@@ -1,9 +1,11 @@
-<project name="RemoteHand" default="Release" basedir=".">
+<project name="RemoteHand" default="WebRHRelease" basedir=".">
 	<property name="release" value="release" />
 	<property name="src" location="src" />
 	<property name="build" location="build" />
 	<property name="lib" location="lib" />
-	<property name="jar" location="${release}/remotehand.jar" />
+	<property name="jar" location="${release}/webremotehand.jar" />
+
+	<property name="webPackage" location="com.exactprosystems.remotehand.web" />
 	
 	<target name="CheckSvnRevision">
 		<path id="svnant.libs.path">
@@ -33,7 +35,7 @@
 		</tstamp>
 	</target>
 	
-	<target name="Release" depends="CheckSvnRevision">
+	<target name="WebRHRelease" depends="CheckSvnRevision">
 		<delete dir="${build}" />
 		<mkdir dir="${build}" />
 
@@ -58,7 +60,7 @@
 			<manifest>
 				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
 				<attribute name="Class-Path" value="."/>
-				<attribute name="Rsrc-Main-Class" value="com.exactprosystems.remotehand.Starter"/>
+				<attribute name="Rsrc-Main-Class" value="com.exactprosystems.remotehand.web.WebRhStarter"/>
 				<attribute name="Rsrc-Class-Path" value="./
 						lib/commons-cli-1.2.jar
 						lib/selenium-java-2.48.2.jar

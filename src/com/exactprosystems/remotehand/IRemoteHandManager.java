@@ -6,21 +6,20 @@
 //  This is unpublished, licensed software, confidential and proprietary
 //  information which is the property of Exactpro Systems or its licensors.
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.exactprosystems.remotehand;
 
 /**
- * Created by alexey.karpukhin on 2/2/16.
+ * Created by alexey.karpukhin on 2/1/16.
  */
-public abstract class ScriptAction {
+public interface IRemoteHandManager {
 
-	protected Action action;
+	ScriptCompiler createScriptCompiler ();
 
-	protected ScriptAction (Action action) {
-		this.action = action;
-	}
+	Configuration createConfiguration();
 
-	public Action getAction() {
-		return action;
-	}
+	ActionsLauncher createActionsLauncher(ScriptProcessorThread thread);
+
+	void close();
 
 }

@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand.http;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.exactprosystems.remotehand.IRemoteHandManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.log4j.Logger;
@@ -26,6 +27,11 @@ public class LoginHandler implements HttpHandler
 		return handler;
 	}
 
+	private IRemoteHandManager manager;
+	public void setRhManager (IRemoteHandManager irh) {
+		this.manager = irh;
+	}
+
 	@Override
 	public void handle(HttpExchange exchanger) throws IOException
 	{
@@ -33,7 +39,7 @@ public class LoginHandler implements HttpHandler
 
 		final String sessionId = "/" + createSessionId();
 
-		HTTPServer.getServer().createContext(sessionId, new SessionHandler(sessionId));
+		HTTPServer.getServer().createContext(sessionId, new SessionHandler(sessionId, manager));
 
 		exchanger.sendResponseHeaders(200, sessionId.length());
 		OutputStream os = exchanger.getResponseBody();

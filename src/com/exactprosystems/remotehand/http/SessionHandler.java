@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
+import com.exactprosystems.remotehand.IRemoteHandManager;
 import com.exactprosystems.remotehand.ScriptProcessorThread;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -25,14 +26,16 @@ public class SessionHandler implements HttpHandler
 
 	private final String id;
 	
-	private String webDictContent;
+//	private String dictionaryContent;
 
 	private ScriptProcessorThread scriptProcessor = null;
+	private IRemoteHandManager manager;
 
-	SessionHandler(String id)
+	SessionHandler(String id, IRemoteHandManager manager)
 	{
 		this.id = id;
 		SessionWatcher.getWatcher().addSession(this);
+		this.manager = manager;
 		logger.info("Created session <" + id + ">");
 	}
 
@@ -52,13 +55,13 @@ public class SessionHandler implements HttpHandler
 			in.close();
 
 			final String body = buff.toString();
-			
-			if (body.contains("#type") || body.contains("#desc"))
-			{
-				webDictContent = body;
-				sendMessage(exchanger, "Dictionary received.");
-				return;
-			}
+
+//			if (body.contains("#type") || body.contains("#desc"))
+//			{
+//				dictionaryContent = body;
+//				sendMessage(exchanger, "Dictionary received.");
+//				return;
+//			}
 
 			sendMessage(exchanger, "OK");
 
@@ -127,9 +130,9 @@ public class SessionHandler implements HttpHandler
 	{
 		if (scriptProcessor == null)
 		{
-			scriptProcessor = new ScriptProcessorThread(this);
-			if (webDictContent != null)
-				scriptProcessor.setWebDictionary(webDictContent);
+			scriptProcessor = new ScriptProcessorThread(this, manager);
+//			if (dictionaryContent != null)
+//				scriptProcessor.setWebDictionary(dictionaryContent);
 			final Thread webThread = new Thread(scriptProcessor);
 			webThread.start();
 		}
