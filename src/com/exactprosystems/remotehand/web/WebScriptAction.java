@@ -19,20 +19,20 @@ import org.openqa.selenium.WebDriver;
 
 public class WebScriptAction extends ScriptAction
 {
-	private WebDriver webdriver 		 = null;
-	private WebLocator webLocator		 = null;
-	private Map<String, String> params	 = null;
+	private WebDriver webdriver = null;
+	private WebLocator webLocator = null;
+	private Map<String, String> params = null;
 	
 	WebScriptAction(WebAction webAction, WebDriver webDriver, WebLocator webLocator,
-					Map<String, String> params) throws ScriptCompileException
+			Map<String, String> params) throws ScriptCompileException
 	{
 		super(webAction);
 		if (webAction == null)
 			throw new ScriptCompileException("Web action tag is missing in the header");
 
-		this.webLocator	 = webLocator;
-		this.params		 = params;
-		this.webdriver 	 = webDriver;
+		this.webLocator = webLocator;
+		this.params = params;
+		this.webdriver = webDriver;
 	}
 
 

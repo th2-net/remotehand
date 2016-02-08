@@ -17,8 +17,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import com.exactprosystems.remotehand.http.LoginHandler;
-import com.exactprosystems.remotehand.web.WebScriptAction;
-import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -64,7 +62,7 @@ public class Starter
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
 				outputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify output path name.").create("output"),
-				dynamicInputName = OptionBuilder.withArgName("file").hasArg().withDescription("Dynamically added input file with next commands").create("dynamicinput");
+				dynamicInputName = OptionBuilder.withArgName("file").hasArg().withDescription("Dynamically added input file with further commands").create("dynamicinput");
 
 		Options options = new Options();
 		options.addOption(enableServerMode);
@@ -175,9 +173,8 @@ public class Starter
 		}
 	}
 
-	private static ActionsLauncher processAllScriptsFromDirectory(String input, String output,
-																  ActionsLauncher launcher,
-																  IRemoteHandManager manager)
+	private static ActionsLauncher processAllScriptsFromDirectory(String input, String output, 
+			ActionsLauncher launcher, IRemoteHandManager manager)
 	{
 		File[] fileList = null;
 		File inputFile = new File(input), 
