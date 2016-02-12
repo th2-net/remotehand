@@ -12,7 +12,6 @@ package com.exactprosystems.remotehand.web;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Action;
-import com.exactprosystems.remotehand.ScriptAction;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.actions.WaitForElement;
@@ -21,11 +20,23 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
-public abstract class WebAction implements Action
+public abstract class WebAction extends Action
 {
 	protected static final String PARAM_WAIT = "wait";
 	
 	protected String[] mandatoryParams;
+
+	private WebDriver webDriver = null;
+	private WebLocator webLocator = null;
+	private Map<String, String> params = null;
+
+	public void init(WebDriver webDriver, WebLocator webLocator,
+					Map<String, String> params) throws ScriptCompileException
+	{
+		this.webLocator = webLocator;
+		this.params = params;
+		this.webDriver = webDriver;
+	}
 	
 	
 	public static int getIntegerParam(Map<String, String> params, String paramName) throws ScriptExecuteException
@@ -49,25 +60,22 @@ public abstract class WebAction implements Action
 	{
 		return false;
 	}
-	
-	public String execute(ScriptAction actionParams) throws ScriptExecuteException
-	{
-		WebScriptAction webScriptAction = (WebScriptAction) actionParams;
-		Map<String, String> params = webScriptAction.getParams();
-		WebLocator locator = webScriptAction.getWebLocator();
-		WebDriver webDriver = webScriptAction.getDriver();
 
-		By webLocator = null;
-		if (locator != null)
+	@Override
+	public String execute() throws ScriptExecuteException
+	{
+
+		By locator = null;
+		if (webLocator != null)
 		{
-			webLocator = locator.getWebLocator(webDriver, params);
+			locator = webLocator.getWebLocator(webDriver, params);
 		}
 
 
 		if (isCanWait())
 		{
 			if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
-				WaitForElement.waitForElement(webLocator, webDriver, getIntegerParam(params, PARAM_WAIT));
+				WaitForElement.waitForElement(locator, webDriver, getIntegerParam(params, PARAM_WAIT));
 		}
 
 		if (isCanSwitchPage())
@@ -75,7 +83,7 @@ public abstract class WebAction implements Action
 
 
 		
-		return run(webDriver, webLocator, params);
+		return run(webDriver, locator, params);
 	}
 
 	public String[] getMandatoryParams() throws ScriptCompileException
@@ -86,5 +94,19 @@ public abstract class WebAction implements Action
 	public void disableLeavePageAlert(WebDriver webDriver)
 	{
 		((JavascriptExecutor)webDriver).executeScript("window.onbeforeunload = function(e){};");
+	}
+
+	public WebDriver getWebDriver() {
+		return webDriver;
+	}
+
+
+	public WebLocator getWebLocator() {
+		return webLocator;
+	}
+
+
+	public Map<String, String> getParams() {
+		return params;
 	}
 }

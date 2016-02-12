@@ -13,7 +13,7 @@ package com.exactprosystems.remotehand;
 /**
  * Created by alexey.karpukhin on 2/1/16.
  */
-public interface Action {
+public abstract class Action {
 
-	String execute(ScriptAction parameters) throws ScriptExecuteException;
+	public abstract String execute() throws ScriptExecuteException;
 }

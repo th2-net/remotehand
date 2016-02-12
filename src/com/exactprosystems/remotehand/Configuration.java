@@ -9,7 +9,7 @@
 
 package com.exactprosystems.remotehand;
 
-import com.exactprosystems.remotehand.web.Browser;
+import org.apache.commons.cli.CommandLine;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import java.util.Properties;
 public class Configuration
 {
 	private static final Logger logger = Logger.getLogger(Configuration.class);
-	public static volatile Configuration instance;
+	protected static volatile Configuration instance = null;
 	protected volatile Properties properties;
 
 	public final String PROPERTY_NOT_SET = "Property '%s' is not set. Using default value = '%s'";
@@ -38,7 +38,7 @@ public class Configuration
 	private volatile char scriptDelimiter;
 	private volatile int sessionExpire;
 
-	protected Configuration()
+	protected Configuration(CommandLine commandLine)
 	{
 		if (instance != null) {
 			throw new RuntimeException("Configuration is already exist. Use getInstance method");

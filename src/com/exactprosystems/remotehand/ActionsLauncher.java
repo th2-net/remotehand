@@ -10,14 +10,6 @@
 package com.exactprosystems.remotehand;
 
 import java.util.List;
-import java.util.Map;
-
-import com.exactprosystems.remotehand.web.WebScriptAction;
-import com.exactprosystems.remotehand.web.WebAction;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-
-import com.exactprosystems.remotehand.web.webelements.WebLocator;
 
 public class ActionsLauncher
 {
@@ -29,15 +21,13 @@ public class ActionsLauncher
 		this.parent = parentThread;
 	}
 
-	public String runActions(List<ScriptAction> scriptActions) throws ScriptExecuteException
+	public String runActions(List<Action> scriptActions) throws ScriptExecuteException
 	{
 		StringBuilder result = null;
 
-		for (ScriptAction scriptAction : scriptActions)
+		for (Action action : scriptActions)
 		{
-			final Action action = scriptAction.getAction();
-
-			final String actionResult = action.execute(scriptAction);
+			final String actionResult = action.execute();
 			if (actionResult != null)
 			{
 				if (result==null)

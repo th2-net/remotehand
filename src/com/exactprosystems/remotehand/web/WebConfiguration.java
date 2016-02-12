@@ -10,6 +10,7 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.Configuration;
+import org.apache.commons.cli.CommandLine;
 import org.apache.log4j.Logger;
 
 import java.util.Properties;
@@ -38,8 +39,8 @@ public class WebConfiguration extends Configuration{
 	private volatile Browser browserToUse;
 	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, ftpProxySetting, socksProxySetting, noProxySetting;
 
-	protected WebConfiguration() {
-		super();
+	protected WebConfiguration(CommandLine commandLine) {
+		super(commandLine);
 
 		this.properties.setProperty(PARAM_BROWSER, DEF_BROWSER.getLabel());
 		this.properties.setProperty(PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);

@@ -9,6 +9,9 @@
 
 package com.exactprosystems.remotehand;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+
 /**
  * Created by alexey.karpukhin on 2/1/16.
  */
@@ -16,9 +19,11 @@ public interface IRemoteHandManager {
 
 	ScriptCompiler createScriptCompiler ();
 
-	Configuration createConfiguration();
+	Configuration createConfiguration(CommandLine commandLine);
 
 	ActionsLauncher createActionsLauncher(ScriptProcessorThread thread);
+
+	Option[] getAdditionalOptions();
 
 	void close();
 

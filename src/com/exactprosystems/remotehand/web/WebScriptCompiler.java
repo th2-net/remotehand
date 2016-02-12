@@ -59,7 +59,7 @@ public class WebScriptCompiler extends ScriptCompiler
 		this.webDriverManager = webDriverManager;
 	}
 
-	public List<ScriptAction> build(String script) throws ScriptCompileException
+	public List<Action> build(String script) throws ScriptCompileException
 	{
 		logger.info("Compiling script...");
 
@@ -67,7 +67,7 @@ public class WebScriptCompiler extends ScriptCompiler
 		{
 			dictionary = new WebElementsDictionary(script, false);
 			logger.info("Web dictionary applied");
-			return new ArrayList<ScriptAction>();
+			return new ArrayList<Action>();
 		}
 
 		script = script.replace("&#13", System.getProperty(LINE_SEPARATOR));
@@ -75,7 +75,7 @@ public class WebScriptCompiler extends ScriptCompiler
 		CsvReader reader = new CsvReader(new ByteArrayInputStream(script.getBytes()), Charset.defaultCharset());
 		reader.setDelimiter(DELIMITER);
 
-		List<ScriptAction> result = new ArrayList<ScriptAction>();
+		List<Action> result = new ArrayList<Action>();
 		String[] header = null;
 		int lineNumber = 1;
 		try
@@ -93,10 +93,10 @@ public class WebScriptCompiler extends ScriptCompiler
 					if (header == null)
 						throw new ScriptCompileException("Header is not defined for action");
 
-					final WebScriptAction action = generateAction(header, values, lineNumber);
+					final WebAction action = generateAction(header, values, lineNumber);
 
 					WebScriptChecker checker = new WebScriptChecker();
-					checker.checkParams((WebAction) action.getAction(), action.getWebLocator(), action.getParams());
+					checker.checkParams(action, action.getWebLocator(), action.getParams());
 					checker.checkParams(action.getWebLocator(), action.getParams());
 
 					logger.info(action.toString());
@@ -134,7 +134,7 @@ public class WebScriptCompiler extends ScriptCompiler
 		return result;
 	}
 
-	private WebScriptAction generateAction(String[] header, String[] values, int lineNumber) throws ScriptCompileException
+	private WebAction generateAction(String[] header, String[] values, int lineNumber) throws ScriptCompileException
 	{
 		WebAction webAction;
 		WebLocator webLocator = null;
@@ -163,7 +163,8 @@ public class WebScriptCompiler extends ScriptCompiler
 		params.remove(WEB_ACTION);
 		params.remove(WEB_LOCATOR);
 
-		return new WebScriptAction(webAction, this.webDriverManager.getWebDriver(), webLocator, params);
+		webAction.init(this.webDriverManager.getWebDriver(), webLocator, params);
+		return webAction;
 	}
 	
 	private void updateParamsByDictionary(Map<String, String> params, String id) throws ScriptCompileException

@@ -22,9 +22,9 @@ public abstract class ScriptCompiler {
 
 	public final String LINE_SEPARATOR = "line.separator";
 
-	public abstract List<ScriptAction> build(String scriptFile) throws ScriptCompileException;
+	public abstract List<Action> build(String scriptFile) throws ScriptCompileException;
 
-	public List<ScriptAction> build(File scriptFile) throws IOException, ScriptCompileException
+	public List<Action> build(File scriptFile) throws IOException, ScriptCompileException
 	{
 		BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
 		StringBuffer sb = new StringBuffer();

@@ -4,8 +4,10 @@
 	<property name="build" location="build" />
 	<property name="lib" location="lib" />
 	<property name="jar" location="${release}/webremotehand.jar" />
+	<property name="jarUIA" location="${release}/uiautomationhand.jar" />
 
-	<property name="webPackage" location="com.exactprosystems.remotehand.web" />
+	<property name="webPackage" value="com/exactprosystems/remotehand/web/**" />
+	<property name="uiaPackage" value="com/exactprosystems/remotehand/uiautomation/**" />
 	
 	<target name="CheckSvnRevision">
 		<path id="svnant.libs.path">
@@ -54,7 +56,9 @@
 
 
 		<echo message="Compiling sources" />
-		<javac srcdir="${src}" destdir="${build}" debug="true" includeantruntime="true" classpathref="classpath" />
+		<javac srcdir="${src}" destdir="${build}" debug="true" includeantruntime="true" classpathref="classpath">
+			<exclude name="${uiaPackage}"/>
+		</javac>
 		
 		<jar basedir="${build}" destfile="${jar}">
 			<manifest>
@@ -80,4 +84,54 @@
 		
 		<delete dir="${build}" />
 	</target>
+
+
+	<target name="UIAHRelease" depends="CheckSvnRevision">
+		<delete dir="${build}" />
+		<mkdir dir="${build}" />
+
+		<delete dir="${release}" />
+		<mkdir dir="${release}" />
+
+		<path id="classpath">
+			<fileset dir="${lib}">
+				<patternset>
+					<include name="**/*" />
+				</patternset>
+			</fileset>
+
+			<pathelement location="${build}" />
+		</path>
+
+
+		<echo message="Compiling sources" />
+		<javac srcdir="${src}" destdir="${build}" debug="true" includeantruntime="true" classpathref="classpath">
+			<exclude name="${webPackage}"/>
+		</javac>
+
+		<jar basedir="${build}" destfile="${jarUIA}">
+			<manifest>
+				<attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader" />
+				<attribute name="Class-Path" value="."/>
+				<attribute name="Rsrc-Main-Class" value="com.exactprosystems.remotehand.web.WebRhStarter"/>
+				<attribute name="Rsrc-Class-Path" value="./
+						lib/commons-cli-1.2.jar
+						lib/log4j-1.2.16.jar
+						lib/javacsv.jar" />
+				<attribute name="Implementation-Title" value="RemoteHand" />
+				<attribute name="Implementation-Vendor" value="Exactpro Systems" />
+				<attribute name="Implementation-Vendor-Id" value="com.exactprosystems" />
+				<attribute name="Implementation-Version" value="${svn.info.lastRev}" />
+			</manifest>
+			<zipfileset src="jar-in-jar-loader.zip"/>
+			<zipfileset dir="${lib}" prefix="lib/" >
+				<exclude name="selenium*" />
+			</zipfileset>
+		</jar>
+		<copy file="config.ini" todir="${release}" />
+		<copy file="log4j.properties" todir="${release}" />
+
+		<delete dir="${build}" />
+	</target>
+
 </project>

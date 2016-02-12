@@ -17,4 +17,12 @@ public class ScriptCompileException extends Exception
 	{
 		super(message);
 	}
+
+	public ScriptCompileException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ScriptCompileException(Throwable cause) {
+		super(cause);
+	}
 }

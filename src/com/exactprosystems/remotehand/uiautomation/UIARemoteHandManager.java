@@ -6,34 +6,27 @@
 //  This is unpublished, licensed software, confidential and proprietary
 //  information which is the property of Exactpro Systems or its licensors.
 ////////////////////////////////////////////////////////////////////////////////
-
-package com.exactprosystems.remotehand.web;
+package com.exactprosystems.remotehand.uiautomation;
 
 import com.exactprosystems.remotehand.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 
 /**
- * Created by alexey.karpukhin on 2/2/16.
+ * Created by alexey.karpukhin on 2/12/16.
  */
-public class WebRemoteHandManager implements IRemoteHandManager {
-
-	private WebDriverManager webDriverManager;
-
-	public WebRemoteHandManager () {
-		webDriverManager = new WebDriverManager();
-	}
+public class UIARemoteHandManager implements IRemoteHandManager{
 
 	@Override
 	public ScriptCompiler createScriptCompiler() {
-		return new WebScriptCompiler(webDriverManager);
+		return new UIAScriptCompiler();
 	}
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		return new WebConfiguration(commandLine);
+		return new UIAConfiguration(commandLine);
 	}
-
 
 	@Override
 	public ActionsLauncher createActionsLauncher(ScriptProcessorThread thread) {
@@ -41,12 +34,14 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	}
 
 	@Override
+	@SuppressWarnings("static-access")
 	public Option[] getAdditionalOptions() {
-		return new Option[0];
+		return new Option[] {
+			OptionBuilder.withArgName("dir").hasArg().withDescription("Specify script directory.").create("scriptDir")} ;
 	}
+
 
 	@Override
 	public void close() {
-		webDriverManager.close();
 	}
 }

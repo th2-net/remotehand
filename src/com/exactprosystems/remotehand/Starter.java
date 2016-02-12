@@ -57,7 +57,6 @@ public class Starter
 		
 		logger.info("Started RemoteHand "+version);
 
-		manager.createConfiguration();
 
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
@@ -69,6 +68,10 @@ public class Starter
 		options.addOption(inputName);
 		options.addOption(outputName);
 		options.addOption(dynamicInputName);
+
+		for (Option additional : manager.getAdditionalOptions()) {
+			options.addOption(additional);
+		}
 
 		CommandLineParser parser = new GnuParser();
 		CommandLine line = null;
@@ -88,6 +91,10 @@ public class Starter
 		String input = line.getOptionValue(inputName.getOpt());
 		String output = line.getOptionValue(outputName.getOpt());
 		String dynInput = line.getOptionValue(dynamicInputName.getOpt());
+
+		if (Configuration.getInstance() == null) {
+			manager.createConfiguration(line);
+		}
 
 		if (!serverMode && (input == null || output == null))
 		{
@@ -205,7 +212,7 @@ public class Starter
 			try
 			{
 				ScriptCompiler compiler = manager.createScriptCompiler();
-				final List<ScriptAction> actions = compiler.build(scriptFile);
+				final List<Action> actions = compiler.build(scriptFile);
 
 				if (launcher == null)
 					launcher = manager.createActionsLauncher(null);

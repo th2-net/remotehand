@@ -80,7 +80,7 @@ public class ScriptProcessorThread implements Runnable
 		try
 		{
 			ScriptCompiler compiler = this.rhmanager.createScriptCompiler();
-			final List<ScriptAction> actions = compiler.build(script);
+			final List<Action> actions = compiler.build(script);
 
 			result = launcher.runActions(actions);
 
