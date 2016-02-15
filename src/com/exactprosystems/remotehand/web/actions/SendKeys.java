@@ -57,6 +57,8 @@ public class SendKeys extends WebAction
 	{
 		WebElement input = webDriver.findElement(webLocator);
 		String text = params.get(PARAM_TEXT);
+		text = replaceConversions(text);
+
 		List<String> strings = new ArrayList<String>();
 		int index;
 		while ((index = text.indexOf(KEY_SIGN))>-1)
@@ -101,6 +103,10 @@ public class SendKeys extends WebAction
 		}
 		else
 			return KEYS.get(label.toLowerCase());
+	}
+
+	private String replaceConversions(String src) {
+		return src.replace("(","#openbracket");
 	}
 
 	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
