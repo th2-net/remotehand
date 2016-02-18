@@ -106,7 +106,7 @@ public class SendKeys extends WebAction
 	}
 
 	private String replaceConversions(String src) {
-		return src.replace("(","#openbracket");
+		return src.replace("(","#openbracket#");
 	}
 
 	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
