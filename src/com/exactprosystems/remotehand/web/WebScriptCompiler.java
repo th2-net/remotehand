@@ -77,39 +77,39 @@ public class WebScriptCompiler extends ScriptCompiler
 
 		List<Action> result = new ArrayList<Action>();
 		String[] header = null;
-		int lineNumber = 1;
+		int lineNumber = 0;
 		try
 		{
 			while (reader.readRecord())
 			{
+				lineNumber++;
 				String[] values = reader.getValues();
 				
-				if (!values[0].startsWith(COMMENT_INDICATOR))
+				if (values[0].startsWith(COMMENT_INDICATOR))
+					continue;
+
+				if (values[0].startsWith(HEADER_DELIMITER))
+					header = parseValues(values);
+				else
 				{
-					if (values[0].startsWith(HEADER_DELIMITER))
-						header = parseValues(values);
-					else
+					if (header == null)
+						throw new ScriptCompileException("Header is not defined for action");
+
+					if (isExecutable(header, values))
 					{
-						if (header == null)
-							throw new ScriptCompileException("Header is not defined for action");
+						final WebAction action = generateAction(header, values, lineNumber);
 
-						if (isExecutable(header, values))
-						{
-							final WebAction action = generateAction(header, values, lineNumber);
+						WebScriptChecker checker = new WebScriptChecker();
+						checker.checkParams(action, action.getWebLocator(), action.getParams());
+						checker.checkParams(action.getWebLocator(), action.getParams());
 
-							WebScriptChecker checker = new WebScriptChecker();
-							checker.checkParams(action, action.getWebLocator(), action.getParams());
-							checker.checkParams(action.getWebLocator(), action.getParams());
+						logger.info(action.toString());
 
-							logger.info(action.toString());
-
-							result.add(action);
-						}
-						else 
-							logger.info(String.format("Action at line %d will be skipped.", lineNumber));
+						result.add(action);
 					}
+					else
+						logger.info(String.format("Action at line %d will be skipped.", lineNumber));
 				}
-				lineNumber++;
 			}
 			reader.close();
 		}
