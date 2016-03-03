@@ -13,10 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.csvreader.CsvReader;
 import com.exactprosystems.remotehand.*;
@@ -39,8 +36,11 @@ public class WebScriptCompiler extends ScriptCompiler
 	public static final String WEB_LOCATOR = "locator";
 	public static final String WEB_MATCHER = "matcher";
 	public static final String WEB_ID = "webid";
+	public static final String EXECUTE = "execute";
 	
 	public static final String DEFAULT_DICT_NAME = "webdictionary.csv"; 
+	
+	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
 			
 	private static WebElementsDictionary dictionary;
 	
@@ -84,24 +84,30 @@ public class WebScriptCompiler extends ScriptCompiler
 			{
 				String[] values = reader.getValues();
 				
-				if (values[0].startsWith(COMMENT_INDICATOR))
-					continue;
-				if (values[0].startsWith(HEADER_DELIMITER))
-					header = parseValues(values);
-				else
+				if (!values[0].startsWith(COMMENT_INDICATOR))
 				{
-					if (header == null)
-						throw new ScriptCompileException("Header is not defined for action");
+					if (values[0].startsWith(HEADER_DELIMITER))
+						header = parseValues(values);
+					else
+					{
+						if (header == null)
+							throw new ScriptCompileException("Header is not defined for action");
 
-					final WebAction action = generateAction(header, values, lineNumber);
+						if (isExecutable(header, values))
+						{
+							final WebAction action = generateAction(header, values, lineNumber);
 
-					WebScriptChecker checker = new WebScriptChecker();
-					checker.checkParams(action, action.getWebLocator(), action.getParams());
-					checker.checkParams(action.getWebLocator(), action.getParams());
+							WebScriptChecker checker = new WebScriptChecker();
+							checker.checkParams(action, action.getWebLocator(), action.getParams());
+							checker.checkParams(action.getWebLocator(), action.getParams());
 
-					logger.info(action.toString());
+							logger.info(action.toString());
 
-					result.add(action);
+							result.add(action);
+						}
+						else 
+							logger.info(String.format("Action at line %d will be skipped.", lineNumber));
+					}
 				}
 				lineNumber++;
 			}
@@ -145,8 +151,11 @@ public class WebScriptCompiler extends ScriptCompiler
 		
 		for (int inx = 0; inx < header.length; inx++)
 		{
-			final String head = header[inx], headLow = head.toLowerCase(), value = (inx < values.length ? values[inx] : null);
-			params.put(headLow, value);
+			String name = header[inx].toLowerCase();
+			if (EXECUTE.equals(name))
+				continue;
+			String value = (inx < values.length ? values[inx] : null);
+			params.put(name, value);
 		}
 		
 		if (params.containsKey(WEB_ID))
@@ -188,5 +197,19 @@ public class WebScriptCompiler extends ScriptCompiler
 		params.put(WEB_LOCATOR, properties.locator);
 		params.put(WEB_MATCHER, properties.matcher);
 		params.remove(WEB_ID);
+	}
+	
+	private boolean isExecutable(String[] header, String[] values)
+	{
+		int foundAt = -1;
+		for (int i = 0; i < header.length; i++)
+		{
+			if (EXECUTE.equalsIgnoreCase(header[i]))
+			{
+				foundAt = i;
+				break;
+			}
+		}
+		return foundAt == -1 || foundAt >= values.length || YES.contains(values[foundAt].toLowerCase());
 	}
 }
