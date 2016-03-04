@@ -16,13 +16,15 @@ import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.actions.WaitForElement;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 public abstract class WebAction extends Action
 {
-	protected static final String PARAM_WAIT = "wait";
+	protected static final String PARAM_WAIT = "wait",
+			PARAM_NOTFOUNDFAIL = "notfoundfail";
 	
 	protected String[] mandatoryParams;
 
@@ -31,7 +33,7 @@ public abstract class WebAction extends Action
 	private Map<String, String> params = null;
 
 	public void init(WebDriver webDriver, WebLocator webLocator,
-					Map<String, String> params) throws ScriptCompileException
+			Map<String, String> params) throws ScriptCompileException
 	{
 		this.webLocator = webLocator;
 		this.params = params;
@@ -60,30 +62,47 @@ public abstract class WebAction extends Action
 	{
 		return false;
 	}
-
+	
+	public boolean isElementMandatory()
+	{
+		return !params.containsKey(PARAM_NOTFOUNDFAIL) || WebScriptCompiler.YES.contains(params.get(PARAM_NOTFOUNDFAIL));
+	}
+	
 	@Override
 	public String execute() throws ScriptExecuteException
 	{
-
 		By locator = null;
 		if (webLocator != null)
-		{
 			locator = webLocator.getWebLocator(webDriver, params);
-		}
-
-
+		
+		boolean needRun = true;
 		if (isCanWait())
 		{
 			if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
-				WaitForElement.waitForElement(locator, webDriver, getIntegerParam(params, PARAM_WAIT));
+			{
+				int waitDuration = getIntegerParam(params, PARAM_WAIT);
+				try
+				{
+					WaitForElement.waitForElement(locator, webDriver, waitDuration);
+				}
+				catch (ScriptExecuteException e)
+				{
+					if (isElementMandatory())
+						throw e;
+					else
+						needRun = false;
+				}
+			}
 		}
 
 		if (isCanSwitchPage())
 			disableLeavePageAlert(webDriver);
 
 
-		
-		return run(webDriver, locator, params);
+		if (needRun)
+			return run(webDriver, locator, params);
+		else
+			return null;
 	}
 
 	public String[] getMandatoryParams() throws ScriptCompileException
