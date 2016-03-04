@@ -23,7 +23,7 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame;
+		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -42,17 +42,18 @@ public class WebActionsMapping
 		case Open :	               return new Open();
 		case Click :               return new Click();
 		case SendKeys :	           return new SendKeys();
-		case WaitForElement :	     return new WaitForElement();
-		case WaitForNew :	         return new WaitForNew();
+		case WaitForElement :      return new WaitForElement();
+		case WaitForNew :          return new WaitForNew();
 		case Wait :	               return new Wait();
-		case GetElement :	         return new GetElement();
+		case GetElement :          return new GetElement();
 		case GetDynamicTable :     return new GetDynamicTable();
 		case ScrollTo :            return new ScrollTo();
 		case PageSource :          return new PageSource();
 		case Refresh :             return new Refresh();
 		case ClearElement :        return new ClearElement();
 		case Output :              return new Output();
-		case SelectFrame: 			return new SelectFrame();
+		case SelectFrame :         return new SelectFrame();
+		case FindElement :         return new FindElement();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
