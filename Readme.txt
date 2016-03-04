@@ -113,10 +113,16 @@ Output,text
 Prints <text> to script output. Useful to divide outputs of actions like GetElement, GetDynamicTable etc.
 
 
+#action,#wait,#locator,#matcher,#id
+FindElement,5,locator,matcher,controlID
+
+Optionally waits <wait> seconds for element specified by <matcher> and <locator>. If element is found, "<id>=found" is printed in output. Else "<id>=notfound" is printed.
+
 
 2. Notes
-All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException is no element had appeared in time.
+All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
 The exception can be supressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
+In case of FindElement, no exception is thrown because the action handles this case.
 
 Possible <locator> values:
 1. cssSelector - in this case <matcher> should contain CSS path to the element like this: div.v-button.v-widget.default.v-button-default;
