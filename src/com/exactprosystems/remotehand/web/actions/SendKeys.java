@@ -20,13 +20,20 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
+import com.exactprosystems.remotehand.web.WebScriptCompiler;
+import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 
 public class SendKeys extends WebAction
 {
 	private static final Logger logger = Logger.getLogger(SendKeys.class);
 	private static final String PARAM_TEXT = "text",
+			PARAM_TEXT2 = PARAM_TEXT+"2",
+			PARAM_WAIT2 = PARAM_WAIT+"2",
+			PARAM_LOCATOR2 = WebScriptCompiler.WEB_LOCATOR+"2",
+			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER+"2",
 			KEY_SIGN = "#";
 
 	public SendKeys()
@@ -59,6 +66,48 @@ public class SendKeys extends WebAction
 		String text = params.get(PARAM_TEXT);
 		text = replaceConversions(text);
 
+		sendText(input, text);
+		logger.info("Sent text to: " + webLocator);
+		
+		
+		if (!params.containsKey(PARAM_TEXT2))
+			return null;
+		
+		String text2 = params.get(PARAM_TEXT2);
+		text2 = replaceConversions(text2);
+		
+		boolean needRun = true;
+		if ((params.containsKey(PARAM_WAIT2)) && (!params.get(PARAM_WAIT2).isEmpty()))
+		{
+			int wait2 = getIntegerParam(params, PARAM_WAIT2);
+			if ((params.containsKey(PARAM_LOCATOR2)) && (params.containsKey(PARAM_MATCHER2)))
+			{
+				try
+				{
+					By locator2 = WebLocatorsMapping.getInstance().getByName(params.get(PARAM_LOCATOR2)).getWebLocator(webDriver, params.get(PARAM_MATCHER2));
+					if (!waitForElement(wait2, locator2))
+						needRun = false;
+				}
+				catch (ScriptCompileException e)
+				{
+					throw new ScriptExecuteException("Error while resolving locator2", e);
+				}
+			}
+			else
+				Wait.webWait(webDriver, wait2);
+		}
+		
+		if (needRun)
+		{
+			sendText(input, text2);
+			logger.info("Sent text2 to: " + webLocator);
+		}
+			
+		return null;
+	}
+	
+	protected void sendText(WebElement input, String text)
+	{
 		List<String> strings = new ArrayList<String>();
 		int index;
 		while ((index = text.indexOf(KEY_SIGN))>-1)
@@ -82,9 +131,6 @@ public class SendKeys extends WebAction
 				if (k != null)
 					input.sendKeys(k);
 			}
-		logger.info("Sent text to: " + webLocator);
-
-		return null;
 	}
 
 	public CharSequence getKeysByLabel(String label)

@@ -17,8 +17,14 @@ import org.openqa.selenium.WebDriver;
 public class Id extends WebLocator
 {
 	@Override
+	public By getWebLocator(WebDriver webDriver, String matcher)
+	{
+		return By.id(matcher);
+	}
+	
+	@Override
 	public By getWebLocator(WebDriver webDriver, Map<String, String> params)
 	{
-		return By.id(params.get(WebLocator.MATCHER));
+		return getWebLocator(webDriver, params.get(WebLocator.MATCHER));
 	}
 }

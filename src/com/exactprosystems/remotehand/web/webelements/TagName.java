@@ -17,9 +17,14 @@ import org.openqa.selenium.WebDriver;
 public class TagName extends WebLocator
 {
 	@Override
+	public By getWebLocator(WebDriver webDriver, String matcher)
+	{
+		return By.tagName(matcher);
+	}
+	
+	@Override
 	public By getWebLocator(WebDriver webDriver, Map<String, String> params)
 	{
-		return By.tagName(params.get(WebLocator.MATCHER));
+		return getWebLocator(webDriver, params.get(WebLocator.MATCHER));
 	}
-
 }

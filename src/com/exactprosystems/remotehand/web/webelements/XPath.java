@@ -17,8 +17,14 @@ import org.openqa.selenium.WebDriver;
 public class XPath extends WebLocator
 {
 	@Override
+	public By getWebLocator(WebDriver webDriver, String matcher)
+	{
+		return By.xpath(matcher);
+	}
+	
+	@Override
 	public By getWebLocator(WebDriver webDriver, Map<String, String> params)
 	{
-		return By.xpath(params.get(WebLocator.MATCHER));
+		return getWebLocator(webDriver, params.get(WebLocator.MATCHER));
 	}
 }

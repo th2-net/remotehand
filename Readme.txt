@@ -15,10 +15,17 @@ Click,5,locator,matcher
 Optionally waits <wait> seconds for element specified by <matcher> and clicks on it. Element is found using <locator>.
 
 
-#action,#wait,#locator,#matcher,#text
-SendKeys,5,locator,matcher,text
+#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2
+SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2
 
 Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
+In some cases it is needed to wait for some element to appear after first input and then continue the input 
+(for example, need to wait for autocomplete box to appear). 
+In these cases optional parameters <wait2>, <locator2>, <matcher2> and <text2> come in handy: 
+after inputing <text>, RemoteHand will wait <wait2> seconds for element specified by <matcher2> and then continue the input, inputing <text2>.
+Element to wait is found using <locator2>. 
+Also, you can skip <locator2> and <matcher2> and RemoteHand will just wait <wait2> seconds before continuing the input with <text2>.
+
 You can tell RemoteHand to press the following special keys by specifying corresponding codes:
 1. Up arrow - #up#
 2. Down arrow - #down#

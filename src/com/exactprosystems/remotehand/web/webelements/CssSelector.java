@@ -17,8 +17,14 @@ import org.openqa.selenium.WebDriver;
 public class CssSelector extends WebLocator
 {
 	@Override
-	public By getWebLocator(WebDriver webDrv, Map<String, String> params)
+	public By getWebLocator(WebDriver webDriver, String matcher)
 	{
-		return By.cssSelector(params.get(WebLocator.MATCHER));
+		return By.cssSelector(matcher);
+	}
+	
+	@Override
+	public By getWebLocator(WebDriver webDriver, Map<String, String> params)
+	{
+		return getWebLocator(webDriver, params.get(WebLocator.MATCHER));
 	}
 }

@@ -48,10 +48,16 @@ public class Wait extends WebAction
 	{
 		int secs = getIntegerParam(params, PARAM_SECONDS);
 		logger.info("Pause for "+secs+" second(s)");
+		webWait(webDriver, secs);
 
+		return null;
+	}
+	
+	public static void webWait(WebDriver webDriver, int seconds)
+	{
 		try
 		{
-			(new WebDriverWait(webDriver, secs)).until((new ExpectedCondition<Boolean>()
+			(new WebDriverWait(webDriver, seconds)).until((new ExpectedCondition<Boolean>()
 			{
 				@Override
 				public Boolean apply(WebDriver driver)
@@ -64,7 +70,5 @@ public class Wait extends WebAction
 		{
 			// Nothing should happen, it's normal to have timeout here
 		}
-
-		return null;
 	}
 }

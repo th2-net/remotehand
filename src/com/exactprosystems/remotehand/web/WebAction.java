@@ -68,6 +68,22 @@ public abstract class WebAction extends Action
 		return !params.containsKey(PARAM_NOTFOUNDFAIL) || WebScriptCompiler.YES.contains(params.get(PARAM_NOTFOUNDFAIL));
 	}
 	
+	protected boolean waitForElement(int waitDuration, By locator) throws ScriptExecuteException
+	{
+		try
+		{
+			WaitForElement.waitForElement(locator, webDriver, waitDuration);
+		}
+		catch (ScriptExecuteException e)
+		{
+			if (isElementMandatory())
+				throw e;
+			else
+				return false;
+		}
+		return true;
+	}
+	
 	@Override
 	public String execute() throws ScriptExecuteException
 	{
@@ -79,20 +95,8 @@ public abstract class WebAction extends Action
 		if (isCanWait())
 		{
 			if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
-			{
-				int waitDuration = getIntegerParam(params, PARAM_WAIT);
-				try
-				{
-					WaitForElement.waitForElement(locator, webDriver, waitDuration);
-				}
-				catch (ScriptExecuteException e)
-				{
-					if (isElementMandatory())
-						throw e;
-					else
-						needRun = false;
-				}
-			}
+				if (!waitForElement(getIntegerParam(params, PARAM_WAIT), locator))
+					needRun = false;
 		}
 
 		if (isCanSwitchPage())

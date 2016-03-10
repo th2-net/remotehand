@@ -18,8 +18,9 @@ public abstract class WebLocator
 {
 	protected static final String MATCHER = "matcher";
 
+	public abstract By getWebLocator(WebDriver webDriver, String matcher);
 	public abstract By getWebLocator(WebDriver webDriver, Map<String, String> params);
-
+	
 	public String[] getMandatoryParams()
 	{
 		final String[] result = { MATCHER };
