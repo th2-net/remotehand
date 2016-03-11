@@ -34,7 +34,8 @@ public class SendKeys extends WebAction
 			PARAM_WAIT2 = PARAM_WAIT+"2",
 			PARAM_LOCATOR2 = WebScriptCompiler.WEB_LOCATOR+"2",
 			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER+"2",
-			KEY_SIGN = "#";
+			KEY_SIGN = "#",
+			CLEAR_BEFORE = "clear";
 
 	public SendKeys()
 	{
@@ -63,19 +64,26 @@ public class SendKeys extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input = webDriver.findElement(webLocator);
+
+		String beforeClear = params.get(CLEAR_BEFORE);
+		if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true"))) {
+			input.clear();
+			logger.debug("Text field has been cleared.");
+		}
+
 		String text = params.get(PARAM_TEXT);
 		text = replaceConversions(text);
 
 		sendText(input, text);
 		logger.info("Sent text to: " + webLocator);
-		
-		
+
+
 		if (!params.containsKey(PARAM_TEXT2))
 			return null;
-		
+
 		String text2 = params.get(PARAM_TEXT2);
 		text2 = replaceConversions(text2);
-		
+
 		boolean needRun = true;
 		if ((params.containsKey(PARAM_WAIT2)) && (!params.get(PARAM_WAIT2).isEmpty()))
 		{
@@ -96,16 +104,16 @@ public class SendKeys extends WebAction
 			else
 				Wait.webWait(webDriver, wait2);
 		}
-		
+
 		if (needRun)
 		{
 			sendText(input, text2);
 			logger.info("Sent text2 to: " + webLocator);
 		}
-			
+
 		return null;
 	}
-	
+
 	protected void sendText(WebElement input, String text)
 	{
 		List<String> strings = new ArrayList<String>();

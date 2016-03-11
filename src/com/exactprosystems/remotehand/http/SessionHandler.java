@@ -63,6 +63,7 @@ public class SessionHandler implements HttpHandler
 //				return;
 //			}
 
+
 			sendMessage(exchanger, "OK");
 
 			logger.info("Session <" + id + ">. Received text:");
