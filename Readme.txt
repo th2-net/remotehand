@@ -131,6 +131,9 @@ All actions that wait for some element will check the page contents till given e
 The exception can be supressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
 In case of FindElement, no exception is thrown because the action handles this case.
 
+All actions support optional parameter #execute. If this parameter is set to false (n, no, f, 0, -), action will not be executed.
+Default value is true.
+
 Possible <locator> values:
 1. cssSelector - in this case <matcher> should contain CSS path to the element like this: div.v-button.v-widget.default.v-button-default;
 2. xpath - <matcher> should contain XPath to the element, for example: //button[contains(@class, 'v-nativebutton v-widget')];
