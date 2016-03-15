@@ -41,6 +41,7 @@ public class WebScriptCompiler extends ScriptCompiler
 	public static final String DEFAULT_DICT_NAME = "webdictionary.csv"; 
 	
 	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
+	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
 			
 	private static WebElementsDictionary dictionary;
 	

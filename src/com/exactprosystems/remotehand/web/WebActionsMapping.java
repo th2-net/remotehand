@@ -23,7 +23,7 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement;
+		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -54,6 +54,7 @@ public class WebActionsMapping
 		case Output :              return new Output();
 		case SelectFrame :         return new SelectFrame();
 		case FindElement :         return new FindElement();
+		case SetCheckbox :         return new SetCheckbox();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}

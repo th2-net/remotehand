@@ -15,6 +15,14 @@ Click,5,locator,matcher
 Optionally waits <wait> seconds for element specified by <matcher> and clicks on it. Element is found using <locator>.
 
 
+#action,#wait,#locator,#matcher,#checked
+SetCheckbox,5,locator,matcher,true
+
+Instead of Click this action checks state of the checkbox before clicking. 
+If #checked = true and checkbox is checked action will not click to element. 
+You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
+
+
 #action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2
 SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2
 
