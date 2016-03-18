@@ -28,14 +28,17 @@ public class Configuration
 	public final String CONFIG_FILE_NAME = "config.ini";
 	public final int DEF_SRV_PORT = 8000;
 	public final char DEF_DELIMITER = ',';
+	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 60; // 1 hour
 
 	public final String PARAM_PORT = "Port",
-			PARAM_DELIMITER = "Delimiter", 
+			PARAM_DELIMITER = "Delimiter",
+			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire";
 
 	private volatile int httpServerPort;
 	private volatile char scriptDelimiter;
+	private volatile char scriptTextQualifier;
 	private volatile int sessionExpire;
 
 	protected Configuration(CommandLine commandLine)
@@ -49,6 +52,7 @@ public class Configuration
 
 		defProperties.setProperty(PARAM_PORT, String.valueOf(DEF_SRV_PORT));
 		defProperties.setProperty(PARAM_DELIMITER, String.valueOf(DEF_DELIMITER));
+		defProperties.setProperty(PARAM_TEXT_QUALIFIER, String.valueOf(DEF_TEXT_QUALIFIER));
 		defProperties.setProperty(PARAM_SESSIONEXPIRE, String.valueOf(DEF_SESSION_EXPIRE));
 
 		properties = new Properties(defProperties);
@@ -82,6 +86,15 @@ public class Configuration
 			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_DELIMITER, String.valueOf(DEF_DELIMITER)));
 			scriptDelimiter = DEF_DELIMITER;
 		}
+		
+		String qualifier = getProperty(PARAM_TEXT_QUALIFIER);
+		if (qualifier != null && !qualifier.isEmpty())
+			scriptTextQualifier = qualifier.charAt(0);
+		else 
+		{
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_TEXT_QUALIFIER, DEF_TEXT_QUALIFIER));
+			scriptTextQualifier = DEF_TEXT_QUALIFIER;
+		}
 
 		try
 		{
@@ -114,6 +127,11 @@ public class Configuration
 	public char getDelimiter()
 	{
 		return scriptDelimiter;
+	}
+	
+	public char getTextQualifier()
+	{
+		return scriptTextQualifier;
 	}
 
 	public int getHttpServerPort()

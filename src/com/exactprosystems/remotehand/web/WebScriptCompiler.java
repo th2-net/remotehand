@@ -28,6 +28,7 @@ public class WebScriptCompiler extends ScriptCompiler
 
 	// csv
 	private static final char DELIMITER = Configuration.getInstance().getDelimiter();
+	private static final char TEXT_QUALIFIER = Configuration.getInstance().getTextQualifier();
 	private static final String HEADER_DELIMITER = "#";
 	public static final String COMMENT_INDICATOR = "//";
 
@@ -75,6 +76,7 @@ public class WebScriptCompiler extends ScriptCompiler
 
 		CsvReader reader = new CsvReader(new ByteArrayInputStream(script.getBytes()), Charset.defaultCharset());
 		reader.setDelimiter(DELIMITER);
+		reader.setTextQualifier(TEXT_QUALIFIER);
 
 		List<Action> result = new ArrayList<Action>();
 		String[] header = null;
