@@ -1,5 +1,6 @@
 <project name="RemoteHand" default="WebRHRelease" basedir=".">
 	<property name="release" value="release" />
+	<property name="release.project" value="${release}/remotehand" />
 	<property name="src" location="src" />
 	<property name="build" location="build" />
 	<property name="lib" location="lib" />
@@ -42,7 +43,7 @@
 		<mkdir dir="${build}" />
 
 		<delete dir="${release}" />
-		<mkdir dir="${release}" />
+		<mkdir dir="${release.project}" />
 
 		<path id="classpath">
 			<fileset dir="${lib}">
@@ -79,10 +80,20 @@
 			<zipfileset src="jar-in-jar-loader.zip"/>
 			<zipfileset dir="${lib}" prefix="lib/" />
 		</jar>
-		<copy file="config.ini" todir="${release}" />
-		<copy file="log4j.properties" todir="${release}" />
+
+		<move todir="${release.project}">
+			<fileset file="${jar}" />
+		</move>
 		
-		<delete dir="${build}" />
+		<copy file="config.ini" todir="${release.project}" />
+		<copy file="log4j.properties" todir="${release.project}" />
+		<copy file="Readme.txt" todir="${release.project}" />
+		
+		<zip destfile="${release}/remotehand_${DSTAMP}rev${svn.info.lastRev}.zip" basedir="${release.project}"/>
+		<echo message="ZIPing done."/>
+		
+		<delete dir="${build}" />		
+		<delete dir="${release.project}" />
 	</target>
 
 
