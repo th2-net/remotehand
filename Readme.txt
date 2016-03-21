@@ -100,6 +100,7 @@ If possible, action scrolls the table down to force it to be loaded completelly 
 ScrollTo,5,locator,matcher
 
 Optionally waits <wait> seconds for element specified by <matcher> and scrolls browser window to it. Element is found using <locator>.
+Note that all of actions working with elements (Click, SendKeys, etc.) will scroll to the element automatically if it is invisible.
 
 
 #action

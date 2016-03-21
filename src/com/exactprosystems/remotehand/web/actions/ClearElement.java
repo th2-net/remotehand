@@ -35,7 +35,7 @@ public class ClearElement extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement element = webDriver.findElement(webLocator);
+		WebElement element = findElement(webDriver, webLocator);
 		element.clear();
 		return null;
 	}

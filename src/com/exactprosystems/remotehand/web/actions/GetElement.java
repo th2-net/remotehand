@@ -38,7 +38,7 @@ public class GetElement extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement element = webDriver.findElement(webLocator);
+		WebElement element = findElement(webDriver, webLocator);
 		String elementHTML = element.getAttribute("outerHTML");
 
 		logger.info("Obtained element: " + elementHTML.toString());

@@ -17,12 +17,17 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.actions.WaitForElement;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.Locatable;
 
 public abstract class WebAction extends Action
 {
+	private static final Logger logger = Logger.getLogger(WebAction.class);
+	
 	protected static final String PARAM_WAIT = "wait",
 			PARAM_NOTFOUNDFAIL = "notfoundfail";
 	
@@ -131,5 +136,24 @@ public abstract class WebAction extends Action
 
 	public Map<String, String> getParams() {
 		return params;
+	}
+	
+	protected WebElement findElement(WebDriver webDriver, By webLocator)
+	{
+		WebElement element = webDriver.findElement(webLocator);
+		if (!element.isDisplayed())
+			scrollTo(element, webLocator);
+		return element;
+	}
+	
+	protected void scrollTo(WebElement element, By webLocator)
+	{
+		if (element instanceof Locatable)
+		{
+			((Locatable)element).getCoordinates().inViewPort();
+			logger.info("Scrolled to: " + webLocator);
+		}
+		else 
+			logger.warn("Cannot scroll to " + webLocator);
 	}
 }

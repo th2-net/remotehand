@@ -63,7 +63,7 @@ public class SendKeys extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement input = webDriver.findElement(webLocator);
+		WebElement input = findElement(webDriver, webLocator);
 
 		String beforeClear = params.get(CLEAR_BEFORE);
 		if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true"))) {

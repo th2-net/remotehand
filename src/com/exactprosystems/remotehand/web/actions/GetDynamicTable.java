@@ -51,7 +51,7 @@ public class GetDynamicTable extends WebAction
 		{
 			boolean haveMoreRows = true;
 
-			WebElement tableElement = webDriver.findElement(webLocator);
+			WebElement tableElement = findElement(webDriver, webLocator);
 
 			List<WebElement> previousRows = null;
 			WebElement lastRow = null;

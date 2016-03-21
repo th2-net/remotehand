@@ -42,7 +42,7 @@ public class SetCheckbox extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement checkbox = webDriver.findElement(webLocator);
+		WebElement checkbox = findElement(webDriver, webLocator);
 		boolean shouldBeChecked = !WebScriptCompiler.NO.contains(params.get(PARAM_CHECKED));
 		switchCheckbox(checkbox, shouldBeChecked);	
 		return null;
