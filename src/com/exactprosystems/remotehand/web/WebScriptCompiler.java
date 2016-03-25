@@ -26,6 +26,8 @@ public class WebScriptCompiler extends ScriptCompiler
 {
 	private static final Logger logger = Logger.getLogger(WebScriptCompiler.class);
 
+	private static final String SCRIPT_LINE_SEPARATOR = "&#13";
+	
 	// csv
 	private static final char DELIMITER = Configuration.getInstance().getDelimiter();
 	private static final char TEXT_QUALIFIER = Configuration.getInstance().getTextQualifier();
@@ -65,14 +67,14 @@ public class WebScriptCompiler extends ScriptCompiler
 	{
 		logger.info("Compiling script...");
 
-		if (script.contains("#type") || script.contains("#desc"))
+		if (isDictionaryUsed(script))
 		{
 			dictionary = new WebElementsDictionary(script, false);
 			logger.info("Web dictionary applied");
 			return new ArrayList<Action>();
 		}
 
-		script = script.replace("&#13", System.getProperty(LINE_SEPARATOR));
+		script = script.replace(SCRIPT_LINE_SEPARATOR, System.getProperty(LINE_SEPARATOR));
 
 		CsvReader reader = new CsvReader(new ByteArrayInputStream(script.getBytes()), Charset.defaultCharset());
 		reader.setDelimiter(DELIMITER);
@@ -214,5 +216,16 @@ public class WebScriptCompiler extends ScriptCompiler
 			}
 		}
 		return foundAt == -1 || foundAt >= values.length || YES.contains(values[foundAt].toLowerCase());
+	}
+	
+	private boolean isDictionaryUsed(String script)
+	{
+		String[] lines = script.split(SCRIPT_LINE_SEPARATOR);
+		for (String line : lines)
+		{
+			if (line.startsWith(HEADER_DELIMITER) && (line.contains("#type") || line.contains("#desc")))
+				return true;
+		}
+		return false;
 	}
 }
