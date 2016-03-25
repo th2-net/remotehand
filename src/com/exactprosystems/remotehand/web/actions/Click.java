@@ -52,44 +52,41 @@ public class Click extends WebAction
 		if (button == null)
 			button = LEFT;
 		
+		String xOffsetStr, yOffsetStr;
+		int xOffset = 0, yOffset = 0;
+		xOffsetStr = params.get(X_OFFSET);
+		yOffsetStr = params.get(Y_OFFSET);
+		
+		Actions actions = new Actions(webDriver);
+		
+		if (xOffsetStr != null && !xOffsetStr.isEmpty() && Y_OFFSET != null && !yOffsetStr.isEmpty())
+		{
+			try
+			{
+				xOffset = Integer.valueOf(xOffsetStr);
+				yOffset = Integer.valueOf(yOffsetStr);
+			}
+			catch (Exception e)
+			{
+				logger.error("xOffset or yOffset is not integer value");
+			}
+			actions = actions.moveToElement(element,xOffset,yOffset);
+		}
+		else
+		{
+			actions = actions.moveToElement(element);
+		}
+		
+		
 		try {
 			if (button.equals(LEFT))
-				element.click();
+				actions.click().perform();
 			else if (button.equals(RIGHT))
-			{
-				String xOffsetStr, yOffsetStr;
-				int xOffset = 0, yOffset = 0;
-				xOffsetStr = params.get(X_OFFSET);
-				yOffsetStr = params.get(Y_OFFSET);
-				
-				Actions actions = new Actions(webDriver);
-				
-				if (xOffsetStr != null && !xOffsetStr.isEmpty() && Y_OFFSET != null && !yOffsetStr.isEmpty())
-				{
-					try
-					{
-						xOffset = Integer.valueOf(xOffsetStr);
-						yOffset = Integer.valueOf(yOffsetStr);
-					}
-					catch (Exception e)
-					{
-						logger.error("xOffset or yOffset is not integer value");
-					}
-					actions.moveToElement(element,xOffset,yOffset).contextClick().perform();
-				}
-				else
-				{
-					actions.contextClick(element).perform();
-				}
-
-				//actions.moveToElement(element,xOffset,yOffset).contextClick().perform();;
-				
-				//actions.contextClick(element);
-				//actions.perform();
-			}
+				actions.contextClick().perform();
 			else if (button.equals(MIDDLE))
 			{
-				
+				logger.error("Middle click is not implemented.");
+				return null;
 			}
 			else
 			{
@@ -111,4 +108,6 @@ public class Click extends WebAction
 
 		return null;
 	}
+	
+	
 }
