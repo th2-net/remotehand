@@ -28,12 +28,13 @@ public abstract class ScriptCompiler {
 	{
 		BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
 		StringBuffer sb = new StringBuffer();
+		String separator = System.getProperty(LINE_SEPARATOR);
 		try
 		{
 			String line;
 			while ((line = reader.readLine()) != null)
 			{
-				sb.append(line).append(System.getProperty(LINE_SEPARATOR));
+				sb.append(line).append(separator);
 			}
 		}
 		finally
