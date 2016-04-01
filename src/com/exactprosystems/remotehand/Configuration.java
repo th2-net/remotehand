@@ -48,24 +48,29 @@ public class Configuration
 		}
 		instance = this;
 
-		Properties defProperties = new Properties();
+		properties = new Properties(getDefaultProperties());
 
-		defProperties.setProperty(PARAM_PORT, String.valueOf(DEF_SRV_PORT));
-		defProperties.setProperty(PARAM_DELIMITER, String.valueOf(DEF_DELIMITER));
-		defProperties.setProperty(PARAM_TEXT_QUALIFIER, String.valueOf(DEF_TEXT_QUALIFIER));
-		defProperties.setProperty(PARAM_SESSIONEXPIRE, String.valueOf(DEF_SESSION_EXPIRE));
-
-		properties = new Properties(defProperties);
-
+		FileInputStream fs = null;
 		try
 		{
-			FileInputStream fs = new FileInputStream(new File(getConfigFileName()));
+			fs = new FileInputStream(new File(getConfigFileName()));
 			properties.load(fs);
-			fs.close();
 		}
 		catch (IOException e)
 		{
 			logger.warn(String.format("File '%s' is not found or has wrong format. Using default cofiguration.", CONFIG_FILE_NAME));
+		}
+		finally
+		{
+			try
+			{
+				if (fs != null)
+					fs.close();
+			}
+			catch (IOException e)
+			{
+				logger.warn(String.format("An error occurred while closing file '%s'.", CONFIG_FILE_NAME), e);
+			}
 		}
 
 		try
@@ -107,6 +112,16 @@ public class Configuration
 		}
 
 
+	}
+	
+	protected Properties getDefaultProperties()
+	{
+		Properties defProperties = new Properties();
+		defProperties.setProperty(PARAM_PORT, String.valueOf(DEF_SRV_PORT));
+		defProperties.setProperty(PARAM_DELIMITER, String.valueOf(DEF_DELIMITER));
+		defProperties.setProperty(PARAM_TEXT_QUALIFIER, String.valueOf(DEF_TEXT_QUALIFIER));
+		defProperties.setProperty(PARAM_SESSIONEXPIRE, String.valueOf(DEF_SESSION_EXPIRE));
+		return defProperties;
 	}
 
 	public static Configuration getInstance()

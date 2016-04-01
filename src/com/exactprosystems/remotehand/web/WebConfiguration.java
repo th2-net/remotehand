@@ -22,33 +22,25 @@ public class WebConfiguration extends Configuration{
 
 	private static final Logger logger = Logger.getLogger(WebConfiguration.class);
 
-	public final Browser DEF_BROWSER = Browser.FIREFOX;
-	public final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
-	public final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
-	public final String DEF_PROXY = "";
+	public static final Browser DEF_BROWSER = Browser.FIREFOX;
+	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
+	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
+	public static final String DEF_PROXY = "";
 
-	public final String PARAM_BROWSER = "Browser";
-	public final String	PARAM_IEDRIVERPATH = "IEDriverPath";
-	public final String	PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
-	public final String PARAM_HTTPPROXY = "HttpProxy";
-	public final String PARAM_SSLPROXY = "SslProxy";
-	public final String PARAM_FTPPROXY = "FtpProxy";
-	public final String PARAM_SOCKSPROXY = "SocksProxy";
-	public final String PARAM_NOPROXY = "NoProxy";
+	public static final String PARAM_BROWSER = "Browser";
+	public static final String	PARAM_IEDRIVERPATH = "IEDriverPath";
+	public static final String	PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
+	public static final String PARAM_HTTPPROXY = "HttpProxy";
+	public static final String PARAM_SSLPROXY = "SslProxy";
+	public static final String PARAM_FTPPROXY = "FtpProxy";
+	public static final String PARAM_SOCKSPROXY = "SocksProxy";
+	public static final String PARAM_NOPROXY = "NoProxy";
 
 	private volatile Browser browserToUse;
 	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, ftpProxySetting, socksProxySetting, noProxySetting;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
-
-		this.properties.setProperty(PARAM_BROWSER, DEF_BROWSER.getLabel());
-		this.properties.setProperty(PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
-		this.properties.setProperty(PARAM_HTTPPROXY, DEF_PROXY);
-		this.properties.setProperty(PARAM_SSLPROXY, DEF_PROXY);
-		this.properties.setProperty(PARAM_FTPPROXY, DEF_PROXY);
-		this.properties.setProperty(PARAM_SOCKSPROXY, DEF_PROXY);
-		this.properties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 
 		browserToUse = Browser.valueByLabel(properties.getProperty(PARAM_BROWSER));
 		if (browserToUse == Browser.INVALID)
@@ -107,6 +99,20 @@ public class WebConfiguration extends Configuration{
 		}
 	}
 
+	@Override
+	protected Properties getDefaultProperties()
+	{
+		Properties defProperties = super.getDefaultProperties();
+		defProperties.setProperty(PARAM_BROWSER, DEF_BROWSER.getLabel());
+		defProperties.setProperty(PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
+		defProperties.setProperty(PARAM_HTTPPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_SSLPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_FTPPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_SOCKSPROXY, DEF_PROXY);
+		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
+		return defProperties;
+	}
+	
 
 	public Browser getBrowserToUse()
 	{
