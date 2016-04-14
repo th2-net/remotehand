@@ -11,21 +11,6 @@
 	<property name="uiaPackage" value="com/exactprosystems/remotehand/uiautomation/**" />
 	
 	<target name="CheckSvnRevision">
-		<path id="svnant.libs.path">
-			<fileset dir="lib_for_build">
-				<include name="svnant.jar"/>
-				<include name="svnClientAdapter.jar"/>
-				<include name="svnjavahl.jar"/>
-			</fileset>
-		</path>
-		
-		<!-- Load SvnAnt -->
-		<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.libs.path" />    
-		<!-- Find head revision number from the local repository. -->
-		<svn username="" password="" javahl="false" svnkit="false">
-			<info target="." />
-		</svn>
-		
 		<condition property="svn.info.lastRev" value="local_build">
 			<not>
 				<isset property="svn.info.lastRev"/>
