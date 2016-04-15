@@ -59,7 +59,7 @@ public class Click extends WebAction
 		
 		Actions actions = new Actions(webDriver);
 		
-		if (xOffsetStr != null && !xOffsetStr.isEmpty() && Y_OFFSET != null && !yOffsetStr.isEmpty())
+		if ((xOffsetStr != null && !xOffsetStr.isEmpty()) && (yOffsetStr != null && !yOffsetStr.isEmpty()))
 		{
 			try
 			{

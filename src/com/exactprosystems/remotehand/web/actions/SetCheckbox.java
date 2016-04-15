@@ -11,9 +11,11 @@ package com.exactprosystems.remotehand.web.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
@@ -58,14 +60,25 @@ public class SetCheckbox extends WebAction
 			return;
 		}
 		
-		checkbox.click();
-		if (checkbox.isSelected() != newState) // Case from LCH frontend
+		try
 		{
-			WebElement parent = checkbox.findElement(By.xpath(".."));
-			logger.info("Try to click on parent " + parent);
-			parent.click();
-			if (checkbox.isSelected() != newState)
-				throw new ScriptExecuteException("Cannot change state of checkbox " + checkbox);				
+			checkbox.click();
+		}
+		catch (WebDriverException e)
+		{
+				if (e.getMessage().contains("Element is not clickable") 
+						&& checkbox.isSelected() != newState) // Case from LCH frontend
+				{
+					WebElement parent = checkbox.findElement(By.xpath(".."));
+					logger.info("Try to click on parent " + parent);
+					parent.click();
+					if (checkbox.isSelected() != newState)
+						throw new ScriptExecuteException("Cannot change state of checkbox " + checkbox);				
+				}
+				else
+				{
+					throw e;
+				}
 		}
 		logger.info("Checkbox has been successfully " + newStateStr);
 	}
