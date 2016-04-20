@@ -12,7 +12,9 @@ package com.exactprosystems.remotehand.http;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.IRemoteHandManager;
+import com.exactprosystems.remotehand.web.WebConfiguration;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.log4j.Logger;
@@ -41,14 +43,21 @@ public class LoginHandler implements HttpHandler
 
 		HTTPServer.getServer().createContext(sessionId, new SessionHandler(sessionId, manager));
 
-		exchanger.sendResponseHeaders(200, sessionId.length());
+		String responseMsg = String.format("sessionId=%s;browser=%s", sessionId, getUsedBrowser());
+		
+		exchanger.sendResponseHeaders(200, responseMsg.length());
 		OutputStream os = exchanger.getResponseBody();
-		os.write(sessionId.getBytes());
+		os.write(responseMsg.getBytes());
 		os.close();
 	}
 
 	private String createSessionId()
 	{
 		return "Ses" + Long.toString(System.currentTimeMillis());
+	}
+	
+	private String getUsedBrowser()
+	{
+		return ((WebConfiguration) Configuration.getInstance()).getBrowserToUse().getLabel();
 	}
 }
