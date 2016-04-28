@@ -16,15 +16,28 @@ import org.openqa.selenium.WebDriver;
 
 public class XPath extends WebLocator
 {
+	public static final String NON_BREAKING_SPACE = "#nbsp#";
+	
 	@Override
 	public By getWebLocator(WebDriver webDriver, String matcher)
 	{
-		return By.xpath(matcher);
+		return By.xpath(prepareMatcher(matcher));
 	}
 	
 	@Override
 	public By getWebLocator(WebDriver webDriver, Map<String, String> params)
 	{
 		return getWebLocator(webDriver, params.get(WebLocator.MATCHER));
+	}
+	
+	protected String prepareMatcher(String matcher)
+	{
+		if (matcher == null)
+			return null;
+		
+		if (matcher.contains(NON_BREAKING_SPACE))
+			return matcher.replace(NON_BREAKING_SPACE, "\u00A0");
+		else 
+			return matcher;
 	}
 }

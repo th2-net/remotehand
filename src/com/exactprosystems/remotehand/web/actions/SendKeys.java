@@ -196,5 +196,16 @@ public class SendKeys extends WebAction
 		put("f10", Keys.F10);
 		put("f11", Keys.F11);
 		put("f12", Keys.F12);
+		put("nbsp", Keys.chord(Keys.ALT, Keys.NUMPAD0, Keys.NUMPAD1, Keys.NUMPAD6, Keys.NUMPAD0));
+		put("num0", Keys.NUMPAD0);
+		put("num1", Keys.NUMPAD1);
+		put("num2", Keys.NUMPAD2);
+		put("num3", Keys.NUMPAD3);
+		put("num4", Keys.NUMPAD4);
+		put("num5", Keys.NUMPAD5);
+		put("num6", Keys.NUMPAD6);
+		put("num7", Keys.NUMPAD7);
+		put("num8", Keys.NUMPAD8);
+		put("num9", Keys.NUMPAD9);
 	}};
 }

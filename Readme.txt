@@ -54,6 +54,8 @@ You can tell RemoteHand to press the following special keys by specifying corres
 17. Insert - #insert#
 18. Delete - #delete#
 19. Functional keys, i.e. F1, F2 etc. - #f1#, #f2# etc.
+20. Numpad's keys - num0, num1, ..., num9
+21. Non-breaking space (Alt+0160, only for Windows) - #nbsp#
 
 The following example writes "text" in a field, then presses Down arrow to select something in a dropdown list, then presses Enter key to confirm the selection:
 text#down##return#
@@ -148,6 +150,8 @@ Possible <locator> values:
 2. xpath - <matcher> should contain XPath to the element, for example: //button[contains(@class, 'v-nativebutton v-widget')];
 3. tagName - in this case <matcher> is a tag name of the element;
 4. id - then <matcher> contains id of the element.
+
+You can specify non-breaking space (&nbsp;) in xpath using special value #nbsp#. For example: //span[text()="#nbsp#"].
 
 RemoteHand can use web element dictionary, which contains list of web elements by tags: #webId,#locator,#matcher,#type,#desc.
 Example:
