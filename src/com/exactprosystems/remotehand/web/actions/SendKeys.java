@@ -184,6 +184,7 @@ public class SendKeys extends WebAction
 		put("home", Keys.HOME);
 		put("insert", Keys.INSERT);
 		put("delete", Keys.DELETE);
+		put("backspace", Keys.BACK_SPACE);
 		put("f1", Keys.F1);
 		put("f2", Keys.F2);
 		put("f3", Keys.F3);

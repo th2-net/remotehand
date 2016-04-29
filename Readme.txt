@@ -56,6 +56,7 @@ You can tell RemoteHand to press the following special keys by specifying corres
 19. Functional keys, i.e. F1, F2 etc. - #f1#, #f2# etc.
 20. Numpad's keys - num0, num1, ..., num9
 21. Non-breaking space (Alt+0160, only for Windows) - #nbsp#
+22. Backspace - #backspace# 
 
 The following example writes "text" in a field, then presses Down arrow to select something in a dropdown list, then presses Enter key to confirm the selection:
 text#down##return#
