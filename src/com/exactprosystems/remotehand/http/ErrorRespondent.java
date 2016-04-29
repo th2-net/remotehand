@@ -11,13 +11,15 @@ package com.exactprosystems.remotehand.http;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import org.openqa.selenium.WebDriverException;
 
 public class ErrorRespondent
 {
 	private static final int COMPILE_ERROR_CODE = 1, 
 			EXECUTE_ERROR_CODE = 2, 
 			BUSY_ERROR_CODE = 3, 
-			INCORRECT_REQ_CODE = 4;
+			INCORRECT_REQ_CODE = 4,
+			WEBDRIVER_ERROR_CODE = 5;
 
 	private static final String ERROR_MARK = "%error%";
 
@@ -48,5 +50,10 @@ public class ErrorRespondent
 	public String error(IncorrectRequestException ex)
 	{
 		return ERROR_MARK + "=" + INCORRECT_REQ_CODE + " : " + ex.getMessage();
+	}
+
+	public String error(WebDriverException ex)
+	{
+		return ERROR_MARK + "=" + WEBDRIVER_ERROR_CODE + " : " + ex.getMessage();
 	}
 }

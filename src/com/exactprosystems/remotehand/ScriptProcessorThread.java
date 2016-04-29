@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand;
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionHandler;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.WebDriverException;
 
 import java.util.List;
 
@@ -94,6 +95,11 @@ public class ScriptProcessorThread implements Runnable
 		{
 			logger.error("Execute error: " + ex2.getMessage());
 			return ErrorRespondent.getRespondent().error(ex2);
+		}
+		catch (WebDriverException ex3)
+		{
+			logger.error("Execute error: " + ex3.getMessage());
+			return ErrorRespondent.getRespondent().error(ex3);
 		}
 
 		return result;
