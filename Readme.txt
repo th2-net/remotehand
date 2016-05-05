@@ -9,10 +9,10 @@ Open,url
 Opens resource at <url>.
 
 
-#action,#wait,#locator,#matcher
-Click,5,locator,matcher
+#action,#wait,#locator,#matcher,#button
+Click,5,locator,matcher,mouse_button
 
-Optionally waits <wait> seconds for element specified by <matcher> and clicks on it. Element is found using <locator>.
+Optionally waits <wait> seconds for element specified by <matcher> and clicks on it with <button> ("left" by default). Element is found using <locator>.
 
 
 #action,#wait,#locator,#matcher,#checked
