@@ -11,6 +11,7 @@ package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.web.actions.*;
+import com.exactprosystems.remotehand.web.actions.mtable.*;
 
 public class WebActionsMapping
 {
@@ -23,7 +24,8 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox;
+		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox,
+		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -55,6 +57,9 @@ public class WebActionsMapping
 		case SelectFrame :         return new SelectFrame();
 		case FindElement :         return new FindElement();
 		case SetCheckbox :         return new SetCheckbox();
+		case MTableGetValue :         return new MTableGetValue();
+		case MTableGetRow :         return new MTableGetRow();
+		case MTableGetTable :         return new MTableGetTable();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
