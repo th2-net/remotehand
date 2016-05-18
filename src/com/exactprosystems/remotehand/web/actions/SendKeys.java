@@ -63,7 +63,11 @@ public class SendKeys extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement input = findElement(webDriver, webLocator);
+		WebElement input;
+		if (webLocator != null)
+			input = findElement(webDriver, webLocator);
+		else
+			input = getWebDriver().switchTo().activeElement();
 
 		String beforeClear = params.get(CLEAR_BEFORE);
 		if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true"))) {
@@ -116,20 +120,7 @@ public class SendKeys extends WebAction
 
 	protected void sendText(WebElement input, String text)
 	{
-		List<String> strings = new ArrayList<String>();
-		int index;
-		while ((index = text.indexOf(KEY_SIGN))>-1)
-		{
-			int endIndex = text.indexOf(KEY_SIGN, index+1);
-			if (endIndex < 0)
-				break;
-			strings.add(text.substring(0, index));  //Text before non-text key
-			strings.add(text.substring(index, endIndex));  //Non-text key code
-			text = text.substring(endIndex+1);
-		}
-		if (!text.isEmpty())
-			strings.add(text);
-		
+		List<String> strings = processInputText(text);
 		for (String s : strings)
 			if (!s.startsWith(KEY_SIGN))
 				input.sendKeys(s);
@@ -139,6 +130,26 @@ public class SendKeys extends WebAction
 				if (k != null)
 					input.sendKeys(k);
 			}
+	}
+	
+	protected static List<String> processInputText(String text)
+	{
+		List<String> strings = new ArrayList<String>();
+		int index;
+		while ((index = text.indexOf(KEY_SIGN))>-1)
+		{
+			int endIndex = text.indexOf(KEY_SIGN, index+1);
+			if (endIndex < 0)
+				break;
+			String before = text.substring(0, index);
+			if (!before.isEmpty())
+				strings.add(before);  //Text before non-text key
+			strings.add(text.substring(index, endIndex));  //Non-text key code
+			text = text.substring(endIndex+1);
+		}
+		if (!text.isEmpty())
+			strings.add(text);
+		return strings;
 	}
 
 	public CharSequence getKeysByLabel(String label)
@@ -159,7 +170,7 @@ public class SendKeys extends WebAction
 			return KEYS.get(label.toLowerCase());
 	}
 
-	private String replaceConversions(String src) {
+	protected static String replaceConversions(String src) {
 		return src.replace("(","#openbracket#");
 	}
 

@@ -137,6 +137,15 @@ FindElement,5,locator,matcher,controlID
 
 Optionally waits <wait> seconds for element specified by <matcher> and <locator>. If element is found, "<id>=found" is printed in output. Else "<id>=notfound" is printed.
 
+#action,#key
+PressKey,#tab#
+
+Allow to send one of keys specified for SendKeys action without reference to locator.
+
+#action,#text,#text2
+SendKeysToActive,text,text2
+
+Allow to send text to active element as SendKeys but without reference to locator.
 
 2. Notes
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
