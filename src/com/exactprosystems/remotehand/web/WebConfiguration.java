@@ -26,7 +26,7 @@ public class WebConfiguration extends Configuration{
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
 	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
 	public static final String DEF_PROXY = "";
-
+	
 	public static final String PARAM_BROWSER = "Browser";
 	public static final String	PARAM_IEDRIVERPATH = "IEDriverPath";
 	public static final String	PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
@@ -35,9 +35,11 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_FTPPROXY = "FtpProxy";
 	public static final String PARAM_SOCKSPROXY = "SocksProxy";
 	public static final String PARAM_NOPROXY = "NoProxy";
+	public static final String PARAM_PROFILE = "Profile";
 
 	private volatile Browser browserToUse;
-	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, ftpProxySetting, socksProxySetting, noProxySetting;
+	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
+		ftpProxySetting, socksProxySetting, noProxySetting, profilePath;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
@@ -48,7 +50,13 @@ public class WebConfiguration extends Configuration{
 			logger.warn(String.format("Property '%s' is not set or has invalid value. Using default value = '%s'", PARAM_BROWSER, DEF_BROWSER.getLabel()));
 			browserToUse = DEF_BROWSER;
 		}
-
+		
+		profilePath = properties.getProperty(PARAM_PROFILE);
+		if ((profilePath == null) || (profilePath.isEmpty()))
+			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_PROFILE, "temporary profile"));
+		else
+			logger.info(PARAM_PROFILE+"="+profilePath);
+		
 		ieDriverFileName = properties.getProperty(PARAM_IEDRIVERPATH);
 		if ((ieDriverFileName == null) || (ieDriverFileName.isEmpty()))
 		{
@@ -153,4 +161,10 @@ public class WebConfiguration extends Configuration{
 	{
 		return noProxySetting;
 	}
+	
+	public String getProfilePath()
+	{
+		return profilePath;
+	}
+	
 }
