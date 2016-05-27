@@ -32,9 +32,10 @@ public class PressKey extends WebAction
 	
 	private void pressKey(WebDriver webDriver, String s) throws ScriptExecuteException
 	{
-		CharSequence key = SendKeys.KEYS.get(s.substring(1));
+		String name = s.substring(1);
+		CharSequence key = SendKeys.KEYS.get(name);
 		if (key == null)
-			throw new ScriptExecuteException("Unknown key: " + key);
+			throw new ScriptExecuteException("Unknown key: " + name);
 		((RemoteWebDriver) webDriver).getKeyboard().pressKey(key);
 	}
 
