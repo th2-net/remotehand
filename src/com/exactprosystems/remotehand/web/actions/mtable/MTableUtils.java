@@ -156,17 +156,22 @@ public class MTableUtils
 
     }
     
-   /* public static void waitForElement(String expression, WebDriver webDriver, int seconds) throws ScriptExecuteException
-	{
-		try
-		{
-			WebDriverWait wait = new WebDriverWait(webDriver, seconds);
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(expression)));
-		}
-		catch (TimeoutException ex)
-		{
-			throw new ScriptExecuteException("Timed out after " + seconds + " seconds waiting for '" + expression + "'");
-		}
-	}*/
-    
+   public static int getIntValue(String input, int orDefault)
+   {
+	   int intValue;
+	   if (input == null || input.isEmpty())
+	   {
+		   intValue = orDefault;
+	   }
+	   else
+		   try
+		   {
+			   intValue = Integer.valueOf(input);
+		   }
+		   catch(Exception e)
+		   {
+			   intValue = orDefault;
+		   }
+	   return intValue;
+   }
 }
