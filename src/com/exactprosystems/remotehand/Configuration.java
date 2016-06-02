@@ -108,7 +108,7 @@ public class Configuration
 		catch (Exception ex)
 		{
 			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", sessionExpire, DEF_SESSION_EXPIRE));
-			httpServerPort = DEF_SRV_PORT;
+			sessionExpire = DEF_SESSION_EXPIRE;
 		}
 
 
