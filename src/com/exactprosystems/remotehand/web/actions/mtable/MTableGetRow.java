@@ -11,6 +11,7 @@ package com.exactprosystems.remotehand.web.actions.mtable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -94,7 +95,9 @@ public class MTableGetRow extends WebAction
 			}
 			else
 			{
-				result = MTableUtils.getTableRow(webDriver, tableId, tableInd, rowInd);
+				result = new HashMap<String,String>();
+				//Getting values from all cells doesn't work
+				//result = MTableUtils.getTableRow(webDriver, tableId, tableInd, rowInd);
 			}
 		}
 		catch(Exception e)
