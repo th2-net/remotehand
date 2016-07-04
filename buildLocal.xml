@@ -1,4 +1,4 @@
-<project name="ClearTH SGX local" default="WebRHRelease" basedir=".">
+<project name="ClearTH RemoteHand local" default="WebRHRelease" basedir=".">
     <target name="Get revision">
         <path id="svnant.libs.path">
         <fileset dir="lib_for_build">
