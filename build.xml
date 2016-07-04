@@ -53,8 +53,8 @@
 				<attribute name="Rsrc-Main-Class" value="com.exactprosystems.remotehand.web.WebRhStarter"/>
 				<attribute name="Rsrc-Class-Path" value="./
 						lib/commons-cli-1.2.jar
-						lib/selenium-java-2.52.0.jar
-						lib/selenium-server-standalone-2.52.0.jar
+						lib/selenium-java-2.53.1.jar
+						lib/selenium-server-standalone-2.53.1.jar
 						lib/log4j-1.2.16.jar
 						lib/javacsv.jar" />
 				<attribute name="Implementation-Title" value="RemoteHand" />
