@@ -223,7 +223,7 @@ public class Starter
 			}
 			catch (Exception ex)
 			{
-				logger.error(ex);
+				logger.error("An error occurred", ex);
 			}
 		}
 		return launcher;

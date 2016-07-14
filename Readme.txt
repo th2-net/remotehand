@@ -23,8 +23,8 @@ If #checked = true and checkbox is checked action will not click to element.
 You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
 
 
-#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2
-SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2
+#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled
+SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes
 
 Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
 In some cases it is needed to wait for some element to appear after first input and then continue the input 
@@ -33,6 +33,7 @@ In these cases optional parameters <wait2>, <locator2>, <matcher2> and <text2> c
 after inputing <text>, RemoteHand will wait <wait2> seconds for element specified by <matcher2> and then continue the input, inputing <text2>.
 Element to wait is found using <locator2>. 
 Also, you can skip <locator2> and <matcher2> and RemoteHand will just wait <wait2> seconds before continuing the input with <text2>.
+If you want to fill disabled field use #CanBeDisabled=yes. Field will be enabled and disabled back after text input.
 
 You can tell RemoteHand to press the following special keys by specifying corresponding codes:
 1. Up arrow - #up#

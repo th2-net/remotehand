@@ -15,10 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
@@ -35,7 +32,8 @@ public class SendKeys extends WebAction
 			PARAM_LOCATOR2 = WebScriptCompiler.WEB_LOCATOR+"2",
 			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER+"2",
 			KEY_SIGN = "#",
-			CLEAR_BEFORE = "clear";
+			CLEAR_BEFORE = "clear",
+			CAN_BE_DISABLED = "canbedisabled";
 
 	public SendKeys()
 	{
@@ -68,53 +66,65 @@ public class SendKeys extends WebAction
 			input = findElement(webDriver, webLocator);
 		else
 			input = getWebDriver().switchTo().activeElement();
-
-		String beforeClear = params.get(CLEAR_BEFORE);
-		if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true"))) {
-			input.clear();
-			logger.debug("Text field has been cleared.");
-		}
-
-		String text = params.get(PARAM_TEXT);
-		text = replaceConversions(text);
-
-		sendText(input, text);
-		logger.info("Sent text to: " + webLocator);
-
-
-		if (!params.containsKey(PARAM_TEXT2))
-			return null;
-
-		String text2 = params.get(PARAM_TEXT2);
-		text2 = replaceConversions(text2);
-
-		boolean needRun = true;
-		if ((params.containsKey(PARAM_WAIT2)) && (!params.get(PARAM_WAIT2).isEmpty()))
+		
+		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
+		try
 		{
-			int wait2 = getIntegerParam(params, PARAM_WAIT2);
-			if ((params.containsKey(PARAM_LOCATOR2)) && (params.containsKey(PARAM_MATCHER2)))
+			if (shouldBeEnabled)
+				enable(webDriver, input);
+			
+			String beforeClear = params.get(CLEAR_BEFORE);
+			if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true")))
 			{
-				try
-				{
-					By locator2 = WebLocatorsMapping.getInstance().getByName(params.get(PARAM_LOCATOR2)).getWebLocator(webDriver, params.get(PARAM_MATCHER2));
-					if (!waitForElement(wait2, locator2))
-						needRun = false;
-				}
-				catch (ScriptCompileException e)
-				{
-					throw new ScriptExecuteException("Error while resolving locator2", e);
-				}
+				input.clear();
+				logger.debug("Text field has been cleared.");
 			}
-			else
-				Wait.webWait(webDriver, wait2);
-		}
 
-		if (needRun)
+			String text = params.get(PARAM_TEXT);
+			text = replaceConversions(text);
+
+			sendText(input, text);
+			logger.info("Sent text to: " + webLocator);
+
+
+			if (!params.containsKey(PARAM_TEXT2))
+				return null;
+
+			String text2 = params.get(PARAM_TEXT2);
+			text2 = replaceConversions(text2);
+
+			boolean needRun = true;
+			if ((params.containsKey(PARAM_WAIT2)) && (!params.get(PARAM_WAIT2).isEmpty()))
+			{
+				int wait2 = getIntegerParam(params, PARAM_WAIT2);
+				if ((params.containsKey(PARAM_LOCATOR2)) && (params.containsKey(PARAM_MATCHER2)))
+				{
+					try
+					{
+						By locator2 = WebLocatorsMapping.getInstance().getByName(params.get(PARAM_LOCATOR2)).getWebLocator(webDriver, params.get(PARAM_MATCHER2));
+						if (!waitForElement(wait2, locator2))
+							needRun = false;
+					}
+					catch (ScriptCompileException e)
+					{
+						throw new ScriptExecuteException("Error while resolving locator2", e);
+					}
+				}
+				else
+					Wait.webWait(webDriver, wait2);
+			}
+
+			if (needRun)
+			{
+				sendText(input, text2);
+				logger.info("Sent text2 to: " + webLocator);
+			}
+		}
+		finally
 		{
-			sendText(input, text2);
-			logger.info("Sent text2 to: " + webLocator);
+			if (shouldBeEnabled)
+				disable(webDriver, input);
 		}
-
 		return null;
 	}
 
@@ -168,6 +178,26 @@ public class SendKeys extends WebAction
 		}
 		else
 			return KEYS.get(label.toLowerCase());
+	}
+	
+	protected boolean shouldBeEnabledAtFirst(WebElement element, Map<String, String> params)
+	{
+		String canBeDisabled = params.get(CAN_BE_DISABLED);
+		return canBeDisabled != null && !element.isEnabled() && WebScriptCompiler.YES.contains(canBeDisabled.toLowerCase());
+	}
+	
+	protected void enable(WebDriver driver, WebElement input)
+	{
+		logger.info("Try to enable element");
+		((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled')", input);
+		logger.info("Now element is " + (input.isEnabled() ? "enabled" : "still disabled"));
+	}
+	
+	protected void disable(WebDriver driver, WebElement input)
+	{
+		logger.info("Try to disable element");
+		((JavascriptExecutor) driver).executeScript("arguments[0].setAttribute('disabled', '')", input);
+		logger.info("Now element is " + (input.isEnabled() ? "still enabled" : "disabled"));
 	}
 
 	protected static String replaceConversions(String src) {
