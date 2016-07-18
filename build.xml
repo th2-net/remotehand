@@ -55,6 +55,7 @@
 						lib/commons-cli-1.2.jar
 						lib/selenium-java-2.53.1.jar
 						lib/selenium-server-standalone-2.53.1.jar
+						lib/commons-lang3-3.4.jar
 						lib/log4j-1.2.16.jar
 						lib/javacsv.jar" />
 				<attribute name="Implementation-Title" value="RemoteHand" />
@@ -113,6 +114,7 @@
 				<attribute name="Rsrc-Class-Path" value="./
 						lib/commons-io-2.4.jar
 						lib/commons-cli-1.2.jar
+						lib/commons-lang3-3.4.jar
 						lib/log4j-1.2.16.jar
 						lib/javacsv.jar" />
 				<attribute name="Implementation-Title" value="RemoteHand" />
