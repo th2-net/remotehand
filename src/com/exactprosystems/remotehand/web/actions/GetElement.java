@@ -43,6 +43,13 @@ public class GetElement extends WebAction
 
 		logger.info("Obtained element: " + elementHTML.toString());
 
-		return elementHTML;
+		String id = params.get(FindElement.PARAM_ID);
+		if (id == null || id.isEmpty())
+			id = "";
+		else 
+			id += "=";
+		
+		
+		return id + elementHTML;
 	};
 }
