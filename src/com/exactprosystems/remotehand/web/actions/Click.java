@@ -17,6 +17,8 @@ import org.openqa.selenium.interactions.Actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Click extends WebAction
 {
@@ -108,6 +110,26 @@ public class Click extends WebAction
 
 		return null;
 	}
-	
-	
+
+	@Override
+	protected boolean waitForElement(int waitDuration, By locator) throws ScriptExecuteException {
+
+		WebDriver driver = getWebDriver();
+
+		try {
+			new WebDriverWait(driver, waitDuration).until(ExpectedConditions.elementToBeClickable(locator));
+
+			logger.info("Appeared locator: '" + locator.toString() + "'");
+		}
+		catch (TimeoutException ex)  {
+			if (isElementMandatory())
+				throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");
+			else
+				return false;
+		}
+
+		return true;
+
+	}
+
 }
