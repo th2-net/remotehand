@@ -9,6 +9,7 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -122,10 +123,15 @@ public class Click extends WebAction
 			logger.info("Appeared locator: '" + locator.toString() + "'");
 		}
 		catch (TimeoutException ex)  {
-			if (isElementMandatory())
-				throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");
-			else
-				return false;
+			List<WebElement> elements = driver.findElements(locator);
+			if (elements.size() > 0) {
+				logger.warn("Element is not clickable, but try to click on it.");
+			} else {
+				if (isElementMandatory())
+					throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");
+				else
+					return false;
+			}
 		}
 
 		return true;
