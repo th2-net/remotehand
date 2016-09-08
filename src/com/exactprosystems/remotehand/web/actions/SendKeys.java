@@ -33,7 +33,8 @@ public class SendKeys extends WebAction
 			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER+"2",
 			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
-			CAN_BE_DISABLED = "canbedisabled";
+			CAN_BE_DISABLED = "canbedisabled",
+			HASH = "#hash";
 
 	public SendKeys()
 	{
@@ -145,21 +146,40 @@ public class SendKeys extends WebAction
 	protected static List<String> processInputText(String text)
 	{
 		List<String> strings = new ArrayList<String>();
-		int index;
-		while ((index = text.indexOf(KEY_SIGN))>-1)
+		boolean afterKey = false;
+		for (String s : text.split("(?=#)"))
 		{
-			int endIndex = text.indexOf(KEY_SIGN, index+1);
-			if (endIndex < 0)
-				break;
-			String before = text.substring(0, index);
-			if (!before.isEmpty())
-				strings.add(before);  //Text before non-text key
-			strings.add(text.substring(index, endIndex));  //Non-text key code
-			text = text.substring(endIndex+1);
+			if (s.startsWith(KEY_SIGN))
+			{
+				if (isSpecialKey(s))
+				{
+					strings.add(s);
+					afterKey = true;
+				}
+				else 
+				{
+					if (afterKey)
+						afterKey = false;
+					else 
+						strings.add(HASH);
+					
+					if (s.length() > 1)
+						strings.add(s.substring(1));
+				}
+			}
+			else 
+				strings.add(s);
 		}
-		if (!text.isEmpty())
-			strings.add(text);
 		return strings;
+	}
+	
+	protected static boolean isSpecialKey(String s)
+	{
+		if (s.length() == 0)
+			return false;		
+		int plusIndex = s.indexOf('+');
+		String firstKey = s.substring(1, plusIndex != -1 ? plusIndex : s.length());
+		return KEYS.containsKey(firstKey);
 	}
 
 	public CharSequence getKeysByLabel(String label)
@@ -211,7 +231,7 @@ public class SendKeys extends WebAction
 		put("right", Keys.RIGHT);
 		put("return", Keys.RETURN);
 		put("space", Keys.SPACE);
-		put("hash", Keys.chord(Keys.SHIFT, "3"));
+		put(HASH, Keys.chord(Keys.SHIFT, "3"));
 		put("dollar", Keys.chord(Keys.SHIFT, "4"));
 		put("percent", Keys.chord(Keys.SHIFT, "5"));
 		put("openbracket", Keys.chord(Keys.SHIFT, "9"));
