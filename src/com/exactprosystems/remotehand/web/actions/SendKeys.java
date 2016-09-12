@@ -178,7 +178,7 @@ public class SendKeys extends WebAction
 		if (s.length() == 0)
 			return false;		
 		int plusIndex = s.indexOf('+');
-		String firstKey = s.substring(1, plusIndex != -1 ? plusIndex : s.length());
+		String firstKey = s.substring(1, plusIndex != -1 ? plusIndex : s.length()).toLowerCase();
 		return KEYS.containsKey(firstKey);
 	}
 
