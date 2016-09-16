@@ -10,9 +10,13 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.web.actions.GetFormFields;
 import org.apache.commons.cli.CommandLine;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -26,6 +30,7 @@ public class WebConfiguration extends Configuration{
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
 	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
 	public static final String DEF_PROXY = "";
+	public static final String FORM_PARSER_CONFIG_FILE = "formParser.properties";
 	
 	public static final String PARAM_BROWSER = "Browser";
 	public static final String	PARAM_IEDRIVERPATH = "IEDriverPath";
@@ -40,6 +45,8 @@ public class WebConfiguration extends Configuration{
 	private volatile Browser browserToUse;
 	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
 		ftpProxySetting, socksProxySetting, noProxySetting, profilePath;
+	
+	private final Properties formParserProperties;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
@@ -105,6 +112,8 @@ public class WebConfiguration extends Configuration{
 			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_NOPROXY, DEF_PROXY));
 			noProxySetting = DEF_PROXY;
 		}
+		
+		formParserProperties = loadFormParserConfig(FORM_PARSER_CONFIG_FILE);
 	}
 
 	@Override
@@ -119,6 +128,36 @@ public class WebConfiguration extends Configuration{
 		defProperties.setProperty(PARAM_SOCKSPROXY, DEF_PROXY);
 		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 		return defProperties;
+	}
+	
+	protected Properties loadFormParserConfig(String fileName)
+	{
+		Properties properties = new Properties();
+		FileInputStream inputStream = null;
+		try
+		{
+			inputStream = new FileInputStream(new File(fileName));
+			properties.load(inputStream);
+		}
+		catch (Exception e)
+		{
+			logger.warn(String.format("Unable to load config '%s' for the action '%s'.", fileName, 
+					GetFormFields.class.getSimpleName()), e);
+			return null;
+		}
+		finally
+		{
+			if (inputStream != null)
+				try
+				{
+					inputStream.close();
+				}
+				catch (IOException e)
+				{
+					logger.error(e);
+				}
+		}
+		return properties;
 	}
 	
 
@@ -166,5 +205,9 @@ public class WebConfiguration extends Configuration{
 	{
 		return profilePath;
 	}
-	
+
+	public Properties getFormParserProperties()
+	{
+		return formParserProperties;
+	}
 }

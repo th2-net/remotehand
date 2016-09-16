@@ -57,7 +57,10 @@
 						lib/selenium-server-standalone-2.53.1.jar
 						lib/commons-lang3-3.4.jar
 						lib/log4j-1.2.16.jar
-						lib/javacsv.jar" />
+						lib/javacsv.jar
+						lib/jaxb-api-2.2.jar
+						lib/jaxb-impl-2.1.12.jar
+						lib/clearth_core_rh_xml.jar" />
 				<attribute name="Implementation-Title" value="RemoteHand" />
 				<attribute name="Implementation-Vendor" value="Exactpro Systems" />
 				<attribute name="Implementation-Vendor-Id" value="com.exactprosystems" />
@@ -74,6 +77,7 @@
 		<copy file="config.ini" todir="${release.project}" />
 		<copy file="log4j.properties" todir="${release.project}" />
 		<copy file="Readme.txt" todir="${release.project}" />
+		<copy file="formParser.properties" todir="${release.project}" />
 		
 		<zip destfile="${release}/remotehand_${DSTAMP}rev${svn.info.lastRev}.zip" basedir="${release.project}"/>
 		<echo message="ZIPing done."/>
