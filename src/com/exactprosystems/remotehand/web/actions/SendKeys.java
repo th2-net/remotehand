@@ -88,7 +88,7 @@ public class SendKeys extends WebAction
 			logger.info("Sent text to: " + webLocator);
 
 
-			if (!params.containsKey(PARAM_TEXT2))
+			if (!params.containsKey(PARAM_TEXT2) || params.get(PARAM_TEXT2) == null)
 				return null;
 
 			String text2 = params.get(PARAM_TEXT2);
