@@ -15,6 +15,7 @@ import com.exactprosystems.clearth.rhxmldata.ObjectFactory;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
+import com.exactprosystems.remotehand.web.WebUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -39,6 +40,8 @@ public class GetFormFields extends WebAction
 {
 	private static final Logger logger = Logger.getLogger(GetFormFields.class);
 	
+	private static final String CHECK_REQUIRED_FLAG_PARAM = "checkRequiredFlag".toLowerCase();
+	private static final String CHECK_DISABLED_FLAG_PARAM = "checkDisabledFlag".toLowerCase();
 	private static final String GROUP_PARAM = "group";
 	private static final String DEFAULT_GROUP = "refdata";
 	
@@ -48,31 +51,40 @@ public class GetFormFields extends WebAction
 	private static final String IS_DISABLED_XPATH = "is.disabled.xpath";
 	
 	private Properties properties;
+	private String group;
+	private boolean checkRequiredFlag;
+	private boolean checkDisabledFlag;
 	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
+		prepare(params);		
+		WebElement formContainer = getFormContainer(webDriver, webLocator);
+		
+		List<WebElement> fieldContainers = findFieldContainers(formContainer);
+		if (fieldContainers.isEmpty())
+			throw new ScriptExecuteException("Unable to find fields in the specified form container.");
+		
+		List<FormFieldDesc> fields = findFields(fieldContainers);
+		if (fields.isEmpty())
+			throw new ScriptExecuteException("Unable to find fields in the specified fields containers.");
+		return serializeFields(fields);
+	}
+	
+	private void prepare(Map<String, String> params) throws ScriptExecuteException
+	{
 		properties = ((WebConfiguration) WebConfiguration.getInstance()).getFormParserProperties();
 		if (properties == null)
 			throw new ScriptExecuteException("Configuration for the form parser wasn't loaded.");
-		
-		String group = params.get(GROUP_PARAM);
+
+		group = params.get(GROUP_PARAM);
 		if (group == null)
 		{
 			group = DEFAULT_GROUP;
 			logger.info(format("Parameter #%s wasn't found. Value %s will be used by default.", GROUP_PARAM, DEFAULT_GROUP));
-		}
-		
-		WebElement formContainer = getFormContainer(webDriver, webLocator);
-		
-		List<WebElement> fieldContainers = findFieldContainers(formContainer, group);
-		if (fieldContainers.isEmpty())
-			throw new ScriptExecuteException("Unable to find fields in the specified form container.");
-		
-		List<FormFieldDesc> fields = findFields(fieldContainers, group);
-		if (fields.isEmpty())
-			throw new ScriptExecuteException("Unable to find fields in the specified fields containers.");
-		return serializeFields(fields);
+		}		
+		checkRequiredFlag = WebUtils.getBooleanOrDefault(params, CHECK_REQUIRED_FLAG_PARAM, false);
+		checkDisabledFlag = WebUtils.getBooleanOrDefault(params, CHECK_DISABLED_FLAG_PARAM, false);
 	}
 	
 	private WebElement getFormContainer(WebDriver webDriver, By webLocator) throws ScriptExecuteException
@@ -87,7 +99,7 @@ public class GetFormFields extends WebAction
 		}
 	}
 	
-	private List<WebElement> findFieldContainers(WebElement formContainer, String group)
+	private List<WebElement> findFieldContainers(WebElement formContainer)
 	{
 		String xpath = properties.getProperty(group + '.' + FIELDS_CONTAINER_XPATH);
 		if (logger.isInfoEnabled())
@@ -98,32 +110,32 @@ public class GetFormFields extends WebAction
 		return containers;
 	}
 	
-	private List<FormFieldDesc> findFields(List<WebElement> fieldContainers, String group)
+	private List<FormFieldDesc> findFields(List<WebElement> fieldContainers)
 	{
 		List<FormFieldDesc> result = new ArrayList<FormFieldDesc>(fieldContainers.size());
 		for (WebElement container : fieldContainers)
 		{
-			FormFieldDesc fieldDesc = findField(container, group);
+			FormFieldDesc fieldDesc = findField(container);
 			if (fieldDesc != null)
 				result.add(fieldDesc);
 		}
 		return result;
 	}
 	
-	private FormFieldDesc findField(WebElement container, String group)
+	private FormFieldDesc findField(WebElement container)
 	{
 		FormFieldDesc fieldDesc;
-		if ((fieldDesc = findFieldWithType(container, group, FormFieldType.DROPDOWN)) != null)
+		if ((fieldDesc = findFieldWithType(container, FormFieldType.DROPDOWN)) != null)
 			return fieldDesc;
-		else if ((fieldDesc = findFieldWithType(container, group, FormFieldType.DATE)) != null)
+		else if ((fieldDesc = findFieldWithType(container, FormFieldType.DATE)) != null)
 			return fieldDesc;
-		else if ((fieldDesc = findFieldWithType(container, group, FormFieldType.TIME)) != null)
+		else if ((fieldDesc = findFieldWithType(container, FormFieldType.TIME)) != null)
 			return fieldDesc;
 		else 
-			return findFieldWithType(container, group, FormFieldType.TEXT);
+			return findFieldWithType(container, FormFieldType.TEXT);
 	}
 	
-	private FormFieldDesc findFieldWithType(WebElement container, String group, FormFieldType type)
+	private FormFieldDesc findFieldWithType(WebElement container, FormFieldType type)
 	{
 		String xpath = properties.getProperty(format("%s.%s.%s", group, type.value(), FIELD_XPATH));	
 		WebElement element = findElementOrNull(container, xpath);
@@ -133,10 +145,15 @@ public class GetFormFields extends WebAction
 		FormFieldDesc fieldDesc = new FormFieldDesc();
 		fieldDesc.setId(element.getAttribute("id"));
 		fieldDesc.setType(type);
-		fieldDesc.setRequired(isRequired(element, group, type));
-		boolean isEnabled = type == FormFieldType.DATE || type == FormFieldType.TIME || !isDisabled(element, group, type);
-		fieldDesc.setEnabled(isEnabled);
 		
+		if (checkRequiredFlag)
+			fieldDesc.setRequired(isRequired(element, type));
+		
+		if (checkDisabledFlag)
+		{
+			boolean isEnabled = type == FormFieldType.DATE || type == FormFieldType.TIME || !isDisabled(element, type);
+			fieldDesc.setEnabled(isEnabled);
+		}		
 		return fieldDesc;
 	}
 	
@@ -146,14 +163,14 @@ public class GetFormFields extends WebAction
 		return list.isEmpty() ? null : list.get(0);
 	}
 	
-	private boolean isRequired(WebElement element, String group, FormFieldType type)
+	private boolean isRequired(WebElement element, FormFieldType type)
 	{
 		String xpath = properties.getProperty(format("%s.%s.%s", group, type.value(), IS_REQUIRED_XPATH));
 		WebElement e = findElementOrNull(element, xpath);
 		return e != null;
 	}
 	
-	private boolean isDisabled(WebElement element, String group, FormFieldType type)
+	private boolean isDisabled(WebElement element, FormFieldType type)
 	{
 		String xpath = properties.getProperty(format("%s.%s.%s", group, type.value(), IS_DISABLED_XPATH));
 		WebElement e = findElementOrNull(element, xpath);
