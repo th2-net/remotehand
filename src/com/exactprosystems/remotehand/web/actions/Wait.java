@@ -42,12 +42,18 @@ public class Wait extends WebAction
 	{
 		return false;
 	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
 	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		int secs = getIntegerParam(params, PARAM_SECONDS);
-		logger.info("Pause for "+secs+" second(s)");
+		logInfo("Pause for "+secs+" second(s)");
 		webWait(webDriver, secs);
 
 		return null;

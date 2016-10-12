@@ -11,6 +11,7 @@ package com.exactprosystems.remotehand.web.actions;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -19,6 +20,8 @@ import com.exactprosystems.remotehand.web.WebAction;
 
 public class Output extends WebAction
 {
+	private static final Logger logger = Logger.getLogger(Output.class);
+	
 	private static final String PARAM_TEXT = "text";
 	
 	public Output()
@@ -36,6 +39,12 @@ public class Output extends WebAction
 	public boolean isCanWait()
 	{
 		return false;
+	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
 	}
 
 	@Override

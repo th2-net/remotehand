@@ -10,8 +10,10 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.*;
+import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.openqa.selenium.WebDriver;
 
 /**
  * Created by alexey.karpukhin on 2/2/16.
@@ -26,7 +28,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public ScriptCompiler createScriptCompiler() {
-		return new WebScriptCompiler(webDriverManager);
+		return new WebScriptCompiler();
 	}
 
 	@Override
@@ -41,12 +43,26 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	}
 
 	@Override
+	public SessionContext createSessionContext(String sessionId)
+	{
+		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
+		webSessionContext.setWebDriver(webDriverManager.createWebDriver());
+		return webSessionContext;
+	}
+
+	@Override
 	public Option[] getAdditionalOptions() {
 		return new Option[0];
 	}
 
 	@Override
-	public void close() {
-		webDriverManager.close();
+	public void close(SessionContext sessionContext) 
+	{
+		if (sessionContext == null)
+			return;		
+		WebSessionContext webSessionContext = (WebSessionContext) sessionContext;
+		WebDriver webDriver = webSessionContext.getWebDriver();
+		if (webDriver != null)
+			webDriver.quit();
 	}
 }

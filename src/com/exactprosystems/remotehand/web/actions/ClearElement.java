@@ -11,6 +11,7 @@ package com.exactprosystems.remotehand.web.actions;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,6 +21,8 @@ import com.exactprosystems.remotehand.web.WebAction;
 
 public class ClearElement extends WebAction
 {
+	private static final Logger logger = Logger.getLogger(ClearElement.class);
+	
 	@Override
 	public boolean isNeedLocator()
 	{
@@ -30,6 +33,12 @@ public class ClearElement extends WebAction
 	public boolean isCanWait()
 	{
 		return true;
+	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
 	}
 	
 	@Override

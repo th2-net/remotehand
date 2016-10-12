@@ -60,13 +60,19 @@ public class SendKeys extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input;
 		if (webLocator != null)
 			input = findElement(webDriver, webLocator);
 		else
-			input = getWebDriver().switchTo().activeElement();
+			input = webDriver.switchTo().activeElement();
 		
 		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
 		try
@@ -78,14 +84,14 @@ public class SendKeys extends WebAction
 			if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true")))
 			{
 				input.clear();
-				logger.debug("Text field has been cleared.");
+				logInfo("Text field has been cleared.");
 			}
 
 			String text = params.get(PARAM_TEXT);
 			text = replaceConversions(text);
 
 			sendText(input, text);
-			logger.info("Sent text to: " + webLocator);
+			logInfo("Sent text to: %s.", webLocator);
 
 
 			if (!params.containsKey(PARAM_TEXT2) || params.get(PARAM_TEXT2) == null)
@@ -103,7 +109,7 @@ public class SendKeys extends WebAction
 					try
 					{
 						By locator2 = WebLocatorsMapping.getInstance().getByName(params.get(PARAM_LOCATOR2)).getWebLocator(webDriver, params.get(PARAM_MATCHER2));
-						if (!waitForElement(wait2, locator2))
+						if (!waitForElement(webDriver, wait2, locator2))
 							needRun = false;
 					}
 					catch (ScriptCompileException e)
@@ -118,7 +124,7 @@ public class SendKeys extends WebAction
 			if (needRun)
 			{
 				sendText(input, text2);
-				logger.info("Sent text2 to: " + webLocator);
+				logInfo("Sent text2 to: %s.", webLocator);
 			}
 		}
 		finally
@@ -208,16 +214,16 @@ public class SendKeys extends WebAction
 	
 	protected void enable(WebDriver driver, WebElement input)
 	{
-		logger.info("Try to enable element");
+		logInfo("Try to enable element");
 		((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled')", input);
-		logger.info("Now element is " + (input.isEnabled() ? "enabled" : "still disabled"));
+		logInfo("Now element is " + (input.isEnabled() ? "enabled" : "still disabled"));
 	}
 	
 	protected void disable(WebDriver driver, WebElement input)
 	{
-		logger.info("Try to disable element");
+		logInfo("Try to disable element");
 		((JavascriptExecutor) driver).executeScript("arguments[0].setAttribute('disabled', '')", input);
-		logger.info("Now element is " + (input.isEnabled() ? "still enabled" : "disabled"));
+		logInfo("Now element is " + (input.isEnabled() ? "still enabled" : "disabled"));
 	}
 
 	protected static String replaceConversions(String src) {

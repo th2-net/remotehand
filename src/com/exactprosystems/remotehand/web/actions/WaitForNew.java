@@ -47,6 +47,12 @@ public class WaitForNew extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, final By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		final int seconds = getIntegerParam(params, PARAM_SECONDS), 
@@ -85,7 +91,7 @@ public class WaitForNew extends WebAction
 				}
 			});
 
-			logger.info("Appeared locator: '" + webLocator.toString() + "'");
+			logInfo("Appeared locator: '%s'.", webLocator);
 		}
 		catch (TimeoutException ex)
 		{

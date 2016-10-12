@@ -9,6 +9,7 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
@@ -22,9 +23,11 @@ public interface IRemoteHandManager {
 	Configuration createConfiguration(CommandLine commandLine);
 
 	ActionsLauncher createActionsLauncher(ScriptProcessorThread thread);
+	
+	SessionContext createSessionContext(String sessionId);
 
 	Option[] getAdditionalOptions();
 
-	void close();
+	void close(SessionContext sessionContext);
 
 }

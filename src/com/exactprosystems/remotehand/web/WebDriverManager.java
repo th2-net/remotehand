@@ -10,6 +10,7 @@
 package com.exactprosystems.remotehand.web;
 
 import java.io.File;
+import java.util.Collections;
 
 import com.exactprosystems.remotehand.Configuration;
 
@@ -27,38 +28,27 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  */
 public class WebDriverManager {
 
-	WebDriver webDriver = null;
-
-	public WebDriver getWebDriver () {
-		if (webDriver == null) {
-			webDriver = createWebDriver();
-		}
-		return webDriver;
-	}
-
-	private WebDriver createWebDriver()
+	private DesiredCapabilities createDesiredCapabilities()
 	{
-		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
-		String httpProxy = configuration.getHttpProxySetting(),
-				sslProxy = configuration.getSslProxySetting(),
-				ftpProxy = configuration.getFtpProxySetting(),
-				socksProxy = configuration.getSocksProxySetting(),
-				noProxy = configuration.getNoProxySetting();
-		DesiredCapabilities dc;
-		if ((!httpProxy.isEmpty()) || (!sslProxy.isEmpty()) || (!ftpProxy.isEmpty()) || (!socksProxy.isEmpty()) || (!noProxy.isEmpty()))
+		WebConfiguration cfg = (WebConfiguration) Configuration.getInstance();
+		if (cfg.isProxySettingsSet())
 		{
 			Proxy proxy = new Proxy();
-			proxy.setHttpProxy(httpProxy);
-			proxy.setSslProxy(sslProxy);
-			proxy.setFtpProxy(ftpProxy);
-			proxy.setSocksProxy(socksProxy);
-			proxy.setNoProxy(noProxy);
-			dc = new DesiredCapabilities();
-			dc.setCapability(CapabilityType.PROXY, proxy);
+			proxy.setHttpProxy(cfg.getHttpProxySetting());
+			proxy.setSslProxy(cfg.getSslProxySetting());
+			proxy.setFtpProxy(cfg.getFtpProxySetting());
+			proxy.setSocksProxy(cfg.getSocksProxySetting());
+			proxy.setNoProxy(cfg.getNoProxySetting());
+			return new DesiredCapabilities(Collections.singletonMap(CapabilityType.PROXY, proxy));
 		}
-		else
-			dc = null;
-
+		else 
+			return null;
+	}
+	
+	public WebDriver createWebDriver()
+	{
+		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
+		DesiredCapabilities dc = createDesiredCapabilities();
 		WebDriver driver;
 		switch (configuration.getBrowserToUse())
 		{
@@ -97,20 +87,8 @@ public class WebDriverManager {
 					driver = new FirefoxDriver(dc);
 				else
 					driver = new FirefoxDriver();
-				
-				//if (profile !=null && !profile.isEmpty())
-				//	FirefoxDriver
 				break;
 		}
 		return driver;
 	}
-
-	public void close()
-	{
-		if (webDriver != null) {
-			webDriver.quit();
-			webDriver = null;
-		}
-	}
-
 }

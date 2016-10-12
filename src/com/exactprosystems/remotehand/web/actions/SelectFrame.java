@@ -37,14 +37,20 @@ public class SelectFrame extends WebAction {
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 
 		if (webLocator == null) {
-			logger.info("Selecting default frame.");
+			logInfo("Selecting default frame.");
 			webDriver.switchTo().defaultContent();
 		} else {
 			WebElement element = webDriver.findElement(webLocator);
-			logger.info("Selecting frame: " + element.getAttribute("name"));
+			logInfo("Selecting frame: " + element.getAttribute("name"));
 			webDriver.switchTo().frame(element);
 		}
 

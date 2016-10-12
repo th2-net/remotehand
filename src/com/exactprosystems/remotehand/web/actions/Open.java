@@ -46,6 +46,12 @@ public class Open extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params)
 	{
 		final String url = params.get(PARAM_URL);
@@ -53,7 +59,7 @@ public class Open extends WebAction
 		webDriver.get(url);
 		webDriver.manage().window().maximize();
 
-		logger.info("Opened: '" + url + "'");
+		logInfo("Opened: '%s'", url);
 
 		return null;
 	}

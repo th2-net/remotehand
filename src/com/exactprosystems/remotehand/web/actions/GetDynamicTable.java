@@ -42,11 +42,17 @@ public class GetDynamicTable extends WebAction
 	{
 		return true;
 	}
+	
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		StringBuffer tableHTML = new StringBuffer();
+		StringBuilder tableHTML = new StringBuilder();
 		try
 		{
 			boolean haveMoreRows = true;
@@ -62,18 +68,18 @@ public class GetDynamicTable extends WebAction
 				haveMoreRows = !rows.equals(previousRows);
 				if (haveMoreRows && !rows.isEmpty())
 				{
-					tableHTML.append(getInnerHTML(webDriver, rows, lastRow));
+					tableHTML.append(getInnerHTML(rows, lastRow));
 
 					lastRow = rows.get(rows.size() - 1);
 					((Locatable)lastRow).getCoordinates().inViewPort();
 
-					logger.info("Obtained part of the table until the following row: " + printTD(lastRow));
+					logInfo("Obtained part of the table until the following row: %s", printTD(lastRow));
 				}
 
 				previousRows = rows;
 			}
 
-			logger.info("Obtained <" + count + "> rows of the table '" + tableElement + "'");
+			logInfo("Obtained <%d> rows of the table '%s'.", count, webLocator);
 
 			return tableHTML.toString();
 		}
@@ -104,9 +110,9 @@ public class GetDynamicTable extends WebAction
 		return tableElement.findElements(By.tagName("tr"));
 	}
 
-	private String getInnerHTML(WebDriver webDriver, List<WebElement> elements, WebElement fromRow)
+	private String getInnerHTML(List<WebElement> elements, WebElement fromRow)
 	{
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 
 		final int posFrom;
 		if (fromRow == null)
@@ -132,7 +138,7 @@ public class GetDynamicTable extends WebAction
 			if (tdElements.isEmpty())
 				return "no one cells";
 
-			StringBuffer result = new StringBuffer();
+			StringBuilder result = new StringBuilder();
 			result.append("|");
 			for (WebElement tdElement : tdElements)
 				result.append(tdElement.getText()).append("|");

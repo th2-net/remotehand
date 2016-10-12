@@ -37,6 +37,12 @@ public class ScrollTo extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = webDriver.findElement(webLocator);
@@ -44,7 +50,7 @@ public class ScrollTo extends WebAction
 		if (element instanceof Locatable)
 		{
 			((Locatable)element).getCoordinates().inViewPort();
-			logger.info("Locate on: " + webLocator.toString());
+			logInfo("Locate on: %s.", webLocator);
 		}
 		else
 			throw new ScriptExecuteException("Can't scroll to the following web element: '" + element.toString() + "'");

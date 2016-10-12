@@ -12,6 +12,7 @@ import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptCompiler;
+import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
@@ -33,7 +34,7 @@ public class UIAScriptCompiler extends ScriptCompiler {
 	private File tempDir;
 
 	@Override
-	public List<Action> build(String script) throws ScriptCompileException {
+	public List<Action> build(String script, SessionContext context) throws ScriptCompileException {
 		logger.info("Compiling script...");
 
 		tempDir = ((UIAConfiguration)Configuration.getInstance()).getScriptDir();

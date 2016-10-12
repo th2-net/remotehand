@@ -10,6 +10,7 @@
 package com.exactprosystems.remotehand.http;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Configuration;
@@ -18,9 +19,10 @@ import org.apache.log4j.Logger;
 public class SessionWatcher implements Runnable
 {
 	private static final Logger logger = Logger.getLogger(SessionWatcher.class);
-	private static final long SESSION_EXPIRE = Configuration.getInstance().getSessionExpire()*60*1000;  //In configuration it is set in minutes, we need it in milliseconds 
+	private static final long SESSION_EXPIRE_IN_MINUTES = Configuration.getInstance().getSessionExpire();
+	private static final long SESSION_EXPIRE = SESSION_EXPIRE_IN_MINUTES * 60 * 1000;  //In configuration it is set in minutes, we need it in milliseconds 
 	private static volatile SessionWatcher watcher = null;
-	private static volatile Map<SessionHandler, long[]> timeSessions = new HashMap<SessionHandler, long[]>();
+	private final Map<SessionHandler, long[]> timeSessions = new HashMap<SessionHandler, long[]>();
 
 	public static SessionWatcher getWatcher()
 	{
@@ -46,7 +48,7 @@ public class SessionWatcher implements Runnable
 			return;
 		}
 
-		logger.info("Session watcher is executed. SessionExpire=" + SESSION_EXPIRE);
+		logger.info("Session watcher is executed. SessionExpire (min) = " + SESSION_EXPIRE_IN_MINUTES);
 
 		while (HTTPServer.getServer() != null)
 		{
@@ -65,42 +67,48 @@ public class SessionWatcher implements Runnable
 	public long closeHttpSessionIfTimeOver()
 	{
 		long timeToNextSessionEnd = SESSION_EXPIRE;
-
-		for (SessionHandler session : timeSessions.keySet())
+		synchronized (timeSessions)
 		{
-			long currentTime = System.currentTimeMillis();
-			long sessionLastAction = timeSessions.get(session)[1];
-			long sessionEnd = sessionLastAction + SESSION_EXPIRE;
-			long timeToEndSession = sessionEnd - currentTime;
-
-			if (timeToEndSession < 0)
+			Iterator<Map.Entry<SessionHandler, long[]>> iterator = timeSessions.entrySet().iterator();
+			while (iterator.hasNext())
 			{
-				if (session != null)
+				Map.Entry<SessionHandler, long[]> entry = iterator.next();
+				long currentTime = System.currentTimeMillis();
+				long sessionLastAction = entry.getValue()[1];
+				long sessionEnd = sessionLastAction + SESSION_EXPIRE;
+				long timeToEndSession = sessionEnd - currentTime;
+
+				if (timeToEndSession < 0)
 				{
-					logger.warn("Session " + session.getId() + " is inactive more than "+SESSION_EXPIRE+" milliseconds. It will be closed due to timeout");
-					session.close();
+					SessionHandler session = entry.getKey();
+					if (session != null)
+					{
+						logger.warn("Session " + session.getId() + " is inactive more than " + 
+								SESSION_EXPIRE_IN_MINUTES + " minutes. " +
+								"It will be closed due to timeout");
+						session.close();
+						iterator.remove();
+					}
 				}
+				else if (timeToNextSessionEnd > timeToEndSession)
+					timeToNextSessionEnd = timeToEndSession;
 			}
-			else if (timeToNextSessionEnd > timeToEndSession)
-				timeToNextSessionEnd = timeToEndSession;
 		}
 		return timeToNextSessionEnd;
 	}
 
 	public void addSession(SessionHandler session)
 	{
-		long start = System.currentTimeMillis();
-		timeSessions.put(session, new long[] { start, start });
-	}
-
-	public void removeSession(SessionHandler session)
-	{
-		timeSessions.remove(session);
+		synchronized (timeSessions)
+		{
+			long start = System.currentTimeMillis();
+			timeSessions.put(session, new long[]{start, start});
+		}
 	}
 	
 	public void updateSession(SessionHandler session)
 	{
-		synchronized (session)
+		synchronized (timeSessions)
 		{
 			timeSessions.get(session)[1] = System.currentTimeMillis();
 		}

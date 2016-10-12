@@ -9,6 +9,8 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.remotehand.http.SessionContext;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,9 +24,9 @@ public abstract class ScriptCompiler {
 
 	public final String LINE_SEPARATOR = "line.separator";
 
-	public abstract List<Action> build(String scriptFile) throws ScriptCompileException;
+	public abstract List<Action> build(String scriptFile, SessionContext context) throws ScriptCompileException;
 
-	public List<Action> build(File scriptFile) throws IOException, ScriptCompileException
+	public List<Action> build(File scriptFile, SessionContext context) throws IOException, ScriptCompileException
 	{
 		BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
 		StringBuffer sb = new StringBuffer();
@@ -45,7 +47,7 @@ public abstract class ScriptCompiler {
 
 		String script = sb.toString();
 
-		return build(script);
+		return build(script, context);
 	}
 
 }

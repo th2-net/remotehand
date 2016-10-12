@@ -25,8 +25,6 @@ public class SessionHandler implements HttpHandler
 	private static final Logger logger = Logger.getLogger(SessionHandler.class);
 
 	private final String id;
-	
-//	private String dictionaryContent;
 
 	private ScriptProcessorThread scriptProcessor = null;
 	private IRemoteHandManager manager;
@@ -55,14 +53,6 @@ public class SessionHandler implements HttpHandler
 			in.close();
 
 			final String body = buff.toString();
-
-//			if (body.contains("#type") || body.contains("#desc"))
-//			{
-//				dictionaryContent = body;
-//				sendMessage(exchanger, "Dictionary received.");
-//				return;
-//			}
-
 
 			sendMessage(exchanger, "OK");
 
@@ -132,8 +122,6 @@ public class SessionHandler implements HttpHandler
 		if (scriptProcessor == null)
 		{
 			scriptProcessor = new ScriptProcessorThread(this, manager);
-//			if (dictionaryContent != null)
-//				scriptProcessor.setWebDictionary(dictionaryContent);
 			final Thread webThread = new Thread(scriptProcessor);
 			webThread.start();
 		}
@@ -153,10 +141,6 @@ public class SessionHandler implements HttpHandler
 		catch (IllegalArgumentException ex)
 		{
 			logger.warn("Error while to closing session <" + id + ">. Nothing to close.");
-		}
-		finally
-		{
-			SessionWatcher.getWatcher().removeSession(this);
 		}
 	}
 

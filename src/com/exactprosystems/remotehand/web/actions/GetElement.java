@@ -36,12 +36,18 @@ public class GetElement extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = findElement(webDriver, webLocator);
 		String elementHTML = element.getAttribute("outerHTML");
 
-		logger.info("Obtained element: " + elementHTML.toString());
+		logInfo("Obtained element: %s.", elementHTML);
 
 		String id = params.get(FindElement.PARAM_ID);
 		if (id == null || id.isEmpty())
@@ -51,5 +57,5 @@ public class GetElement extends WebAction
 		
 		
 		return id + elementHTML;
-	};
+	}
 }

@@ -81,7 +81,7 @@ public class GetFormFields extends WebAction
 		if (group == null)
 		{
 			group = DEFAULT_GROUP;
-			logger.info(format("Parameter #%s wasn't found. Value %s will be used by default.", GROUP_PARAM, DEFAULT_GROUP));
+			logInfo("Parameter #%s wasn't found. Value %s will be used by default.", GROUP_PARAM, DEFAULT_GROUP);
 		}		
 		checkRequiredFlag = WebUtils.getBooleanOrDefault(params, CHECK_REQUIRED_FLAG_PARAM, false);
 		checkDisabledFlag = WebUtils.getBooleanOrDefault(params, CHECK_DISABLED_FLAG_PARAM, false);
@@ -102,11 +102,9 @@ public class GetFormFields extends WebAction
 	private List<WebElement> findFieldContainers(WebElement formContainer)
 	{
 		String xpath = properties.getProperty(group + '.' + FIELDS_CONTAINER_XPATH);
-		if (logger.isInfoEnabled())
-			logger.info(format("Try to find field containers by xpath '%s'...", xpath));		
+		logInfo("Try to find field containers by xpath '%s'...", xpath);		
 		List<WebElement> containers = formContainer.findElements(By.xpath(xpath));
-		if (logger.isInfoEnabled())
-			logger.info(format("%d field containers found.", containers.size()));
+		logInfo("%d field containers found.", containers.size());
 		return containers;
 	}
 	
@@ -206,5 +204,11 @@ public class GetFormFields extends WebAction
 	public boolean isCanWait()
 	{
 		return true;
+	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
 	}
 }

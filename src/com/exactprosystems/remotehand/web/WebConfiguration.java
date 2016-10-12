@@ -43,10 +43,11 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_PROFILE = "Profile";
 
 	private volatile Browser browserToUse;
-	private volatile String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
+	private final String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
 		ftpProxySetting, socksProxySetting, noProxySetting, profilePath;
 	
 	private final Properties formParserProperties;
+	private boolean isProxySettingsSet;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
@@ -58,60 +59,16 @@ public class WebConfiguration extends Configuration{
 			browserToUse = DEF_BROWSER;
 		}
 		
-		profilePath = properties.getProperty(PARAM_PROFILE);
-		if ((profilePath == null) || (profilePath.isEmpty()))
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_PROFILE, "temporary profile"));
-		else
-			logger.info(PARAM_PROFILE+"="+profilePath);
+		profilePath = loadProperty(properties, PARAM_PROFILE, "temporary profile");
 		
-		ieDriverFileName = properties.getProperty(PARAM_IEDRIVERPATH);
-		if ((ieDriverFileName == null) || (ieDriverFileName.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH));
-			ieDriverFileName = DEF_IEDRIVER_PATH;
-		}
+		ieDriverFileName = loadProperty(properties, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
+		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
 
-		chromeDriverFileName = properties.getProperty(PARAM_CHROMEDRIVERPATH);
-		if ((chromeDriverFileName == null) || (chromeDriverFileName.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH));
-			chromeDriverFileName = DEF_CHROMEDRIVER_PATH;
-		}
-
-		httpProxySetting = properties.getProperty(PARAM_HTTPPROXY);
-		if ((httpProxySetting == null) || (httpProxySetting.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_HTTPPROXY, DEF_PROXY));
-			httpProxySetting = DEF_PROXY;
-		}
-
-		sslProxySetting = properties.getProperty(PARAM_SSLPROXY);
-		if ((sslProxySetting == null) || (sslProxySetting.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_SSLPROXY, DEF_PROXY));
-			sslProxySetting = DEF_PROXY;
-		}
-
-		ftpProxySetting = properties.getProperty(PARAM_FTPPROXY);
-		if ((ftpProxySetting == null) || (ftpProxySetting.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_FTPPROXY, DEF_PROXY));
-			ftpProxySetting = DEF_PROXY;
-		}
-
-		socksProxySetting = properties.getProperty(PARAM_SOCKSPROXY);
-		if ((socksProxySetting == null) || (socksProxySetting.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_SOCKSPROXY, DEF_PROXY));
-			socksProxySetting = DEF_PROXY;
-		}
-
-		noProxySetting = properties.getProperty(PARAM_NOPROXY);
-		if ((noProxySetting == null) || (noProxySetting.isEmpty()))
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_NOPROXY, DEF_PROXY));
-			noProxySetting = DEF_PROXY;
-		}
+		httpProxySetting = loadProxySetting(properties, PARAM_HTTPPROXY);
+		sslProxySetting = loadProxySetting(properties, PARAM_SSLPROXY);
+		ftpProxySetting = loadProxySetting(properties, PARAM_FTPPROXY);
+		socksProxySetting = loadProxySetting(properties, PARAM_SOCKSPROXY);
+		noProxySetting = loadProxySetting(properties, PARAM_NOPROXY);
 		
 		formParserProperties = loadFormParserConfig(FORM_PARSER_CONFIG_FILE);
 	}
@@ -128,6 +85,33 @@ public class WebConfiguration extends Configuration{
 		defProperties.setProperty(PARAM_SOCKSPROXY, DEF_PROXY);
 		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 		return defProperties;
+	}
+	
+	private String loadProperty(Properties properties, String name, String defaultValue)
+	{
+		String property = properties.getProperty(name, "");
+		if (property.isEmpty())
+		{
+			logger.warn(String.format(PROPERTY_NOT_SET, name, defaultValue));
+			property = defaultValue;
+		}
+		else 
+			logger.info(name + " = " + property);
+		return property;
+	}
+	
+	private String loadProxySetting(Properties properties, String propertyName)
+	{
+		String setting = properties.getProperty(propertyName, "");
+		if (setting.isEmpty())
+			logger.warn(String.format("Property '%s' is not set.", propertyName));
+		else 
+		{
+			logger.info(propertyName + " = " + setting);
+			if (!isProxySettingsSet)
+				isProxySettingsSet = true;
+		}
+		return setting;
 	}
 	
 	protected Properties loadFormParserConfig(String fileName)
@@ -174,6 +158,11 @@ public class WebConfiguration extends Configuration{
 	public String getChromeDriverFileName()
 	{
 		return chromeDriverFileName;
+	}
+
+	public boolean isProxySettingsSet()
+	{
+		return isProxySettingsSet;
 	}
 
 	public String getHttpProxySetting()

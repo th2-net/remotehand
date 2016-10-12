@@ -17,6 +17,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import com.exactprosystems.remotehand.http.LoginHandler;
+import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -125,7 +126,10 @@ public class Starter
 			if (dynInput != null)
 				logger.info("Dynamic input file: '" + dynInput + "'");
 
-			ActionsLauncher launcher = processAllScriptsFromDirectory(input, output, null, manager);
+			ActionsLauncher launcher = manager.createActionsLauncher(null);
+			ScriptCompiler compiler = manager.createScriptCompiler();
+			SessionContext sessionContext = manager.createSessionContext("Main");
+					processAllScriptsFromDirectory(input, output, launcher, compiler, sessionContext);
 			if (dynInput != null)
 			{
 				File dynFile = new File(dynInput);
@@ -135,7 +139,7 @@ public class Starter
 					if (dynFile.exists())
 					{
 						firstWait = true;
-						processAllScriptsFromDirectory(dynInput, output, launcher, manager);
+						processAllScriptsFromDirectory(dynInput, output, launcher, compiler, sessionContext);
 
 						if (dynFile.isFile())
 						{
@@ -173,17 +177,16 @@ public class Starter
 					}
 				}
 			}
-			if (manager != null)
-				manager.close();
+			manager.close(sessionContext);
 
 			logger.info("Application stopped");
 		}
 	}
 
-	private static ActionsLauncher processAllScriptsFromDirectory(String input, String output, 
-			ActionsLauncher launcher, IRemoteHandManager manager)
+	private static void processAllScriptsFromDirectory(String input, String output, 
+			ActionsLauncher launcher, ScriptCompiler compiler, SessionContext sessionContext)
 	{
-		File[] fileList = null;
+		File[] fileList;
 		File inputFile = new File(input), 
 				outputFile = new File(output);
 		if (!inputFile.exists())
@@ -211,11 +214,7 @@ public class Starter
 		{
 			try
 			{
-				ScriptCompiler compiler = manager.createScriptCompiler();
-				final List<Action> actions = compiler.build(scriptFile);
-
-				if (launcher == null)
-					launcher = manager.createActionsLauncher(null);
+				final List<Action> actions = compiler.build(scriptFile, sessionContext);
 				String result = launcher.runActions(actions);
 
 				TextFileWriter.getInstance().setContent(result);
@@ -226,7 +225,6 @@ public class Starter
 				logger.error("An error occurred", ex);
 			}
 		}
-		return launcher;
 	}
 
 	private static void printHelp(Options options)

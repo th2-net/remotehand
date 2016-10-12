@@ -18,6 +18,7 @@ import java.util.*;
 import com.csvreader.CsvReader;
 import com.exactprosystems.remotehand.*;
 
+import com.exactprosystems.remotehand.http.SessionContext;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 import org.apache.log4j.Logger;
@@ -45,32 +46,18 @@ public class WebScriptCompiler extends ScriptCompiler
 	
 	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
 	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
-			
-	private static WebElementsDictionary dictionary;
-	
-	private boolean findLocalDict = true;
-	
-//	public void setDictionary(WebElementsDictionary dictionary)
-//	{
-//		if (dictionary == null)
-//			findLocalDict = false;
-//		this.dictionary = dictionary;
-//	}
 
-	private WebDriverManager webDriverManager = null;
-
-	public WebScriptCompiler (WebDriverManager webDriverManager) {
-		this.webDriverManager = webDriverManager;
-	}
-
-	public List<Action> build(String script) throws ScriptCompileException
+	@Override
+	public List<Action> build(String script, SessionContext context) throws ScriptCompileException
 	{
-		logger.info("Compiling script...");
+		WebSessionContext webSessionContext = (WebSessionContext) context;
+		String sessionId = webSessionContext.getSessionId();
+		WebUtils.logInfo(logger, sessionId, "Compiling script...");
 
 		if (isDictionaryUsed(script))
 		{
-			dictionary = new WebElementsDictionary(script, false);
-			logger.info("Web dictionary applied");
+			webSessionContext.setDictionary(new WebElementsDictionary(script, false));
+			WebUtils.logInfo(logger, sessionId, "Web dictionary applied");
 			return new ArrayList<Action>();
 		}
 
@@ -102,18 +89,19 @@ public class WebScriptCompiler extends ScriptCompiler
 
 					if (isExecutable(header, values))
 					{
-						final WebAction action = generateAction(header, values, lineNumber);
+						final WebAction action = generateAction(header, values, lineNumber, webSessionContext);
 
 						WebScriptChecker checker = new WebScriptChecker();
 						checker.checkParams(action, action.getWebLocator(), action.getParams());
 						checker.checkParams(action.getWebLocator(), action.getParams());
 
-						logger.info(action.toString());
+						WebUtils.logInfo(logger, sessionId, String.format("%s: %s", 
+								action.getClass().getSimpleName(), action.getParams()));
 
 						result.add(action);
 					}
 					else
-						logger.info(String.format("Action at line %d will be skipped.", lineNumber));
+						WebUtils.logInfo(logger, sessionId, String.format("Action at line %d will be skipped.", lineNumber));
 				}
 			}
 			reader.close();
@@ -145,14 +133,18 @@ public class WebScriptCompiler extends ScriptCompiler
 		return result;
 	}
 
-	private WebAction generateAction(String[] header, String[] values, int lineNumber) throws ScriptCompileException
+	private WebAction generateAction(String[] header, String[] values, int lineNumber, WebSessionContext context) throws ScriptCompileException
 	{
 		WebAction webAction;
 		WebLocator webLocator = null;
 		Map<String, String> params = new HashMap<String, String>();
 		
 		if (header.length > values.length)
-			logger.warn("Line <" + lineNumber + ">: " + header.length + " columns in header, " + values.length + " columns in values. Considering missing values empty by default");
+		{
+			logger.warn(String.format("<%s> Line <%d>: %d columns in header, %d columns in values. " +
+							"Considering missing values empty by default", 
+					context.getSessionId(), lineNumber, header.length, values.length));
+		}
 		
 		for (int inx = 0; inx < header.length; inx++)
 		{
@@ -168,7 +160,7 @@ public class WebScriptCompiler extends ScriptCompiler
 			if (params.containsKey(WEB_LOCATOR) || params.containsKey(WEB_MATCHER))
 				throw new ScriptCompileException(String.format("Web action '%s' has incompatible parameters: '%s' and '%s' + '%s'", 
 						params.get(WEB_ACTION), WEB_ID, WEB_LOCATOR, WEB_MATCHER));
-			updateParamsByDictionary(params, params.get(WEB_ID));
+			updateParamsByDictionary(params, params.get(WEB_ID), context);
 		}
 
 		webAction = WebActionsMapping.getInstance().getByName(params.get(WEB_ACTION));
@@ -177,20 +169,21 @@ public class WebScriptCompiler extends ScriptCompiler
 		params.remove(WEB_ACTION);
 		params.remove(WEB_LOCATOR);
 
-		webAction.init(this.webDriverManager.getWebDriver(), webLocator, params);
+		webAction.init(context, webLocator, params);
 		return webAction;
 	}
 	
-	private void updateParamsByDictionary(Map<String, String> params, String id) throws ScriptCompileException
+	private void updateParamsByDictionary(Map<String, String> params, String id, WebSessionContext context) throws ScriptCompileException
 	{
+		WebElementsDictionary dictionary = context.getDictionary();
 		if (dictionary == null)
 		{
-			if (!findLocalDict)
-				throw new ScriptCompileException("Web dictionary has not been sent. Script cannot be processed.");
-			
 			File dict = new File(DEFAULT_DICT_NAME);
 			if (dict.exists())
+			{
 				dictionary = new WebElementsDictionary(DEFAULT_DICT_NAME, true);
+				context.setDictionary(dictionary);
+			}
 			else
 				throw new ScriptCompileException("Web dictionary " + DEFAULT_DICT_NAME + " is not found. Script cannot be processed.");
 		}

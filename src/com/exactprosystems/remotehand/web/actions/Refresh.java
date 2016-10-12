@@ -11,6 +11,7 @@ package com.exactprosystems.remotehand.web.actions;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -19,6 +20,8 @@ import com.exactprosystems.remotehand.web.WebAction;
 
 public class Refresh extends WebAction
 {
+	private static final Logger logger = Logger.getLogger(Refresh.class);
+	
 	@Override
 	public boolean isNeedLocator()
 	{
@@ -36,5 +39,11 @@ public class Refresh extends WebAction
 	{
 		webDriver.navigate().refresh();
 		return null;
+	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
 	}
 }

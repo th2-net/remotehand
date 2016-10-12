@@ -2,6 +2,7 @@ package com.exactprosystems.remotehand.web.actions.mtable;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -11,6 +12,8 @@ import static com.exactprosystems.remotehand.web.actions.mtable.MTableUtils.getI
 
 public class MTableGetRowCount extends WebAction
 {
+	private static final Logger logger = Logger.getLogger(MTableGetRowCount.class);
+	
 	@Override
 	public boolean isNeedLocator()
 	{
@@ -21,6 +24,12 @@ public class MTableGetRowCount extends WebAction
 	public boolean isCanWait()
 	{
 		return true;
+	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
 	}
 
 	@Override

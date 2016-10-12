@@ -17,7 +17,6 @@ import org.openqa.selenium.WebDriver;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
-import com.exactprosystems.remotehand.web.actions.Click;
 
 /**
  * @author daria.plotnikova
@@ -40,6 +39,12 @@ public class MTableGetValue extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		String tableId = params.get(MTableUtils.TABLE_ID),
@@ -49,7 +54,7 @@ public class MTableGetValue extends WebAction
 		
 		int tableInd, rowInd;
 		
-		logger.debug("Input params: "+params);
+		logInfo("Input params: "+params);
 
 		if (tableIndex == null || tableIndex.isEmpty())
 		{
@@ -80,7 +85,7 @@ public class MTableGetValue extends WebAction
 			}
 		
 		if (column == null || tableId == null)
-			logger.error("Some of input parameters are not defined!");
+			logError("Some of input parameters are not defined!");
 		
 		
 		String result = null;
@@ -90,7 +95,7 @@ public class MTableGetValue extends WebAction
 		}
 		catch(Exception e)
 		{
-			logger.error("Exception while executing javascript ", e);
+			logError("Exception while executing javascript ", e);
 		}
 		
 		return result;

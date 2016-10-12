@@ -42,6 +42,12 @@ public class SetCheckbox extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement checkbox = findElement(webDriver, webLocator);
@@ -56,7 +62,7 @@ public class SetCheckbox extends WebAction
 		boolean oldState = checkbox.isSelected();
 		if (newState == oldState)
 		{
-			logger.info("Checkbox has been already " + newStateStr);
+			logInfo("Checkbox has been already " + newStateStr);
 			return;
 		}
 		
@@ -70,7 +76,7 @@ public class SetCheckbox extends WebAction
 						&& checkbox.isSelected() != newState) // Case from LCH frontend
 				{
 					WebElement parent = checkbox.findElement(By.xpath(".."));
-					logger.info("Try to click on parent " + parent);
+					logInfo("Try to click on parent " + parent);
 					parent.click();
 					if (checkbox.isSelected() != newState)
 						throw new ScriptExecuteException("Cannot change state of checkbox " + checkbox);				
@@ -80,6 +86,6 @@ public class SetCheckbox extends WebAction
 					throw e;
 				}
 		}
-		logger.info("Checkbox has been successfully " + newStateStr);
+		logInfo("Checkbox has been successfully " + newStateStr);
 	}
 }

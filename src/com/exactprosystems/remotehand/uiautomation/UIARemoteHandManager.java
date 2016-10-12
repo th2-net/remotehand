@@ -9,6 +9,7 @@
 package com.exactprosystems.remotehand.uiautomation;
 
 import com.exactprosystems.remotehand.*;
+import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
@@ -34,6 +35,12 @@ public class UIARemoteHandManager implements IRemoteHandManager{
 	}
 
 	@Override
+	public SessionContext createSessionContext(String sessionId)
+	{
+		return new SessionContext(sessionId);
+	}
+
+	@Override
 	@SuppressWarnings("static-access")
 	public Option[] getAdditionalOptions() {
 		return new Option[] {
@@ -42,6 +49,6 @@ public class UIARemoteHandManager implements IRemoteHandManager{
 
 
 	@Override
-	public void close() {
+	public void close(SessionContext sessionContext) {
 	}
 }

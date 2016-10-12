@@ -10,7 +10,6 @@
 package com.exactprosystems.remotehand.web.actions.mtable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +41,12 @@ public class MTableGetTable extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		String tableId = params.get(MTableUtils.TABLE_ID),
@@ -66,7 +71,7 @@ public class MTableGetTable extends WebAction
 		
 		
 		if (tableId == null)
-			logger.error("Some of input parameters are not defined!");
+			logError("Some of input parameters are not defined!");
 		
 		List<Map<String,String>> result = new ArrayList<Map<String,String>> ();
 		for (int i = 0; i < MTableUtils.getTableRowCount(webDriver, tableId, tableInd); i++)

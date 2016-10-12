@@ -3,6 +3,7 @@ package com.exactprosystems.remotehand.web.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -14,6 +15,8 @@ import static com.exactprosystems.remotehand.web.actions.SendKeys.processInputTe
 
 public class PressKey extends WebAction
 {
+	private static final Logger logger = Logger.getLogger(PressKey.class);
+	
 	private static final String PARAM_KEY = "key";
 
 	@Override
@@ -51,5 +54,11 @@ public class PressKey extends WebAction
 	public boolean isCanWait()
 	{
 		return false;
+	}
+
+	@Override
+	protected Logger getLogger()
+	{
+		return logger;
 	}
 }

@@ -8,7 +8,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand.web;
 
+import org.apache.log4j.Logger;
+
 import java.util.Map;
+
+import static java.lang.String.format;
 
 /**
  * @author anna.bykova.
@@ -22,5 +26,21 @@ public class WebUtils
 			return defaultValue;
 		else 
 			return WebScriptCompiler.YES.contains(value.toLowerCase());
+	}
+	
+	public static void logError(Logger logger, String sessionId, String msg)
+	{
+		logger.error(simpleMsg(sessionId, msg));
+	}
+	
+	public static void logInfo(Logger logger, String sessionId, String msg)
+	{
+		if (logger.isInfoEnabled())
+			logger.info(simpleMsg(sessionId, msg));
+	}
+	
+	private static String simpleMsg(String sessionId, String msg)
+	{
+		return format("<%s> %s", sessionId, msg);
 	}
 }

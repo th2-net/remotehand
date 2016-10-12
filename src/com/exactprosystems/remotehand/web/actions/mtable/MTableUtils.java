@@ -116,7 +116,8 @@ public class MTableUtils
     }
 
     public  static void clickTableContextMenuLink(WebDriver webDriver, String menuItem) throws Exception {
-    	WaitForElement.waitForElement(By.xpath("//div[@class='popupContent'])[last()]/div/table"), webDriver, 5);
+    	//todo: waitForElement isn't static now.
+      	//WaitForElement.waitForElement(By.xpath("//div[@class='popupContent'])[last()]/div/table"), webDriver, 5);
         String xpath = "(//div[@class='popupContent'])[last()]/div/table/tbody/tr[?]/td";
         int index = 1;
         while (true) {

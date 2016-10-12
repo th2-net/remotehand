@@ -47,6 +47,12 @@ public class Click extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = findElement(webDriver, webLocator);
@@ -71,7 +77,7 @@ public class Click extends WebAction
 			}
 			catch (Exception e)
 			{
-				logger.error("xOffset or yOffset is not integer value");
+				logError("xOffset or yOffset is not integer value");
 			}
 			actions = actions.moveToElement(element,xOffset,yOffset);
 		}
@@ -88,19 +94,19 @@ public class Click extends WebAction
 				actions.contextClick().perform();
 			else if (button.equals(MIDDLE))
 			{
-				logger.error("Middle click is not implemented.");
+				logError("Middle click is not implemented.");
 				return null;
 			}
 			else
 			{
-				logger.error("Button may be only left, right or middle.");
+				logError("Button may be only left, right or middle.");
 				return null;
 			}
 			
-			logger.info("Clicked " + button + " button " + "on: '" + element.toString() + "'");
+			logInfo("Clicked %s button on: '%s'.", button, webLocator);
 				
 		} catch (ElementNotVisibleException e) {
-			logger.error("Element is not visible" ,e);
+			logError("Element is not visible" ,e);
 
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 			js.executeScript("arguments[0].click();", element);
@@ -113,19 +119,17 @@ public class Click extends WebAction
 	}
 
 	@Override
-	protected boolean waitForElement(int waitDuration, By locator) throws ScriptExecuteException {
-
-		WebDriver driver = getWebDriver();
+	protected boolean waitForElement(WebDriver driver, int waitDuration, By locator) throws ScriptExecuteException {
 
 		try {
 			new WebDriverWait(driver, waitDuration).until(ExpectedConditions.elementToBeClickable(locator));
 
-			logger.info("Appeared locator: '" + locator.toString() + "'");
+			logInfo("Appeared locator: '%s'.", locator);
 		}
 		catch (TimeoutException ex)  {
 			List<WebElement> elements = driver.findElements(locator);
 			if (elements.size() > 0) {
-				logger.warn("Element is not clickable, but try to click on it.");
+				logWarn("Element is not clickable, but try to click on it.");
 			} else {
 				if (isElementMandatory())
 					throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");

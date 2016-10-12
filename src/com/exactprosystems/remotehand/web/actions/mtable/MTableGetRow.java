@@ -43,6 +43,12 @@ public class MTableGetRow extends WebAction
 	}
 
 	@Override
+	protected Logger getLogger()
+	{
+		return logger;
+	}
+
+	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		String tableId = params.get(MTableUtils.TABLE_ID),
@@ -82,7 +88,7 @@ public class MTableGetRow extends WebAction
 			}
 		
 		if (tableId == null)
-			logger.error("Some of input parameters are not defined!");
+			logError("Some of input parameters are not defined!");
 		
 		Map<String,String> result = null;
 		
@@ -102,7 +108,7 @@ public class MTableGetRow extends WebAction
 		}
 		catch(Exception e)
 		{
-			logger.error("Exception while executing javascript ", e);
+			logError("Exception while executing javascript ", e);
 		}
 		
 		return result.toString();
