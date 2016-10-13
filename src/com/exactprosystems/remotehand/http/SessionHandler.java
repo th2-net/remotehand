@@ -46,8 +46,8 @@ public class SessionHandler implements HttpHandler
 		{
 			BufferedReader in = new BufferedReader(new InputStreamReader(exchanger.getRequestBody()));
 
-			String line = "";
-			StringBuffer buff = new StringBuffer();
+			String line;
+			StringBuilder buff = new StringBuilder();
 			while ((line = in.readLine()) != null)
 				buff.append(line);
 			in.close();
@@ -121,7 +121,7 @@ public class SessionHandler implements HttpHandler
 	{
 		if (scriptProcessor == null)
 		{
-			scriptProcessor = new ScriptProcessorThread(this, manager);
+			scriptProcessor = new ScriptProcessorThread(id, manager);
 			final Thread webThread = new Thread(scriptProcessor);
 			webThread.start();
 		}

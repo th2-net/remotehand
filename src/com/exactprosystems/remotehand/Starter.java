@@ -18,6 +18,7 @@ import java.util.jar.Manifest;
 
 import com.exactprosystems.remotehand.http.LoginHandler;
 import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.web.WebUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -128,7 +129,7 @@ public class Starter
 
 			ActionsLauncher launcher = manager.createActionsLauncher(null);
 			ScriptCompiler compiler = manager.createScriptCompiler();
-			SessionContext sessionContext = manager.createSessionContext("Main");
+			SessionContext sessionContext = manager.createSessionContext(WebUtils.SESSION_FOR_FILE_MODE);
 					processAllScriptsFromDirectory(input, output, launcher, compiler, sessionContext);
 			if (dynInput != null)
 			{

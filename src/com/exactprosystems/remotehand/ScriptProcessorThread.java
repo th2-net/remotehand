@@ -11,7 +11,6 @@ package com.exactprosystems.remotehand;
 
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionContext;
-import com.exactprosystems.remotehand.http.SessionHandler;
 import com.exactprosystems.remotehand.web.WebUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
@@ -22,8 +21,6 @@ public class ScriptProcessorThread implements Runnable
 {
 	private static final Logger logger = Logger.getLogger(ScriptProcessorThread.class);
 
-	private SessionHandler parentSession = null;
-
 	private boolean switchOn = true, 
 			busy = true, 
 			close = false;
@@ -31,24 +28,25 @@ public class ScriptProcessorThread implements Runnable
 	private String script = null, 
 			lastResult = null;
 
+	private final String sessionId;
 	private final ActionsLauncher launcher;
 	private final IRemoteHandManager rhmanager;
 	private final ScriptCompiler scriptCompiler;
 	private final SessionContext sessionContext;
 
-	public ScriptProcessorThread(SessionHandler session, IRemoteHandManager rhmanager)
+	public ScriptProcessorThread(String sessionId, IRemoteHandManager rhmanager)
 	{
-		this.parentSession = session;
+		this.sessionId = sessionId;
 		this.rhmanager = rhmanager;
 		this.scriptCompiler = rhmanager.createScriptCompiler();
 		this.launcher = rhmanager.createActionsLauncher(this);
-		this.sessionContext = rhmanager.createSessionContext(session.getId());
+		this.sessionContext = rhmanager.createSessionContext(sessionId);
 	}
 
 	@Override
 	public void run()
 	{
-		WebUtils.logInfo(logger, parentSession.getId(), "Processor thread is executed.");
+		WebUtils.logInfo(logger, sessionId, "Processor thread is executed.");
 		while (switchOn)
 		{
 			if (script != null)
@@ -59,7 +57,7 @@ public class ScriptProcessorThread implements Runnable
 				busy = false;
 			}
 
-			if (close || parentSession == null)
+			if (close)
 				closeThread();
 
 			try
@@ -71,7 +69,7 @@ public class ScriptProcessorThread implements Runnable
 				// it's ok, do nothing
 			}
 		}
-		WebUtils.logInfo(logger, parentSession.getId(), "Processor thread was terminated.");
+		WebUtils.logInfo(logger, sessionId, "Processor thread was terminated.");
 	}
 
 	private String processScript()
@@ -84,17 +82,17 @@ public class ScriptProcessorThread implements Runnable
 		}
 		catch (ScriptCompileException ex1)
 		{
-			WebUtils.logError(logger, parentSession.getId(), "Compile error: " + ex1.getMessage());
+			WebUtils.logError(logger, sessionId, "Compile error: " + ex1.getMessage());
 			return ErrorRespondent.getRespondent().error(ex1);
 		}
 		catch (ScriptExecuteException ex2)
 		{
-			WebUtils.logError(logger, parentSession.getId(), "Execute error: " + ex2.getMessage());
+			WebUtils.logError(logger, sessionId, "Execute error: " + ex2.getMessage());
 			return ErrorRespondent.getRespondent().error(ex2);
 		}
 		catch (WebDriverException ex3)
 		{
-			WebUtils.logError(logger, parentSession.getId(), "Execute error: " + ex3.getMessage());
+			WebUtils.logError(logger, sessionId, "Execute error: " + ex3.getMessage());
 			return ErrorRespondent.getRespondent().error(ex3);
 		}
 
@@ -131,5 +129,10 @@ public class ScriptProcessorThread implements Runnable
 	public boolean isClosing()
 	{
 		return close;
+	}
+
+	public String getSessionId()
+	{
+		return sessionId;
 	}
 }

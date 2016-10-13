@@ -19,6 +19,8 @@ import static java.lang.String.format;
  */
 public class WebUtils
 {
+	public static final String SESSION_FOR_FILE_MODE = "Main";
+	
 	public static boolean getBooleanOrDefault(Map<String, String> params, String name, boolean defaultValue)
 	{
 		String value = params.get(name);
