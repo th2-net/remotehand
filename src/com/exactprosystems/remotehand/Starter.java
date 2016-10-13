@@ -38,6 +38,8 @@ import org.apache.log4j.PropertyConfigurator;
 public class Starter
 {
 	private static final Logger logger = Logger.getLogger(Starter.class);
+	
+	public static final String CLEANUP_SCRIPT_FILE = "cleanup.csv";
 
 	@SuppressWarnings("static-access")
 	public static void main(String[] args, IRemoteHandManager manager)
@@ -224,6 +226,7 @@ public class Starter
 			catch (Exception ex)
 			{
 				logger.error("An error occurred", ex);
+				cleanUpAfterFail(launcher, compiler, sessionContext);
 			}
 		}
 	}
@@ -238,5 +241,24 @@ public class Starter
 	{
 		logger.info("Application stopped");
 		System.exit(1);
+	}
+	
+	private static void cleanUpAfterFail(ActionsLauncher launcher, ScriptCompiler compiler, SessionContext context)
+	{
+		File file = new File(CLEANUP_SCRIPT_FILE);
+		if (file.exists())
+		{
+			try
+			{
+				List<Action> actions = compiler.build(file, context);
+				launcher.runActions(actions);
+			}
+			catch (Exception e)
+			{
+				logger.error("An error occurred while running cleanup script.", e);
+			}
+		}
+		else 
+			logger.info("Cleanup script doesn't exist.");
 	}
 }
