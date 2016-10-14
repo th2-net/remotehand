@@ -14,11 +14,12 @@ public enum Browser
 	FIREFOX("Firefox"), 
 	IE("IE"), 
 	CHROME("Chrome"), 
+	HEADLESS("Headless"),
 	INVALID("");
 
 	private String label;
 
-	private Browser(String label)
+	Browser(String label)
 	{
 		this.label = label;
 	}

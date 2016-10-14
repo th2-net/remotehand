@@ -20,6 +20,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -68,6 +69,14 @@ public class WebDriverManager {
 					driver = new ChromeDriver(dc);
 				else
 					driver = new ChromeDriver();
+				break;
+			}
+			case HEADLESS:
+			{
+				if (dc != null)
+					driver = new PhantomJSDriver(dc);
+				else 
+					driver = new PhantomJSDriver();
 				break;
 			}
 			default :
