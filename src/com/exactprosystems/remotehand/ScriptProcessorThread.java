@@ -11,7 +11,6 @@ package com.exactprosystems.remotehand;
 
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionContext;
-import com.exactprosystems.remotehand.web.WebUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriverException;
 
@@ -46,12 +45,13 @@ public class ScriptProcessorThread implements Runnable
 	@Override
 	public void run()
 	{
-		WebUtils.logInfo(logger, sessionId, "Processor thread is executed.");
+		RhUtils.logInfo(logger, sessionId, "Processor thread is executed.");
 		while (switchOn)
 		{
 			if (script != null)
 			{
 				lastResult = processScript();
+
 				script = null;
 
 				busy = false;
@@ -69,31 +69,20 @@ public class ScriptProcessorThread implements Runnable
 				// it's ok, do nothing
 			}
 		}
-		WebUtils.logInfo(logger, sessionId, "Processor thread was terminated.");
+		RhUtils.logInfo(logger, sessionId, "Processor thread was terminated.");
 	}
 
-	private String processScript()
-	{
+	private String processScript() {
 		String result;
 		try
 		{
 			final List<Action> actions = scriptCompiler.build(script, sessionContext);
 			result = launcher.runActions(actions);
 		}
-		catch (ScriptCompileException ex1)
+		catch (Exception ex1)
 		{
-			WebUtils.logError(logger, sessionId, "Compile error: " + ex1.getMessage());
+			RhUtils.logError(logger, sessionId, "Compile error: " + ex1.getMessage());
 			return ErrorRespondent.getRespondent().error(ex1);
-		}
-		catch (ScriptExecuteException ex2)
-		{
-			WebUtils.logError(logger, sessionId, "Execute error: " + ex2.getMessage());
-			return ErrorRespondent.getRespondent().error(ex2);
-		}
-		catch (WebDriverException ex3)
-		{
-			WebUtils.logError(logger, sessionId, "Execute error: " + ex3.getMessage());
-			return ErrorRespondent.getRespondent().error(ex3);
 		}
 
 		return result;

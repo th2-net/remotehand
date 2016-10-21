@@ -6,8 +6,9 @@
 //  This is unpublished, licensed software, confidential and proprietary 
 //  information which is the property of Exactpro Systems or its licensors.
 ////////////////////////////////////////////////////////////////////////////////
-package com.exactprosystems.remotehand.web;
+package com.exactprosystems.remotehand;
 
+import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ import static java.lang.String.format;
 /**
  * @author anna.bykova.
  */
-public class WebUtils
+public class RhUtils
 {
 	public static final String SESSION_FOR_FILE_MODE = "Main";
 	

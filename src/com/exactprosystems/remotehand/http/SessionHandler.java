@@ -9,15 +9,16 @@
 
 package com.exactprosystems.remotehand.http;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.List;
 
+import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.IRemoteHandManager;
 import com.exactprosystems.remotehand.ScriptProcessorThread;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.http.entity.mime.Header;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.log4j.Logger;
 
 public class SessionHandler implements HttpHandler
@@ -44,22 +45,82 @@ public class SessionHandler implements HttpHandler
 		final String method = exchanger.getRequestMethod();
 		if (method.equalsIgnoreCase("POST"))
 		{
-			BufferedReader in = new BufferedReader(new InputStreamReader(exchanger.getRequestBody()));
+			List<String> contTypeList = exchanger.getRequestHeaders().get("Content-type");
+			List<String> transFNs = exchanger.getRequestHeaders().get("Transfer-filename");
+			if (contTypeList != null && !contTypeList.isEmpty() && "application/octet-stream".equals(contTypeList.get(0))
+					 && transFNs != null && !transFNs.isEmpty()) {
 
-			String line;
-			StringBuilder buff = new StringBuilder();
-			while ((line = in.readLine()) != null)
-				buff.append(line);
-			in.close();
+				String outFileName = transFNs.get(0);
+				File f = new File(outFileName);
 
-			final String body = buff.toString();
+				if (!f.isAbsolute()) {
+					f = new File(Configuration.getInstance().getFileStorage(), outFileName);
+				}
 
-			sendMessage(exchanger, "OK");
+				if (f.exists()) {
+					logger.info("File: " + f.toString() + " exists. Rewriting...");
+				} else {
 
-			logger.info("Session <" + id + ">. Received text:");
-			logger.info(body);
+					try {
 
-			launchScript(body);
+						if (f.getParentFile() != null && !f.getParentFile().exists()) {
+							f.getParentFile().mkdirs();
+						}
+						f.createNewFile();
+					} catch (Exception e) {
+						logger.error("Can't create directory or file.", e);
+						return;
+					}
+
+				}
+
+				InputStream requestBody = null;
+				FileOutputStream fw = null;
+
+
+				try {
+					requestBody = exchanger.getRequestBody();
+					fw = new FileOutputStream(f, false);
+					byte[] buffer = new byte[512];
+					int readBytes = -1;
+					while ((readBytes = requestBody.read(buffer)) != -1) {
+						fw.write(buffer, 0, readBytes);
+					}
+					sendMessage(exchanger, "OK");
+					logger.info("Session <" + id + ">. Received request for file:" + f.toString());
+				} catch (Exception e) {
+					logger.error("Can't write file.", e);
+				} finally {
+					if (requestBody != null) {
+						requestBody.close();
+					}
+					if (fw != null) {
+						fw.close();
+					}
+				}
+
+
+			} else {
+
+				BufferedReader in = new BufferedReader(new InputStreamReader(exchanger.getRequestBody()));
+
+				String line;
+				StringBuilder buff = new StringBuilder();
+				while ((line = in.readLine()) != null)
+					buff.append(line);
+				in.close();
+
+				final String body = buff.toString();
+
+				//			MultipartEntity
+
+				sendMessage(exchanger, "OK");
+
+				logger.info("Session <" + id + ">. Received text:");
+				logger.info(body);
+
+				launchScript(body);
+			}
 		}
 		else if (method.equalsIgnoreCase("GET"))
 		{

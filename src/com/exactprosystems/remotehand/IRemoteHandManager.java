@@ -9,6 +9,7 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.remotehand.http.LoginHandler;
 import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -25,6 +26,8 @@ public interface IRemoteHandManager {
 	ActionsLauncher createActionsLauncher(ScriptProcessorThread thread);
 	
 	SessionContext createSessionContext(String sessionId);
+
+	LoginHandler createLoginHandler();
 
 	Option[] getAdditionalOptions();
 

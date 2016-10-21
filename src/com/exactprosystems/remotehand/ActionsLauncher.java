@@ -9,7 +9,6 @@
 
 package com.exactprosystems.remotehand;
 
-import com.exactprosystems.remotehand.web.WebUtils;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -59,6 +58,6 @@ public class ActionsLauncher
 	
 	private String getSessionId()
 	{
-		return parent != null ? parent.getSessionId() : WebUtils.SESSION_FOR_FILE_MODE;
+		return parent != null ? parent.getSessionId() : RhUtils.SESSION_FOR_FILE_MODE;
 	}
 }

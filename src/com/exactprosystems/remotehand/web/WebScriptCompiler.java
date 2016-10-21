@@ -52,12 +52,12 @@ public class WebScriptCompiler extends ScriptCompiler
 	{
 		WebSessionContext webSessionContext = (WebSessionContext) context;
 		String sessionId = webSessionContext.getSessionId();
-		WebUtils.logInfo(logger, sessionId, "Compiling script...");
+		RhUtils.logInfo(logger, sessionId, "Compiling script...");
 
 		if (isDictionaryUsed(script))
 		{
 			webSessionContext.setDictionary(new WebElementsDictionary(script, false));
-			WebUtils.logInfo(logger, sessionId, "Web dictionary applied");
+			RhUtils.logInfo(logger, sessionId, "Web dictionary applied");
 			return new ArrayList<Action>();
 		}
 
@@ -95,13 +95,13 @@ public class WebScriptCompiler extends ScriptCompiler
 						checker.checkParams(action, action.getWebLocator(), action.getParams());
 						checker.checkParams(action.getWebLocator(), action.getParams());
 
-						WebUtils.logInfo(logger, sessionId, String.format("%s: %s", 
+						RhUtils.logInfo(logger, sessionId, String.format("%s: %s",
 								action.getClass().getSimpleName(), action.getParams()));
 
 						result.add(action);
 					}
 					else
-						WebUtils.logInfo(logger, sessionId, String.format("Action at line %d will be skipped.", lineNumber));
+						RhUtils.logInfo(logger, sessionId, String.format("Action at line %d will be skipped.", lineNumber));
 				}
 			}
 			reader.close();

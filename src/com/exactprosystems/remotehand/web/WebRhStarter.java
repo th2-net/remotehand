@@ -16,6 +16,7 @@ import com.exactprosystems.remotehand.Starter;
 public class WebRhStarter {
 
 	public static void main(String[] args) {
+		WebErrorRespondent.getRespondent();
 		Starter.main(args, new WebRemoteHandManager());
 	}
 

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.exactprosystems.remotehand.Configuration;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 
@@ -227,7 +228,7 @@ public class SendKeys extends WebAction
 	}
 
 	protected static String replaceConversions(String src) {
-		return src.replace("(","#openbracket#");
+		return src.replace("(","#openbracket#").replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath() + "/");
 	}
 
 	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{

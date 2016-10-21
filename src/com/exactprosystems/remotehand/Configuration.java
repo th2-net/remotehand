@@ -30,16 +30,19 @@ public class Configuration
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 60; // 1 hour
+	public final String DEF_FILE_STORAGE = "generated/";
 
 	public final String PARAM_PORT = "Port",
 			PARAM_DELIMITER = "Delimiter",
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
-			PARAM_SESSIONEXPIRE = "SessionExpire";
+			PARAM_SESSIONEXPIRE = "SessionExpire",
+			PARAM_FILE_STORAGE = "DefaultFileStorage";
 
 	private volatile int httpServerPort;
 	private volatile char scriptDelimiter;
 	private volatile char scriptTextQualifier;
 	private volatile int sessionExpire;
+	private volatile File fileStorage;
 
 	protected Configuration(CommandLine commandLine)
 	{
@@ -111,6 +114,22 @@ public class Configuration
 			sessionExpire = DEF_SESSION_EXPIRE;
 		}
 
+		try
+		{
+			String fileStorageString = properties.getProperty(PARAM_FILE_STORAGE);
+			if (fileStorageString == null || fileStorageString.trim().isEmpty()) {
+				logger.info(String.format("Property '%s' is empty. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
+				fileStorageString = DEF_FILE_STORAGE;
+			}
+
+			fileStorage = new File(DEF_FILE_STORAGE);
+		}
+		catch (Exception ex)
+		{
+			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
+			fileStorage = new File(DEF_FILE_STORAGE);
+		}
+
 
 	}
 	
@@ -157,6 +176,10 @@ public class Configuration
 	public int getSessionExpire()
 	{
 		return sessionExpire;
+	}
+
+	public File getFileStorage() {
+		return fileStorage;
 	}
 
 }

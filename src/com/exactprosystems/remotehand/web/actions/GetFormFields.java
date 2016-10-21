@@ -15,7 +15,7 @@ import com.exactprosystems.clearth.rhxmldata.ObjectFactory;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
-import com.exactprosystems.remotehand.web.WebUtils;
+import com.exactprosystems.remotehand.RhUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -83,8 +83,8 @@ public class GetFormFields extends WebAction
 			group = DEFAULT_GROUP;
 			logInfo("Parameter #%s wasn't found. Value %s will be used by default.", GROUP_PARAM, DEFAULT_GROUP);
 		}		
-		checkRequiredFlag = WebUtils.getBooleanOrDefault(params, CHECK_REQUIRED_FLAG_PARAM, false);
-		checkDisabledFlag = WebUtils.getBooleanOrDefault(params, CHECK_DISABLED_FLAG_PARAM, false);
+		checkRequiredFlag = RhUtils.getBooleanOrDefault(params, CHECK_REQUIRED_FLAG_PARAM, false);
+		checkDisabledFlag = RhUtils.getBooleanOrDefault(params, CHECK_DISABLED_FLAG_PARAM, false);
 	}
 	
 	private WebElement getFormContainer(WebDriver webDriver, By webLocator) throws ScriptExecuteException

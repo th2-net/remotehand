@@ -24,23 +24,26 @@ public class HTTPServer
 
 	private static volatile HttpServer server = null;
 
-	public static HttpServer getServer()
-	{
-		if (server == null)
-			try
-			{
+	public static boolean createServer(LoginHandler loginHandler) {
+		if (server == null) {
+			try {
 				server = HttpServer.create(new InetSocketAddress(HTTP_SRV_PORT), 0);
-				server.createContext(LOGIN_LISTENER, LoginHandler.getHandler());
+				server.createContext(LOGIN_LISTENER, loginHandler);
 				server.setExecutor(null); // creates a default executor
 				server.start();
 
 				logger.info(String.format("HTTP Server started on port <%s>", HTTP_SRV_PORT));
-			}
-			catch (IOException ex)
-			{
+			} catch (IOException ex) {
 				logger.error(String.format("Could not create HTTP Server on port <%s>", HTTP_SRV_PORT), ex);
 			}
+			return server != null;
+		} else {
+			return false;
+		}
+	}
 
+	public static HttpServer getServer()
+	{
 		return server;
 	}
 }

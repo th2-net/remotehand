@@ -16,9 +16,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import com.exactprosystems.remotehand.http.LoginHandler;
 import com.exactprosystems.remotehand.http.SessionContext;
-import com.exactprosystems.remotehand.web.WebUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -38,6 +36,8 @@ import org.apache.log4j.PropertyConfigurator;
 public class Starter
 {
 	private static final Logger logger = Logger.getLogger(Starter.class);
+
+	private static final String DEFAULT_VERSION = "local_build";
 	
 	public static final String CLEANUP_SCRIPT_FILE = "cleanup.csv";
 
@@ -53,8 +53,11 @@ public class Starter
 		}
 		catch (Exception e)
 		{
-			version = "local_build";
-			logger.warn("Error while reading MANIFEST.MF file. Using '" + version + "' as version value", e);
+			logger.warn("Error while reading MANIFEST.MF file. Using '" + DEFAULT_VERSION + "' as version value", e);
+		}
+
+		if (version == null) {
+			version = DEFAULT_VERSION;
 		}
 		
 		PropertyConfigurator.configureAndWatch("log4j.properties");
@@ -109,9 +112,8 @@ public class Starter
 
 		if (serverMode)
 		{
-			LoginHandler.getHandler().setRhManager(manager);
 			// starting HTTP Server
-			if (HTTPServer.getServer() == null)
+			if (!HTTPServer.createServer(manager.createLoginHandler()))
 				logger.info("Application stopped with error");
 
 			// starting threads watcher
@@ -131,7 +133,7 @@ public class Starter
 
 			ActionsLauncher launcher = manager.createActionsLauncher(null);
 			ScriptCompiler compiler = manager.createScriptCompiler();
-			SessionContext sessionContext = manager.createSessionContext(WebUtils.SESSION_FOR_FILE_MODE);
+			SessionContext sessionContext = manager.createSessionContext(RhUtils.SESSION_FOR_FILE_MODE);
 					processAllScriptsFromDirectory(input, output, launcher, compiler, sessionContext);
 			if (dynInput != null)
 			{
