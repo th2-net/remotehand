@@ -9,14 +9,23 @@
 
 package com.exactprosystems.remotehand.web;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.actions.GetScreenshot;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.internal.Locatable;
@@ -29,6 +38,8 @@ public abstract class WebAction extends Action
 {
 	protected static final String PARAM_WAIT = "wait",
 			PARAM_NOTFOUNDFAIL = "notfoundfail";
+	
+	protected static final SimpleDateFormat SCREENSHOT_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 	
 	protected String[] mandatoryParams;
 
@@ -102,26 +113,35 @@ public abstract class WebAction extends Action
 	@Override
 	public String execute() throws ScriptExecuteException
 	{
-		By locator = null;
-		if (webLocator != null)
-			locator = webLocator.getWebLocator(webDriver, params);
-		
-		boolean needRun = true;
-		if (isCanWait())
+		try
 		{
-			if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
-				if (!waitForElement(webDriver, getIntegerParam(params, PARAM_WAIT), locator))
-					needRun = false;
+			By locator = null;
+			if (webLocator != null)
+				locator = webLocator.getWebLocator(webDriver, params);
+
+			boolean needRun = true;
+			if (isCanWait())
+			{
+				if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
+					if (!waitForElement(webDriver, getIntegerParam(params, PARAM_WAIT), locator))
+						needRun = false;
+			}
+
+			if (isCanSwitchPage())
+				disableLeavePageAlert(webDriver);
+
+
+			if (needRun)
+				return run(webDriver, locator, params);
+			else
+				return null;
 		}
-
-		if (isCanSwitchPage())
-			disableLeavePageAlert(webDriver);
-
-
-		if (needRun)
-			return run(webDriver, locator, params);
-		else
-			return null;
+		catch (ScriptExecuteException e)
+		{
+			if (!(this instanceof GetScreenshot))
+				takeScreenshotIfError();
+			throw e;
+		}
 	}
 
 	public String[] getMandatoryParams() throws ScriptCompileException
@@ -161,6 +181,70 @@ public abstract class WebAction extends Action
 		}
 		else 
 			logWarn("Cannot scroll %s.", webLocator);
+	}
+	
+	protected String takeScreenshot() throws ScriptExecuteException
+	{
+		if (!(webDriver instanceof TakesScreenshot))
+			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
+		TakesScreenshot takesScreenshot = (TakesScreenshot) webDriver;
+		
+		Path storageDirPath = Paths.get(WebConfiguration.SCREENSHOTS_DIR_NAME);
+		createScreenshotsDirIfNeeded(storageDirPath);
+		
+		File tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+		
+		String fileName = createScreenshotFileName();
+		Path storePath = storageDirPath.resolve(fileName);
+		saveScreenshot(tmpFile, storePath);
+		logInfo("Screenshot %s has been successfully saved.", storePath);
+		
+		return fileName;
+	}
+	
+	private void createScreenshotsDirIfNeeded(Path relativeDirPath) throws ScriptExecuteException
+	{
+		if (Files.notExists(relativeDirPath))
+		{
+			try
+			{
+				Files.createDirectory(relativeDirPath);
+			}
+			catch (IOException e)
+			{
+				throw new ScriptExecuteException("Unable to create directory to store screenshots.", e);
+			}
+		}
+	}
+	
+	private String createScreenshotFileName()
+	{
+		return "screenshot" + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + ".png";
+	}
+	
+	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
+	{
+		try
+		{
+			FileUtils.copyFile(tmpFile, targetPath.toFile());
+		}
+		catch (IOException e)
+		{
+			throw new ScriptExecuteException(format("Unable to copy screenshot file '%s' to the storage directory '%s'.",
+					tmpFile, WebConfiguration.SCREENSHOTS_DIR_NAME));
+		}
+	}
+	
+	private void takeScreenshotIfError()
+	{
+		try
+		{
+			takeScreenshot();
+		}
+		catch (ScriptExecuteException e)
+		{
+			logError("Unable to create screenshot.", e);
+		}
 	}
 	
 	protected void logError(String msg)

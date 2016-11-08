@@ -41,6 +41,8 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_SOCKSPROXY = "SocksProxy";
 	public static final String PARAM_NOPROXY = "NoProxy";
 	public static final String PARAM_PROFILE = "Profile";
+	
+	public static final String SCREENSHOTS_DIR_NAME = "screenshots";
 
 	private volatile Browser browserToUse;
 	private final String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 

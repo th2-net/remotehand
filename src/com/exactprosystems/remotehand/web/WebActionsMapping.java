@@ -25,7 +25,7 @@ public class WebActionsMapping
 	private enum WebActionName
 	{
 		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox,
-		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields;
+		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -35,7 +35,7 @@ public class WebActionsMapping
 
 			throw new ScriptCompileException("Web action '" + label + "' not found in actions list");
 		}
-	};
+	}
 
 	public WebAction getByName(String actionName) throws ScriptCompileException
 	{
@@ -64,6 +64,7 @@ public class WebActionsMapping
 		case SendKeysToActive:     return new SendKeysToActive();
 		case PressKey :            return new PressKey();
 		case GetFormFields:        return new GetFormFields();
+		case GetScreenshot:        return new GetScreenshot();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
