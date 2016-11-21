@@ -9,6 +9,7 @@
 package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.ActionOutputType;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -22,12 +23,19 @@ import java.util.Map;
 public class GetScreenshot extends WebAction
 {
 	private static final Logger log = Logger.getLogger(GetScreenshot.class);
+	
+	public static final String NAME_PARAM = "name";
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		takeScreenshot();		
-		return null;
+		return takeScreenshot(params.get(NAME_PARAM));
+	}
+	
+	@Override
+	public ActionOutputType getOutputType()
+	{
+		return ActionOutputType.SCREENSHOT;
 	}
 
 	@Override

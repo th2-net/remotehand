@@ -8,6 +8,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand.web;
 
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode;
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import org.openqa.selenium.WebDriverException;
 
@@ -15,8 +17,6 @@ import org.openqa.selenium.WebDriverException;
  * Created by alexey.karpukhin on 10/21/16.
  */
 public class WebErrorRespondent extends ErrorRespondent{
-
-	protected static final int WEBDRIVER_ERROR_CODE = 5;
 
 	public static synchronized ErrorRespondent getRespondent()
 	{
@@ -26,12 +26,16 @@ public class WebErrorRespondent extends ErrorRespondent{
 	}
 
 	@Override
-	public String error(Exception ex) {
-		if (ex instanceof WebDriverException) {
-			return ERROR_MARK + "=" + WEBDRIVER_ERROR_CODE + " : " + ex.getMessage();
-		} else {
-			return super.error(ex);
+	public RhScriptResult error(Exception ex)
+	{
+		if (ex instanceof WebDriverException)
+		{
+			RhScriptResult result = new RhScriptResult();
+			result.setCode(RhResponseCode.WEBDRIVER_ERROR.getCode());
+			result.setErrorMessage(ex.getMessage());
+			return result;
 		}
-
+		else 
+			return super.error(ex);
 	}
 }

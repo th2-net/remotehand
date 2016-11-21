@@ -12,13 +12,14 @@ package com.exactprosystems.remotehand.http;
 import java.io.*;
 import java.util.List;
 
+import com.exactprosystems.clearth.connectivity.data.rhdata.JsonSerializer;
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode;
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.IRemoteHandManager;
 import com.exactprosystems.remotehand.ScriptProcessorThread;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.apache.http.entity.mime.Header;
-import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.log4j.Logger;
 
 public class SessionHandler implements HttpHandler
@@ -29,6 +30,7 @@ public class SessionHandler implements HttpHandler
 
 	private ScriptProcessorThread scriptProcessor = null;
 	private IRemoteHandManager manager;
+	private JsonSerializer serializer = new JsonSerializer();
 
 	SessionHandler(String id, IRemoteHandManager manager)
 	{
@@ -138,18 +140,10 @@ public class SessionHandler implements HttpHandler
 
 			logger.info("Session <" + id + ">. Request for result");
 
-			if (scriptProcessor.getResult() != null)
-				sendMessage(exchanger, scriptProcessor.getResult());
-			else
-				sendMessage(exchanger, "");
+			sendMessage(exchanger, serializer.serialize(scriptProcessor.getResult()));
 		}
 		else if (method.equals("DELETE"))
 		{
-			if (scriptProcessor == null)
-			{
-				sendIncorrectRequestMessage(exchanger, "No results. No scripts have been passed.");
-				return;
-			}
 			logger.info("Session <" + id + ">. Request for session close");
 
 			this.close();
@@ -168,14 +162,18 @@ public class SessionHandler implements HttpHandler
 
 	private void sendBusyMessage(HttpExchange exchanger) throws IOException
 	{
-		final String response = ErrorRespondent.getRespondent().error(new ThreadBusyException("Process is busy"));
-		sendMessage(exchanger, response);
+		RhScriptResult result = new RhScriptResult();
+		result.setCode(RhResponseCode.TOOL_BUSY.getCode());
+		result.setErrorMessage("Process is busy");
+		sendMessage(exchanger, serializer.serialize(result));
 	}
 
 	private void sendIncorrectRequestMessage(HttpExchange exchanger, String message) throws IOException
 	{
-		final String response = ErrorRespondent.getRespondent().error(new IncorrectRequestException(message));
-		sendMessage(exchanger, response);
+		RhScriptResult result = new RhScriptResult();
+		result.setCode(RhResponseCode.INCORRECT_REQUEST.getCode());
+		result.setErrorMessage(message);
+		sendMessage(exchanger, serializer.serialize(result));
 	}
 
 	private void launchScript(String script)

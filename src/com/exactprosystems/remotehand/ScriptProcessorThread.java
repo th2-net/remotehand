@@ -9,10 +9,10 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.log4j.Logger;
-import org.openqa.selenium.WebDriverException;
 
 import java.util.List;
 
@@ -24,8 +24,8 @@ public class ScriptProcessorThread implements Runnable
 			busy = true, 
 			close = false;
 
-	private String script = null, 
-			lastResult = null;
+	private String script;
+	private RhScriptResult lastResult;
 
 	private final String sessionId;
 	private final ActionsLauncher launcher;
@@ -72,20 +72,18 @@ public class ScriptProcessorThread implements Runnable
 		RhUtils.logInfo(logger, sessionId, "Processor thread was terminated.");
 	}
 
-	private String processScript() {
-		String result;
+	private RhScriptResult processScript() 
+	{
 		try
 		{
 			final List<Action> actions = scriptCompiler.build(script, sessionContext);
-			result = launcher.runActions(actions);
+			return launcher.runActions(actions);
 		}
 		catch (Exception ex1)
 		{
 			RhUtils.logError(logger, sessionId, "Compile error: " + ex1.getMessage());
 			return ErrorRespondent.getRespondent().error(ex1);
 		}
-
-		return result;
 	}
 
 	private void closeThread()
@@ -94,7 +92,7 @@ public class ScriptProcessorThread implements Runnable
 		switchOn = false;
 	}
 
-	public String getResult()
+	public RhScriptResult getResult()
 	{
 		return lastResult;
 	}

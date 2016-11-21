@@ -53,15 +53,18 @@ public class Configuration
 
 		properties = new Properties(getDefaultProperties());
 
+		String configFileName = commandLine.getOptionValue(Starter.CONFIG_PARAM, CONFIG_FILE_NAME);
+		logger.info(String.format("Using configuration file '%s'", configFileName));
+		
 		FileInputStream fs = null;
 		try
 		{
-			fs = new FileInputStream(new File(getConfigFileName()));
+			fs = new FileInputStream(new File(configFileName));
 			properties.load(fs);
 		}
 		catch (IOException e)
 		{
-			logger.warn(String.format("File '%s' is not found or has wrong format. Using default cofiguration.", CONFIG_FILE_NAME));
+			logger.warn(String.format("File '%s' is not found or has wrong format. Using default configuration.", configFileName));
 		}
 		finally
 		{
@@ -72,7 +75,7 @@ public class Configuration
 			}
 			catch (IOException e)
 			{
-				logger.warn(String.format("An error occurred while closing file '%s'.", CONFIG_FILE_NAME), e);
+				logger.warn(String.format("An error occurred while closing file '%s'.", configFileName), e);
 			}
 		}
 
@@ -148,10 +151,6 @@ public class Configuration
 		return instance;
 	}
 
-
-	protected String getConfigFileName() {
-		return CONFIG_FILE_NAME;
-	}
 
 	public String getProperty(String key)
 	{

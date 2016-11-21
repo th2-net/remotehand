@@ -21,6 +21,7 @@ public class HTTPServer
 	private static final Logger logger = Logger.getLogger(HTTPServer.class);
 	private static final int HTTP_SRV_PORT = Configuration.getInstance().getHttpServerPort();
 	private static final String LOGIN_LISTENER = "/login";
+	private static final String DOWNLOAD_LISTENER = "/download";
 
 	private static volatile HttpServer server = null;
 
@@ -29,6 +30,7 @@ public class HTTPServer
 			try {
 				server = HttpServer.create(new InetSocketAddress(HTTP_SRV_PORT), 0);
 				server.createContext(LOGIN_LISTENER, loginHandler);
+				server.createContext(DOWNLOAD_LISTENER, new DownloadHandler());
 				server.setExecutor(null); // creates a default executor
 				server.start();
 

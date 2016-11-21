@@ -40,7 +40,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public ActionsLauncher createActionsLauncher(ScriptProcessorThread thread) {
-		return new ActionsLauncher(thread);
+		return new WebActionsLauncher(thread);
 	}
 
 	@Override

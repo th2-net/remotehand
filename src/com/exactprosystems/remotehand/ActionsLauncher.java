@@ -9,6 +9,7 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -25,9 +26,9 @@ public class ActionsLauncher
 		this.parent = parentThread;
 	}
 
-	public String runActions(List<Action> scriptActions) throws ScriptExecuteException
+	public RhScriptResult runActions(List<Action> scriptActions) throws ScriptExecuteException
 	{
-		StringBuilder result = null;
+		RhScriptResult result = new RhScriptResult();
 		
 		String sessionId = getSessionId();
 		logger.info(String.format("<%s> Script execution starting...", sessionId));
@@ -37,11 +38,7 @@ public class ActionsLauncher
 		{
 			final String actionResult = action.execute();
 			if (actionResult != null)
-			{
-				if (result==null)
-					result = new StringBuilder();
-				result.append(actionResult).append("\r\n");
-			}
+				processActionResult(result, action, actionResult);
 
 			if (parent != null && parent.isClosing())
 			{
@@ -53,7 +50,12 @@ public class ActionsLauncher
 		logger.info(String.format("<%s> Script execution time: %d sec.", sessionId, 
 				TimeUnit.MILLISECONDS.toSeconds(duration)));
 
-		return result!=null ? result.toString() : null;
+		return result;
+	}
+	
+	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult)
+	{
+		scriptResult.addToTextOutput(actionResult);
 	}
 	
 	private String getSessionId()

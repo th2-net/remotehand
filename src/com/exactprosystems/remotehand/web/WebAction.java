@@ -40,6 +40,7 @@ public abstract class WebAction extends Action
 			PARAM_NOTFOUNDFAIL = "notfoundfail";
 	
 	protected static final SimpleDateFormat SCREENSHOT_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+	protected static final String SCREENSHOT_EXTENSION = ".png";
 	
 	protected String[] mandatoryParams;
 
@@ -77,6 +78,11 @@ public abstract class WebAction extends Action
 	public boolean isCanSwitchPage()
 	{
 		return false;
+	}
+	
+	public ActionOutputType getOutputType()
+	{
+		return ActionOutputType.TEXT;
 	}
 	
 	public boolean isElementMandatory()
@@ -139,7 +145,7 @@ public abstract class WebAction extends Action
 		catch (ScriptExecuteException e)
 		{
 			if (!(this instanceof GetScreenshot))
-				takeScreenshotIfError();
+				e.setScreenshotId(takeScreenshotIfError());
 			throw e;
 		}
 	}
@@ -183,7 +189,7 @@ public abstract class WebAction extends Action
 			logWarn("Cannot scroll %s.", webLocator);
 	}
 	
-	protected String takeScreenshot() throws ScriptExecuteException
+	protected String takeScreenshot(String name) throws ScriptExecuteException
 	{
 		if (!(webDriver instanceof TakesScreenshot))
 			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
@@ -194,7 +200,7 @@ public abstract class WebAction extends Action
 		
 		File tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
 		
-		String fileName = createScreenshotFileName();
+		String fileName = createScreenshotFileName(name);
 		Path storePath = storageDirPath.resolve(fileName);
 		saveScreenshot(tmpFile, storePath);
 		logInfo("Screenshot %s has been successfully saved.", storePath);
@@ -217,9 +223,17 @@ public abstract class WebAction extends Action
 		}
 	}
 	
-	private String createScreenshotFileName()
+	private String createScreenshotFileName(String name)
 	{
-		return "screenshot" + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + ".png";
+		if (name != null)
+		{
+			if (name.endsWith(SCREENSHOT_EXTENSION))
+				return name;
+			else 
+				return name + SCREENSHOT_EXTENSION;
+		}
+		else 
+			return "screenshot" + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + SCREENSHOT_EXTENSION;
 	}
 	
 	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
@@ -235,15 +249,16 @@ public abstract class WebAction extends Action
 		}
 	}
 	
-	private void takeScreenshotIfError()
+	private String takeScreenshotIfError()
 	{
 		try
 		{
-			takeScreenshot();
+			return takeScreenshot(null);
 		}
 		catch (ScriptExecuteException e)
 		{
 			logError("Unable to create screenshot.", e);
+			return null;
 		}
 	}
 	

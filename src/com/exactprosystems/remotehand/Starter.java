@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -40,6 +41,7 @@ public class Starter
 	private static final String DEFAULT_VERSION = "local_build";
 	
 	public static final String CLEANUP_SCRIPT_FILE = "cleanup.csv";
+	public static final String CONFIG_PARAM = "config";
 
 	@SuppressWarnings("static-access")
 	public static void main(String[] args, IRemoteHandManager manager)
@@ -69,12 +71,16 @@ public class Starter
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
 				outputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify output path name.").create("output"),
 				dynamicInputName = OptionBuilder.withArgName("file").hasArg().withDescription("Dynamically added input file with further commands").create("dynamicinput");
+		
+		Option configFileOption = OptionBuilder.isRequired(false).withArgName("file").hasArg()
+				.withDescription("Specify configuration file").create(CONFIG_PARAM);
 
 		Options options = new Options();
 		options.addOption(enableServerMode);
 		options.addOption(inputName);
 		options.addOption(outputName);
 		options.addOption(dynamicInputName);
+		options.addOption(configFileOption);
 
 		for (Option additional : manager.getAdditionalOptions()) {
 			options.addOption(additional);
@@ -220,9 +226,9 @@ public class Starter
 			try
 			{
 				final List<Action> actions = compiler.build(scriptFile, sessionContext);
-				String result = launcher.runActions(actions);
+				RhScriptResult result = launcher.runActions(actions);
 
-				TextFileWriter.getInstance().setContent(result);
+				TextFileWriter.getInstance().setContent(resultToText(result));
 				TextFileWriter.getInstance().writeFile(outputFile);
 			}
 			catch (Exception ex)
@@ -262,5 +268,19 @@ public class Starter
 		}
 		else 
 			logger.info("Cleanup script doesn't exist.");
+	}
+	
+	private static String resultToText(RhScriptResult result)
+	{
+		StringBuilder sb = new StringBuilder();
+		for (String line : result.getTextOutput())
+		{
+			sb.append(line).append("\r\n");
+		}
+		for (String line : result.getEncodedOutput())
+		{
+			sb.append(line).append("\r\n");
+		}
+		return sb.toString();
 	}
 }

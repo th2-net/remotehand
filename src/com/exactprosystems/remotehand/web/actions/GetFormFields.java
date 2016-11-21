@@ -8,11 +8,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand.web.actions;
 
-import com.exactprosystems.clearth.rhxmldata.FormDesc;
-import com.exactprosystems.clearth.rhxmldata.FormFieldDesc;
-import com.exactprosystems.clearth.rhxmldata.FormFieldType;
-import com.exactprosystems.clearth.rhxmldata.ObjectFactory;
+import com.exactprosystems.clearth.connectivity.data.rhdata.JsonSerializer;
+import com.exactprosystems.clearth.connectivity.data.rhdata.form.FormDesc;
+import com.exactprosystems.clearth.connectivity.data.rhdata.form.FormFieldDesc;
+import com.exactprosystems.clearth.connectivity.data.rhdata.form.FormFieldType;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.ActionOutputType;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
 import com.exactprosystems.remotehand.RhUtils;
@@ -22,10 +23,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import java.io.StringWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +52,14 @@ public class GetFormFields extends WebAction
 	private String group;
 	private boolean checkRequiredFlag;
 	private boolean checkDisabledFlag;
+	
+	private final JsonSerializer serializer = new JsonSerializer();
+	
+	@Override
+	public ActionOutputType getOutputType()
+	{
+		return ActionOutputType.ENCODED_DATA;
+	}
 	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
@@ -178,17 +184,12 @@ public class GetFormFields extends WebAction
 	private String serializeFields(List<FormFieldDesc> fieldDescs) throws ScriptExecuteException
 	{
 		FormDesc formDesc = new FormDesc();
-		formDesc.getFields().addAll(fieldDescs);
+		formDesc.setFields(fieldDescs);
 		try
 		{
-			Marshaller m = JAXBContext.newInstance(FormDesc.class).createMarshaller();
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			StringWriter writer = new StringWriter();
-			ObjectFactory of = new ObjectFactory();
-			m.marshal(of.createForm(formDesc), writer);
-			return writer.toString();
+			return serializer.serialize(formDesc);
 		}
-		catch (JAXBException e)
+		catch (IOException e)
 		{
 			throw new ScriptExecuteException("Unable to serialize action result", e);
 		}

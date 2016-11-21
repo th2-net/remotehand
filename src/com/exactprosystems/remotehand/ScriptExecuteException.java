@@ -12,6 +12,8 @@ package com.exactprosystems.remotehand;
 public class ScriptExecuteException extends Exception
 {
 	private static final long serialVersionUID = 2L;
+	
+	private String screenshotId;
 
 	public ScriptExecuteException(String message)
 	{
@@ -24,5 +26,15 @@ public class ScriptExecuteException extends Exception
 
 	public ScriptExecuteException(Throwable cause) {
 		super(cause);
+	}
+
+	public String getScreenshotId()
+	{
+		return screenshotId;
+	}
+
+	public void setScreenshotId(String screenshotId)
+	{
+		this.screenshotId = screenshotId;
 	}
 }
