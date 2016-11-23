@@ -136,18 +136,24 @@ public abstract class WebAction extends Action
 			if (isCanSwitchPage())
 				disableLeavePageAlert(webDriver);
 
-
-			if (needRun)
-				return run(webDriver, locator, params);
-			else
-				return null;
+			return (needRun) ? run(webDriver, locator, params) : null;
 		}
 		catch (ScriptExecuteException e)
 		{
-			if (!(this instanceof GetScreenshot))
-				e.setScreenshotId(takeScreenshotIfError());
-			throw e;
+			throw addScreenshot(e);
 		}
+		catch (WebDriverException e)
+		{
+			throw addScreenshot(new ScriptExecuteException(e.getMessage(), e));
+		}
+	}
+	
+	private ScriptExecuteException addScreenshot(ScriptExecuteException see)
+	{
+		if (this instanceof GetScreenshot)
+			return see;
+		see.setScreenshotId(takeScreenshotIfError());
+		return see;
 	}
 
 	public String[] getMandatoryParams() throws ScriptCompileException
@@ -197,13 +203,19 @@ public abstract class WebAction extends Action
 		
 		Path storageDirPath = Paths.get(WebConfiguration.SCREENSHOTS_DIR_NAME);
 		createScreenshotsDirIfNeeded(storageDirPath);
-		
-		File tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+
+		File tmpFile;
+		try
+		{
+			tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+		}
+		catch (WebDriverException wde)
+		{
+			throw new ScriptExecuteException("Unable to create screenshot: " + wde.getMessage(), wde);
+		}
 		
 		String fileName = createScreenshotFileName(name);
-		Path storePath = storageDirPath.resolve(fileName);
-		saveScreenshot(tmpFile, storePath);
-		logInfo("Screenshot %s has been successfully saved.", storePath);
+		saveScreenshot(tmpFile, storageDirPath.resolve(fileName));
 		
 		return fileName;
 	}
@@ -241,6 +253,7 @@ public abstract class WebAction extends Action
 		try
 		{
 			FileUtils.copyFile(tmpFile, targetPath.toFile());
+			logInfo("Screenshot %s has been successfully saved.", targetPath);
 		}
 		catch (IOException e)
 		{
