@@ -33,7 +33,7 @@ public class ScriptProcessorThread implements Runnable
 	private final ScriptCompiler scriptCompiler;
 	private final SessionContext sessionContext;
 
-	public ScriptProcessorThread(String sessionId, IRemoteHandManager rhmanager)
+	public ScriptProcessorThread(String sessionId, IRemoteHandManager rhmanager) throws RhConfigurationException
 	{
 		this.sessionId = sessionId;
 		this.rhmanager = rhmanager;

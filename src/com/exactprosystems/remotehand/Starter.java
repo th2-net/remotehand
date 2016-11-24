@@ -139,8 +139,19 @@ public class Starter
 
 			ActionsLauncher launcher = manager.createActionsLauncher(null);
 			ScriptCompiler compiler = manager.createScriptCompiler();
-			SessionContext sessionContext = manager.createSessionContext(RhUtils.SESSION_FOR_FILE_MODE);
-					processAllScriptsFromDirectory(input, output, launcher, compiler, sessionContext);
+
+			SessionContext sessionContext = null;
+			try
+			{
+				sessionContext = manager.createSessionContext(RhUtils.SESSION_FOR_FILE_MODE);
+			}
+			catch (RhConfigurationException e)
+			{
+				logger.error("Unable to initialize application.", e);
+				closeApp();
+			}
+
+			processAllScriptsFromDirectory(input, output, launcher, compiler, sessionContext);
 			if (dynInput != null)
 			{
 				File dynFile = new File(dynInput);

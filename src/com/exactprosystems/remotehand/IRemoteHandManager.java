@@ -25,7 +25,7 @@ public interface IRemoteHandManager {
 
 	ActionsLauncher createActionsLauncher(ScriptProcessorThread thread);
 	
-	SessionContext createSessionContext(String sessionId);
+	SessionContext createSessionContext(String sessionId) throws RhConfigurationException;
 
 	LoginHandler createLoginHandler();
 

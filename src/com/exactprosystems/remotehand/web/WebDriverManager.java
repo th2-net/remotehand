@@ -14,6 +14,7 @@ import java.util.Collections;
 
 import com.exactprosystems.remotehand.Configuration;
 
+import com.exactprosystems.remotehand.RhConfigurationException;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -29,9 +30,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  */
 public class WebDriverManager {
 
-	private DesiredCapabilities createDesiredCapabilities()
+	private DesiredCapabilities createDesiredCapabilities(WebConfiguration cfg)
 	{
-		WebConfiguration cfg = (WebConfiguration) Configuration.getInstance();
 		if (cfg.isProxySettingsSet())
 		{
 			Proxy proxy = new Proxy();
@@ -46,58 +46,82 @@ public class WebDriverManager {
 			return null;
 	}
 	
-	public WebDriver createWebDriver()
+	public WebDriver createWebDriver() throws RhConfigurationException
 	{
 		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
-		DesiredCapabilities dc = createDesiredCapabilities();
-		WebDriver driver;
+		DesiredCapabilities dc = createDesiredCapabilities(configuration);
 		switch (configuration.getBrowserToUse())
 		{
-			case IE :
-			{
-				System.setProperty("webdriver.ie.driver", configuration.getIeDriverFileName());
-				if (dc!=null)
-					driver = new InternetExplorerDriver(dc);
-				else
-					driver = new InternetExplorerDriver();
-				break;
-			}
-			case CHROME :
-			{
-				System.setProperty("webdriver.chrome.driver", configuration.getChromeDriverFileName());
-				if (dc!=null)
-					driver = new ChromeDriver(dc);
-				else
-					driver = new ChromeDriver();
-				break;
-			}
-			case HEADLESS:
-			{
-				if (dc != null)
-					driver = new PhantomJSDriver(dc);
-				else 
-					driver = new PhantomJSDriver();
-				break;
-			}
-			default :
-				String profile = configuration.getProfilePath();
-				if (profile !=null && !profile.isEmpty())
-				{
-					File profileDir = new File(profile);
-					if (profileDir.exists())
-					{
-						FirefoxProfile fxProfile = new FirefoxProfile(profileDir);
-						if (dc == null)
-							dc = new DesiredCapabilities();
-						dc.setCapability(FirefoxDriver.PROFILE,  fxProfile);
-					}
-				}
-				if (dc!=null)
-					driver = new FirefoxDriver(dc);
-				else
-					driver = new FirefoxDriver();
-				break;
+			case IE :       return createIeDriver(configuration, dc);
+			case CHROME :   return createChromeDriver(configuration, dc);
+			case HEADLESS:  return createPhantomJsDriver(dc);
+			default :       return createFireFoxDriver(configuration, dc);
 		}
-		return driver;
+	}
+	
+	// Notes about driver initialization:
+	// 1. For some driver's constructors we will get an error if we pass null as DesiredCapabilities.
+	// 2. Constructor can throw RuntimeException in case of driver file absence.
+	
+	private InternetExplorerDriver createIeDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	{
+		try
+		{
+			System.setProperty("webdriver.ie.driver", cfg.getIeDriverFileName());
+			return (dc != null) ? new InternetExplorerDriver(dc) : new InternetExplorerDriver();
+		}
+		catch (Exception e)
+		{
+			throw new RhConfigurationException("Unable to create Internet Explorer driver: " + e.getMessage(), e);
+		}
+	}
+	
+	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	{
+		try
+		{
+			System.setProperty("webdriver.chrome.driver", cfg.getChromeDriverFileName());
+			return (dc != null) ? new ChromeDriver(dc) : new ChromeDriver();
+		}
+		catch (Exception e)
+		{
+			throw new RhConfigurationException("Unable to create Chrome driver: " + e.getMessage(), e);
+		}
+	}
+	
+	private PhantomJSDriver createPhantomJsDriver(DesiredCapabilities dc) throws RhConfigurationException
+	{
+		try
+		{
+			return (dc != null) ? new PhantomJSDriver(dc) : new PhantomJSDriver();
+		}
+		catch (Exception e)
+		{
+			throw new RhConfigurationException("Unable to create PhantomJS (Headless) driver: " + e.getMessage(), e);
+		}
+	}
+	
+	private FirefoxDriver createFireFoxDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	{
+		try
+		{
+			String profile = cfg.getProfilePath();
+			if (profile != null && !profile.isEmpty())
+			{
+				File profileDir = new File(profile);
+				if (profileDir.exists())
+				{
+					FirefoxProfile fxProfile = new FirefoxProfile(profileDir);
+					if (dc == null)
+						dc = new DesiredCapabilities();
+					dc.setCapability(FirefoxDriver.PROFILE, fxProfile);
+				}
+			}
+			return (dc != null) ? new FirefoxDriver(dc) : new FirefoxDriver();
+		}
+		catch (Exception e)
+		{
+			throw new RhConfigurationException("Unable to create FireFox driver: " + e.getMessage(), e);
+		}
 	}
 }

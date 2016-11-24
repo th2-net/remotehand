@@ -15,12 +15,16 @@ import java.util.List;
 import com.exactprosystems.clearth.connectivity.data.rhdata.JsonSerializer;
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode;
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
-import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.IRemoteHandManager;
-import com.exactprosystems.remotehand.ScriptProcessorThread;
+import com.exactprosystems.remotehand.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+
+import static com.exactprosystems.remotehand.RhUtils.logError;
+import static com.exactprosystems.remotehand.RhUtils.logInfo;
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SessionHandler implements HttpHandler
 {
@@ -84,7 +88,7 @@ public class SessionHandler implements HttpHandler
 					requestBody = exchanger.getRequestBody();
 					fw = new FileOutputStream(f, false);
 					byte[] buffer = new byte[512];
-					int readBytes = -1;
+					int readBytes;
 					while ((readBytes = requestBody.read(buffer)) != -1) {
 						fw.write(buffer, 0, readBytes);
 					}
@@ -104,24 +108,21 @@ public class SessionHandler implements HttpHandler
 
 			} else {
 
-				BufferedReader in = new BufferedReader(new InputStreamReader(exchanger.getRequestBody()));
+				final String body = IOUtils.toString(exchanger.getRequestBody(), UTF_8);
+				exchanger.getRequestBody().close();
 
-				String line;
-				StringBuilder buff = new StringBuilder();
-				while ((line = in.readLine()) != null)
-					buff.append(line);
-				in.close();
-
-				final String body = buff.toString();
-
-				//			MultipartEntity
-
-				sendMessage(exchanger, "OK");
-
-				logger.info("Session <" + id + ">. Received text:");
-				logger.info(body);
-
-				launchScript(body);
+				logInfo(logger, id, format("Received text:%n%s", body));
+				
+				try
+				{
+					launchScript(body);
+					sendMessage(exchanger, "OK");
+				}
+				catch (RhConfigurationException e)
+				{
+					logError(logger, id, "An error occurred:", e);
+					sendMessage(exchanger, 500, "Internal error. " + e.getMessage());
+				}
 			}
 		}
 		else if (method.equalsIgnoreCase("GET"))
@@ -154,7 +155,12 @@ public class SessionHandler implements HttpHandler
 
 	private void sendMessage(HttpExchange exchanger, String message) throws IOException
 	{
-		exchanger.sendResponseHeaders(200, message.length());
+		sendMessage(exchanger, 200, message);
+	}
+	
+	private void sendMessage(HttpExchange exchanger, int code, String message) throws IOException
+	{
+		exchanger.sendResponseHeaders(code, message.length());
 		OutputStream os = exchanger.getResponseBody();
 		os.write(message.getBytes());
 		os.close();
@@ -176,7 +182,7 @@ public class SessionHandler implements HttpHandler
 		sendMessage(exchanger, serializer.serialize(result));
 	}
 
-	private void launchScript(String script)
+	private void launchScript(String script) throws RhConfigurationException
 	{
 		if (scriptProcessor == null)
 		{

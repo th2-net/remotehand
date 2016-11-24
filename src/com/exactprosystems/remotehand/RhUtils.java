@@ -35,6 +35,11 @@ public class RhUtils
 	{
 		logger.error(simpleMsg(sessionId, msg));
 	}
+
+	public static void logError(Logger logger, String sessionId, String msg, Throwable t)
+	{
+		logger.error(simpleMsg(sessionId, msg), t);
+	}
 	
 	public static void logInfo(Logger logger, String sessionId, String msg)
 	{
