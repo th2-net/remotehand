@@ -92,7 +92,7 @@ public class SendKeys extends WebAction
 			text = replaceConversions(text);
 
 			sendText(input, text);
-			logInfo("Sent text to: %s.", webLocator);
+			logInfo("Sent text: %s to: %s.", text, webLocator);
 
 
 			if (!params.containsKey(PARAM_TEXT2) || params.get(PARAM_TEXT2) == null)
@@ -228,7 +228,7 @@ public class SendKeys extends WebAction
 	}
 
 	protected static String replaceConversions(String src) {
-		return src.replace("(","#openbracket#").replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath() + "/");
+		return src.replace("(","#openbracket#").replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath());
 	}
 
 	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
