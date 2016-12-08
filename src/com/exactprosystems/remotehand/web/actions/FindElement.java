@@ -62,8 +62,8 @@ public class FindElement extends WebAction
 		String result;
 		try
 		{
-			waitForElement(webDriver, waitDuration, webLocator);
-			result = RESULT_FOUND;
+			boolean found = waitForElement(webDriver, waitDuration, webLocator);
+			result = (found) ? RESULT_FOUND : RESULT_NOTFOUND;
 		}
 		catch (ScriptExecuteException e)
 		{
