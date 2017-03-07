@@ -18,6 +18,7 @@ import com.exactprosystems.remotehand.RhConfigurationException;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -117,6 +118,19 @@ public class WebDriverManager {
 					dc.setCapability(FirefoxDriver.PROFILE, fxProfile);
 				}
 			}
+
+			String ffBinaryParam = cfg.getBinary();
+			if (ffBinaryParam != null && !ffBinaryParam.isEmpty()) {
+				File ffBinaryFile = new File(ffBinaryParam);
+				if (ffBinaryFile.exists())
+				{
+					FirefoxBinary ffBinary = new FirefoxBinary(ffBinaryFile);
+					if (dc == null)
+						dc = new DesiredCapabilities();
+					dc.setCapability(FirefoxDriver.BINARY, ffBinary);
+				}
+			}
+
 			return (dc != null) ? new FirefoxDriver(dc) : new FirefoxDriver();
 		}
 		catch (Exception e)

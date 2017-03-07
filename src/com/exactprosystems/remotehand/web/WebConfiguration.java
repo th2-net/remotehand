@@ -41,12 +41,13 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_SOCKSPROXY = "SocksProxy";
 	public static final String PARAM_NOPROXY = "NoProxy";
 	public static final String PARAM_PROFILE = "Profile";
+	public static final String BINARY_PARAM = "Binary";
 	
 	public static final String SCREENSHOTS_DIR_NAME = "screenshots";
 
 	private volatile Browser browserToUse;
 	private final String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
-		ftpProxySetting, socksProxySetting, noProxySetting, profilePath;
+		ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary;
 	
 	private final Properties formParserProperties;
 	private boolean isProxySettingsSet;
@@ -65,6 +66,7 @@ public class WebConfiguration extends Configuration{
 		
 		ieDriverFileName = loadProperty(properties, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
 		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
+		binary = loadProperty(properties, BINARY_PARAM, "");
 
 		httpProxySetting = loadProxySetting(properties, PARAM_HTTPPROXY);
 		sslProxySetting = loadProxySetting(properties, PARAM_SSLPROXY);
@@ -88,7 +90,11 @@ public class WebConfiguration extends Configuration{
 		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 		return defProperties;
 	}
-	
+
+	public String getBinary() {
+		return binary;
+	}
+
 	private String loadProperty(Properties properties, String name, String defaultValue)
 	{
 		String property = properties.getProperty(name, "");
