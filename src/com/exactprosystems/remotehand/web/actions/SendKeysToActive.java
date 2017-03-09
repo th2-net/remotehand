@@ -5,7 +5,9 @@
 //  All rights reserved.
 //  This is unpublished, licensed software, confidential and proprietary 
 //  information which is the property of Exactpro Systems or its licensors.
-////////////////////////////////////////////////////////////////////////////////package com.exactprosystems.remotehand.web.actions;
+////////////////////////////////////////////////////////////////////////////////
+
+package com.exactprosystems.remotehand.web.actions;
 
 import org.apache.log4j.Logger;
 
