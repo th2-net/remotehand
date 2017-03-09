@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2009-2016, Exactpro Systems
+//  Copyright (c) 2009-2017, Exactpro Systems
 //  Quality Assurance & Related Software Development for Innovative Trading Systems.
 //  London Stock Exchange Group.
 //  All rights reserved.
