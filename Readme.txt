@@ -148,6 +148,11 @@ SendKeysToActive,text,text2
 
 Allow to send text to active element as SendKeys but without reference to locator.
 
+#action,#wait,#locator,#matcher,#absolutepath
+UploadFile,5,locator,matcher,absolutepath
+
+Upload the file by locator, use the absolute path to the file or the relative path of the RemoteHand directory.
+
 2. Notes
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
 The exception can be supressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
