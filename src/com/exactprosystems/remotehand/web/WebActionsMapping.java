@@ -25,7 +25,7 @@ public class WebActionsMapping
 	private enum WebActionName
 	{
 		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox,
-		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot, UploadFile;
+		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot, SwitchWindow, UploadFile;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -57,14 +57,15 @@ public class WebActionsMapping
 		case SelectFrame :         return new SelectFrame();
 		case FindElement :         return new FindElement();
 		case SetCheckbox :         return new SetCheckbox();
-		case MTableGetValue :         return new MTableGetValue();
-		case MTableGetRow :         return new MTableGetRow();
-		case MTableGetTable :         return new MTableGetTable();
-		case MTableGetRowCount :         return new MTableGetRowCount();
+		case MTableGetValue :      return new MTableGetValue();
+		case MTableGetRow :        return new MTableGetRow();
+		case MTableGetTable :      return new MTableGetTable();
+		case MTableGetRowCount :   return new MTableGetRowCount();
 		case SendKeysToActive:     return new SendKeysToActive();
 		case PressKey :            return new PressKey();
 		case GetFormFields:        return new GetFormFields();
 		case GetScreenshot:        return new GetScreenshot();
+		case SwitchWindow:         return new SwitchWindow();
 		case UploadFile:        return new UploadFile();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
