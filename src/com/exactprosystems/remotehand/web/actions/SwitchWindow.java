@@ -17,7 +17,12 @@ import java.util.Set;
 public class SwitchWindow extends WebAction
 {
     private final static Logger logger = Logger.getLogger(SwitchWindow.class);
-    private final static String CHILD = "child";
+    private final static String WINDOW = "window";
+
+    public SwitchWindow()
+    {
+        super.mandatoryParams = new String[]{WINDOW};
+    }
 
     @Override
     public boolean isNeedLocator()
@@ -36,33 +41,24 @@ public class SwitchWindow extends WebAction
     {
         Set<String> windowHandles = webDriver.getWindowHandles();
         Iterator<String> iterator = windowHandles.iterator();
-        String parentWindowHandle;
         if (iterator.hasNext())
         {
-            parentWindowHandle = iterator.next();
-            if (params.containsKey(CHILD))
+            int windowNumber = getIntegerParam(params, WINDOW);
+            if (windowNumber < 0 || windowNumber > windowHandles.size() - 1)
             {
-                int childNumber = getIntegerParam(params, CHILD);
-                String childWindowHandler = null;
-                for (int i = 1; i <= childNumber; i++)
-                {
-                    if (iterator.hasNext())
-                    {
-                        childWindowHandler = iterator.next();
-                    } else
-                    {
-                        logger.error("There is no such child: " + childNumber);
-                        throw new ScriptExecuteException("There is no such child: " + childNumber);
-                    }
-                }
-                if (childWindowHandler != null)
-                {
-                    logger.debug("Child number is: " + childNumber);
-                    webDriver.switchTo().window(childWindowHandler);
-                }
+                String errorMessage = "There is no such window: " + windowNumber;
+                logger.error(errorMessage);
+                throw new ScriptExecuteException(errorMessage);
             } else
             {
-                webDriver.switchTo().window(parentWindowHandle);
+                String windowHandle = iterator.next();
+                for (int i = 0; i < windowNumber; i++)
+                {
+                    windowHandle = iterator.next();
+                }
+                webDriver.switchTo().window(windowHandle);
+                logger.debug("Child number is: " + windowNumber);
+                webDriver.switchTo().window(windowHandle);
             }
         }
         return null;

@@ -153,6 +153,14 @@ UploadFile,5,locator,matcher,absolutepath
 
 Upload the file by locator, use the absolute path to the file or the relative path of the RemoteHand directory.
 
+#action,#window
+SwitchWindow,N
+The action switches the window. N is an order of opened window(e.g. 0 - is a parent window for all windows, 1 - next child window)
+
+#action
+CloseWindow
+The action closes currently opened window and focuses at the firstly opened window(0 window).
+
 2. Notes
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
 The exception can be supressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
