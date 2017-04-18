@@ -1,15 +1,19 @@
 package com.exactprosystems.remotehand.web.actions;
 
-import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.web.WebAction;
-
-import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.WebAction;
 
 /**
  * Created by alexey.suknatov on 4/3/17.
@@ -31,9 +35,41 @@ public class SwitchWindow extends WebAction
     }
 
     @Override
+    protected boolean waitForElement(WebDriver webDriver, int seconds, By webLocator) throws ScriptExecuteException
+    {
+        Boolean findWindow;
+        try
+        {
+            findWindow = (new WebDriverWait(webDriver, seconds)).until(new ExpectedCondition<Boolean>() {
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    try
+                    {
+                        return driver.getWindowHandles().size() >= getIntegerParam(getParams(), WINDOW) + 1;
+                    } catch (WebDriverException | ScriptExecuteException e)
+                    {
+                        logger.error("During waiting opened window was thrown exception {}", e);
+                        return false;
+                    }
+                }
+            });
+        } catch (TimeoutException ex)
+        {
+            throw new ScriptExecuteException("Timed out after " + seconds + ". Actual number opened windows is: " + webDriver.getWindowHandles().size() + ". Expected: " + getIntegerParam(getParams(), WINDOW) + 1);
+        }
+
+        if (!findWindow)
+            throw new ScriptExecuteException("Actual number opened windows is: " + webDriver.getWindowHandles().size() + ". Expected: " + getIntegerParam(getParams(), WINDOW) + 1);
+
+        logInfo("Number of windows: '%s'", webDriver.getWindowHandles().size());
+        return findWindow;
+    }
+
+    @Override
     public boolean isCanWait()
     {
-        return false;
+        return true;
     }
 
     @Override
