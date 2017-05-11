@@ -82,7 +82,7 @@ public class SendKeys extends WebAction
 				enable(webDriver, input);
 			
 			String beforeClear = params.get(CLEAR_BEFORE);
-			if (beforeClear != null && (beforeClear.equalsIgnoreCase("yes") || beforeClear.equalsIgnoreCase("true")))
+			if (beforeClear != null && WebScriptCompiler.YES.contains(beforeClear.toLowerCase()))
 			{
 				input.clear();
 				logInfo("Text field has been cleared.");

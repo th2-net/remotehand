@@ -23,9 +23,10 @@ If #checked = true and checkbox is checked action will not click to element.
 You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
 
 
-#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled
-SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes
+#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear
+SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes
 
+"Clear" parameter can be true or yes when we want to clear element before sending.
 Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
 In some cases it is needed to wait for some element to appear after first input and then continue the input 
 (for example, need to wait for autocomplete box to appear). 
