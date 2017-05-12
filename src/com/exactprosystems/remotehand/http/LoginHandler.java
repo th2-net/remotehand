@@ -17,6 +17,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.log4j.Logger;
 
+import static java.util.UUID.randomUUID;
+
 public class LoginHandler implements HttpHandler
 {
 	private static final Logger logger = Logger.getLogger(LoginHandler.class);
@@ -40,7 +42,7 @@ public class LoginHandler implements HttpHandler
 
 	private String createSessionId()
 	{
-		return "Ses" + Long.toString(System.currentTimeMillis());
+		return "Ses" + randomUUID().toString();
 	}
 
 	protected void sendResponse(HttpExchange exchange, String sessionId) throws IOException {
