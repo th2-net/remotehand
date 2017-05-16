@@ -42,7 +42,7 @@
 
 
 		<echo message="Compiling sources" />
-		<javac srcdir="${src}" destdir="${build}" debug="true" includeantruntime="true" classpathref="classpath">
+		<javac srcdir="${src}" destdir="${build}" debug="true" includeantruntime="true" classpathref="classpath" source="1.7" target="1.7">
 			<exclude name="${uiaPackage}"/>
 		</javac>
 		
