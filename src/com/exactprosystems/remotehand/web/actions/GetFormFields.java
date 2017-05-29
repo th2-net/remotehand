@@ -129,7 +129,9 @@ public class GetFormFields extends WebAction
 	private FormFieldDesc findField(WebElement container)
 	{
 		FormFieldDesc fieldDesc;
-		if ((fieldDesc = findFieldWithType(container, FormFieldType.DROPDOWN)) != null)
+		if ((fieldDesc = findFieldWithType(container, FormFieldType.DROPDOWN_EXT)) != null)
+			return fieldDesc;
+		else if ((fieldDesc = findFieldWithType(container, FormFieldType.DROPDOWN)) != null)
 			return fieldDesc;
 		else if ((fieldDesc = findFieldWithType(container, FormFieldType.DATE)) != null)
 			return fieldDesc;
