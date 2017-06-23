@@ -205,7 +205,7 @@ public class SessionHandler implements HttpHandler
 		}
 		catch (IllegalArgumentException ex)
 		{
-			logger.warn("Error while to closing session <" + id + ">. Nothing to close.");
+			logger.warn("Error while closing session <" + id + ">. Nothing to close.");
 		}
 	}
 
