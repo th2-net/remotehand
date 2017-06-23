@@ -13,11 +13,12 @@ import java.io.File;
 import java.util.Collections;
 
 import com.exactprosystems.remotehand.Configuration;
-
 import com.exactprosystems.remotehand.RhConfigurationException;
+
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -82,7 +83,12 @@ public class WebDriverManager {
 		try
 		{
 			System.setProperty("webdriver.chrome.driver", cfg.getChromeDriverFileName());
-			return (dc != null) ? new ChromeDriver(dc) : new ChromeDriver();
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("--no-sandbox");
+			
+			if (dc != null)
+				dc.setCapability(ChromeOptions.CAPABILITY, options);
+			return (dc != null) ? new ChromeDriver(dc) : new ChromeDriver(options);
 		}
 		catch (Exception e)
 		{
