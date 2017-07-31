@@ -23,6 +23,7 @@ public class Select extends WebAction
 {
 	private static final Logger logger = Logger.getLogger(Select.class);
 	private static final String TEXT = "text";
+	private static final String DEFAULT_TEXT = "default";
 	private static final String NO_OPTION_FAIL_PARAM = "nooptionfail";
 
 	public Select()
@@ -46,13 +47,19 @@ public class Select extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		org.openqa.selenium.support.ui.Select dropdown = new org.openqa.selenium.support.ui.Select(webDriver.findElement(webLocator));
-		if (doesOptionExist(dropdown, getParams().get(TEXT)) || noOptionFail())
+
+		String option = getParams().get(TEXT);
+		String default_option = getParams().get(DEFAULT_TEXT);
+		if (!doesOptionExist(dropdown, option) && default_option != null && !default_option.isEmpty())
+			option = default_option;
+
+		if (doesOptionExist(dropdown, option) || noOptionFail())
 		{
-			dropdown.selectByVisibleText(params.get(TEXT));
-			logInfo("Option " + params.get(TEXT) + " is selected in element with locator " + webLocator);
+			dropdown.selectByVisibleText(option);
+			logInfo("Option " + option + " is selected in element with locator " + webLocator);
 		} else
 		{
-			logInfo("Option " + getParams().get(TEXT) + " doesn't exist. It hasn't been selected");
+			logInfo("Option " + option + " doesn't exist. It hasn't been selected");
 		}
 		return null;
 	}
