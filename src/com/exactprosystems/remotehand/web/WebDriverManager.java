@@ -9,12 +9,8 @@
 
 package com.exactprosystems.remotehand.web;
 
-import java.io.File;
-import java.util.Collections;
-
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhConfigurationException;
-
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -26,6 +22,9 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+
+import java.io.File;
+import java.util.Collections;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -85,7 +84,15 @@ public class WebDriverManager {
 			System.setProperty("webdriver.chrome.driver", cfg.getChromeDriverFileName());
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--no-sandbox");
-			
+
+			String binaryParam = cfg.getBinary();
+			if (binaryParam != null && !binaryParam.isEmpty())
+			{
+				File binaryFile = new File(binaryParam);
+				if (binaryFile.exists())
+					options.setBinary(binaryParam);
+			}
+
 			if (dc != null)
 				dc.setCapability(ChromeOptions.CAPABILITY, options);
 			return (dc != null) ? new ChromeDriver(dc) : new ChromeDriver(options);
