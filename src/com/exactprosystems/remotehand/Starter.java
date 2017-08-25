@@ -237,7 +237,7 @@ public class Starter
 			try
 			{
 				final List<Action> actions = compiler.build(scriptFile, sessionContext);
-				RhScriptResult result = launcher.runActions(actions);
+				RhScriptResult result = launcher.runActions(actions, sessionContext);
 
 				TextFileWriter.getInstance().setContent(resultToText(result));
 				TextFileWriter.getInstance().writeFile(outputFile);
@@ -270,7 +270,7 @@ public class Starter
 			try
 			{
 				List<Action> actions = compiler.build(file, context);
-				launcher.runActions(actions);
+				launcher.runActions(actions, context);
 			}
 			catch (Exception e)
 			{

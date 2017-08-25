@@ -47,6 +47,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
 		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
+		webSessionContext.setWebDriverManager(webDriverManager);
 		webSessionContext.setWebDriver(webDriverManager.createWebDriver());
 		return webSessionContext;
 	}

@@ -32,6 +32,7 @@ import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 import static java.lang.String.format;
 
 public abstract class WebAction extends Action
@@ -44,14 +45,14 @@ public abstract class WebAction extends Action
 	
 	protected String[] mandatoryParams;
 
-	private WebDriver webDriver = null;
+	private WebSessionContext context;
 	private String sessionIdForLogs;
 	private WebLocator webLocator = null;
 	private Map<String, String> params = null;
 
 	public void init(WebSessionContext context, WebLocator webLocator, Map<String, String> params) throws ScriptCompileException
 	{
-		this.webDriver = context.getWebDriver();
+		this.context = context;
 		this.sessionIdForLogs = '<' + context.getSessionId() + "> ";
 		this.webLocator = webLocator;
 		this.params = params;
@@ -121,6 +122,8 @@ public abstract class WebAction extends Action
 	{
 		try
 		{
+			WebDriver webDriver = context.getWebDriver();
+			
 			By locator = null;
 			if (webLocator != null)
 				locator = webLocator.getWebLocator(webDriver, params);
@@ -144,7 +147,10 @@ public abstract class WebAction extends Action
 		}
 		catch (WebDriverException e)
 		{
-			throw addScreenshot(new ScriptExecuteException(e.getMessage(), e));
+			ScriptExecuteException see = new ScriptExecuteException(e.getMessage(), e);
+			if (!isBrowserNotReachable(e))
+				see = addScreenshot(see);
+			throw see;
 		}
 	}
 	
@@ -197,6 +203,7 @@ public abstract class WebAction extends Action
 	
 	protected String takeScreenshot(String name) throws ScriptExecuteException
 	{
+		WebDriver webDriver = context.getWebDriver();
 		if (!(webDriver instanceof TakesScreenshot))
 			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
 		TakesScreenshot takesScreenshot = (TakesScreenshot) webDriver;
@@ -212,6 +219,12 @@ public abstract class WebAction extends Action
 		catch (WebDriverException wde)
 		{
 			throw new ScriptExecuteException("Unable to create screenshot: " + wde.getMessage(), wde);
+		}
+		catch (RuntimeException e)
+		{
+			String msg = "Unexpected error while trying to create screenshot";
+			logError(msg, e);
+			throw new ScriptExecuteException(msg);
 		}
 		
 		String fileName = createScreenshotFileName(name);

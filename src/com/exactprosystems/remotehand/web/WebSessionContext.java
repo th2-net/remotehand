@@ -16,12 +16,23 @@ import org.openqa.selenium.WebDriver;
  */
 public class WebSessionContext extends SessionContext
 {
+	private WebDriverManager webDriverManager;
 	private WebDriver webDriver;
 	private WebElementsDictionary dictionary;
 
 	public WebSessionContext(String sessionId)
 	{
 		super(sessionId);
+	}
+
+	public WebDriverManager getWebDriverManager()
+	{
+		return webDriverManager;
+	}
+
+	public void setWebDriverManager(WebDriverManager webDriverManager)
+	{
+		this.webDriverManager = webDriverManager;
 	}
 
 	public WebDriver getWebDriver()

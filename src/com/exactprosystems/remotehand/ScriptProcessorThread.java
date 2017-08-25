@@ -77,11 +77,11 @@ public class ScriptProcessorThread implements Runnable
 		try
 		{
 			final List<Action> actions = scriptCompiler.build(script, sessionContext);
-			return launcher.runActions(actions);
+			return launcher.runActions(actions, sessionContext);
 		}
 		catch (Exception ex1)
 		{
-			RhUtils.logError(logger, sessionId, "Compile error: " + ex1.getMessage());
+			RhUtils.logError(logger, sessionId, ex1.getMessage(), ex1);
 			return ErrorRespondent.getRespondent().error(ex1);
 		}
 	}

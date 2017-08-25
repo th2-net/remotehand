@@ -10,10 +10,13 @@ package com.exactprosystems.remotehand;
 
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import org.apache.log4j.Logger;
+import org.openqa.selenium.NoSuchWindowException;
+import org.openqa.selenium.WebDriverException;
 
 import java.util.Map;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 /**
  * @author anna.bykova.
@@ -50,5 +53,12 @@ public class RhUtils
 	private static String simpleMsg(String sessionId, String msg)
 	{
 		return format("<%s> %s", sessionId, msg);
+	}
+
+	public static boolean isBrowserNotReachable(WebDriverException e)
+	{
+		String msg = e.getMessage();
+		return ((e instanceof NoSuchWindowException) && contains(msg, "target window already closed"))
+				|| contains(msg, "not reachable");
 	}
 }

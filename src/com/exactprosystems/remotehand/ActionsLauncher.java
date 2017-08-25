@@ -10,6 +10,7 @@
 package com.exactprosystems.remotehand;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.http.SessionContext;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class ActionsLauncher
 		this.parent = parentThread;
 	}
 
-	public RhScriptResult runActions(List<Action> scriptActions) throws ScriptExecuteException
+	public RhScriptResult runActions(List<Action> scriptActions, SessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
+		beforeActions(context);
+		
 		RhScriptResult result = new RhScriptResult();
 		
 		String sessionId = getSessionId();
@@ -58,8 +61,10 @@ public class ActionsLauncher
 		scriptResult.addToTextOutput(actionResult);
 	}
 	
-	private String getSessionId()
+	protected String getSessionId()
 	{
 		return parent != null ? parent.getSessionId() : RhUtils.SESSION_FOR_FILE_MODE;
 	}
+	
+	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException { }
 }
