@@ -250,15 +250,7 @@ public abstract class WebAction extends Action
 	
 	private String createScreenshotFileName(String name)
 	{
-		if (name != null)
-		{
-			if (name.endsWith(SCREENSHOT_EXTENSION))
-				return name;
-			else 
-				return name + SCREENSHOT_EXTENSION;
-		}
-		else 
-			return "screenshot" + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + SCREENSHOT_EXTENSION;
+		return ((name != null) ? name : "screenshot") + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + SCREENSHOT_EXTENSION;
 	}
 	
 	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
