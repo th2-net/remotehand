@@ -86,6 +86,6 @@ public class WebActionsLauncher extends ActionsLauncher
 	{
 		logger.info("Trying to create new driver...");
 		WebDriverManager driverManager = context.getWebDriverManager();
-		context.setWebDriver(driverManager.createWebDriver());
+		context.setWebDriver(driverManager.createWebDriver(context.getDonwloadDir()));
 	}
 }

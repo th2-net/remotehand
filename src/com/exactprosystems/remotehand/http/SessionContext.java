@@ -8,20 +8,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand.http;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author anna.bykova.
  */
 public class SessionContext
 {
 	private final String sessionId;
-
+	private Map<String, Object> contextData;
+	
 	public SessionContext(String sessionId)
 	{
 		this.sessionId = sessionId;
+		this.contextData = new HashMap<>();
 	}
 
 	public String getSessionId()
 	{
 		return sessionId;
+	}
+
+	public Map<String, Object> getContextData() {
+		return contextData;
 	}
 }

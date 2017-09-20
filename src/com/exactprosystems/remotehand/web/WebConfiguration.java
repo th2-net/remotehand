@@ -51,6 +51,7 @@ public class WebConfiguration extends Configuration{
 	
 	private final Properties formParserProperties;
 	private boolean isProxySettingsSet;
+	private volatile File downloadsDir;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
@@ -75,6 +76,9 @@ public class WebConfiguration extends Configuration{
 		noProxySetting = loadProxySetting(properties, PARAM_NOPROXY);
 		
 		formParserProperties = loadFormParserConfig(FORM_PARSER_CONFIG_FILE);
+		
+		this.downloadsDir = new File(loadProperty(properties, "DownloadsDir", "downloads/"));
+		
 	}
 
 	@Override
@@ -206,5 +210,9 @@ public class WebConfiguration extends Configuration{
 	public Properties getFormParserProperties()
 	{
 		return formParserProperties;
+	}
+
+	public File getDownloadsDir() {
+		return downloadsDir;
 	}
 }

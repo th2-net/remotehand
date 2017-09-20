@@ -25,6 +25,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -47,14 +49,14 @@ public class WebDriverManager {
 			return null;
 	}
 	
-	public WebDriver createWebDriver() throws RhConfigurationException
+	public WebDriver createWebDriver(File downloadDir) throws RhConfigurationException
 	{
 		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
 		DesiredCapabilities dc = createDesiredCapabilities(configuration);
 		switch (configuration.getBrowserToUse())
 		{
 			case IE :       return createIeDriver(configuration, dc);
-			case CHROME :   return createChromeDriver(configuration, dc);
+			case CHROME :   return createChromeDriver(configuration, dc, downloadDir);
 			case HEADLESS:  return createPhantomJsDriver(dc);
 			default :       return createFireFoxDriver(configuration, dc);
 		}
@@ -77,13 +79,17 @@ public class WebDriverManager {
 		}
 	}
 	
-	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir) throws RhConfigurationException
 	{
 		try
-		{
+		{			
 			System.setProperty("webdriver.chrome.driver", cfg.getChromeDriverFileName());
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--no-sandbox");
+			Map<String, String> prefs = new HashMap<>(2);
+			prefs.put("profile.default_content_settings.popups", "0");
+			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
+			options.setExperimentalOption("prefs", prefs);
 
 			String binaryParam = cfg.getBinary();
 			if (binaryParam != null && !binaryParam.isEmpty())

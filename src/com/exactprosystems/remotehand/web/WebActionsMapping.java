@@ -26,7 +26,7 @@ public class WebActionsMapping
 	{
 		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox,
 		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot, SwitchWindow, UploadFile, CloseWindow
-		, Select;
+		, Select, DownloadFile;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -70,6 +70,7 @@ public class WebActionsMapping
 		case UploadFile:           return new UploadFile();
 		case CloseWindow:          return new CloseWindow();
 		case Select: 			   return new Select();
+		case DownloadFile: 		return new DownloadFile();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}

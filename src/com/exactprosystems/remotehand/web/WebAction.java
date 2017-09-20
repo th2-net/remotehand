@@ -45,7 +45,7 @@ public abstract class WebAction extends Action
 	
 	protected String[] mandatoryParams;
 
-	private WebSessionContext context;
+	protected WebSessionContext context;
 	private String sessionIdForLogs;
 	private WebLocator webLocator = null;
 	private Map<String, String> params = null;

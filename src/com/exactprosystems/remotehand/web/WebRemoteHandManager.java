@@ -16,6 +16,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.openqa.selenium.WebDriver;
 
+import java.io.File;
+
 /**
  * Created by alexey.karpukhin on 2/2/16.
  */
@@ -47,8 +49,10 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
 		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
+		File downloadDir = WebUtils.createDownloadDirectory();
+		webSessionContext.setDonwloadDir(downloadDir);
 		webSessionContext.setWebDriverManager(webDriverManager);
-		webSessionContext.setWebDriver(webDriverManager.createWebDriver());
+		webSessionContext.setWebDriver(webDriverManager.createWebDriver(downloadDir));
 		return webSessionContext;
 	}
 
@@ -66,6 +70,11 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		WebDriver webDriver = webSessionContext.getWebDriver();
 		if (webDriver != null)
 			webDriver.quit();
+		File donwloadDir = webSessionContext.getDonwloadDir();
+		File[] tmp;
+		if (donwloadDir != null && (tmp = donwloadDir.listFiles()) != null && tmp.length == 0) {
+			donwloadDir.delete();
+		}
 	}
 
 	@Override

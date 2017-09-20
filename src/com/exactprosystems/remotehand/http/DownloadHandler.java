@@ -8,6 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand.http;
 
+import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.web.WebConfiguration;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -33,6 +34,7 @@ public class DownloadHandler implements HttpHandler
 	private static final String FILE_ID_PARAM = "id";
 	
 	private static final String SCREENSHOT_FILE_TYPE = "screenshot";
+	private static final String DOWNLOADED_FILE_TYPE = "downloaded";
 	
 	private static final String REQUIRED_PARAM_ABSENT = "Required parameter '%s' isn't specified";
 	private static final String UNKNOWN_FILE_TYPE = "Unknown file type '%s'";
@@ -52,7 +54,9 @@ public class DownloadHandler implements HttpHandler
 		
 		if (SCREENSHOT_FILE_TYPE.equalsIgnoreCase(fileType))
 			sendScreenshot(httpExchange, fileId);
-		else 
+		else if (DOWNLOADED_FILE_TYPE.equalsIgnoreCase(fileType)) 
+			sendFile(httpExchange, fileId);
+		else
 			sendResponse(httpExchange, 400, format(UNKNOWN_FILE_TYPE, fileType));
 	}
 	
@@ -88,17 +92,28 @@ public class DownloadHandler implements HttpHandler
 	private void sendScreenshot(HttpExchange exchanger, String fileId) throws IOException
 	{
 		File file = new File(WebConfiguration.SCREENSHOTS_DIR_NAME, fileId);
+		this.sendHttpFile(exchanger, file, "image/png", "attachment; filename=" + fileId, fileId);
+	}
+
+	private void sendFile(HttpExchange exchanger, String fileLocation) throws IOException
+	{
+		File downDir = ((WebConfiguration) Configuration.getInstance()).getDownloadsDir();
+		File file = new File(downDir, fileLocation);
+		this.sendHttpFile(exchanger, file, "application/octet-stream", "attachment; filename=" + fileLocation, fileLocation);
+	}
+	
+	private void sendHttpFile(HttpExchange exchanger, File file, String contentType, String contentDisposition, String id) throws IOException {
 		if (file.exists())
 		{
 			exchanger.sendResponseHeaders(200, file.length());
-			exchanger.getResponseHeaders().set("Content-Type", "image/png");
-			exchanger.getResponseHeaders().set("Content-Disposition", "attachment; filename=" + fileId);
+			exchanger.getResponseHeaders().set("Content-Type", contentType);
+			exchanger.getResponseHeaders().set("Content-Disposition", contentDisposition);
 			try (OutputStream os = exchanger.getResponseBody())
 			{
 				Files.copy(file.toPath(), os);
 			}
 		}
-		else 
-			sendResponse(exchanger, 404, format(RESOURCE_NOT_FOUND, fileId));
+		else
+			sendResponse(exchanger, 404, format(RESOURCE_NOT_FOUND, id));
 	}
 }

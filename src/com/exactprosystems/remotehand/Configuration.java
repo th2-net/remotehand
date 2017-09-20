@@ -125,14 +125,13 @@ public class Configuration
 				fileStorageString = DEF_FILE_STORAGE;
 			}
 
-			fileStorage = new File(DEF_FILE_STORAGE);
+			fileStorage = new File(fileStorageString);
 		}
 		catch (Exception ex)
 		{
 			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
 			fileStorage = new File(DEF_FILE_STORAGE);
 		}
-
 
 	}
 	
