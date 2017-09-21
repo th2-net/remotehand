@@ -49,6 +49,7 @@ public class DownloadFile extends WebAction {
 		if ("snapshot".equalsIgnoreCase(type)) {
 			String[] fileList = downloadDir.list();
 			context.getContextData().put(FILES_KEY, fileList);
+			getLogger().debug("Snapshot file list: " + Arrays.toString(fileList));
 			return null;
 		} else if ("download".equalsIgnoreCase(type)) {
 			File file;
@@ -59,6 +60,7 @@ public class DownloadFile extends WebAction {
 				file = waitForFile(list, downloadDir, 1000);
 				if (file == null)
 					throw new ScriptExecuteException("No new files in download dir");
+				getLogger().debug("Selected file: " + file.getName());
 				boolean isTemp = this.isTempFile(file);
 				String timeoutParam = params.get(PARAM_WAIT);
 				Integer timout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
@@ -115,7 +117,8 @@ public class DownloadFile extends WebAction {
 			}
 			if (size == 0 && !file.exists())
 				return false;
-			Thread.sleep(250);
+			if (count < 10)
+				Thread.sleep(250);
 		}
 		return (count == 10);
 		
