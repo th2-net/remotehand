@@ -101,7 +101,8 @@ public class DownloadFile extends WebAction {
 	}
 	
 	protected boolean isTempFile(File file) {
-		return file.getName().endsWith(".crdownload");
+		String filename = file.getName();
+		return filename.endsWith(".crdownload") || filename.endsWith(".tmp");
 	}
 
 	private boolean checkSize(File file, long timeout) throws InterruptedException {
