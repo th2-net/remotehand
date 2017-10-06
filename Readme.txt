@@ -1,20 +1,27 @@
-1. List of actions
+LIST OF ACTIONS
+***************
 Here is the list of currently supported actions of RemoteHand with possible parameters and descriptions.
 Some useful info can be found below the list.
 
 
+OPEN
+============
 #action,#url
 Open,url
 
 Opens resource at <url>.
 
 
+CLICK
+=====
 #action,#wait,#locator,#matcher,#button
 Click,5,locator,matcher,mouse_button
 
 Optionally waits <wait> seconds for element specified by <matcher> and clicks on it with <button> ("left" by default). Element is found using <locator>.
 
 
+SETCHECKBOX
+===========
 #action,#wait,#locator,#matcher,#checked
 SetCheckbox,5,locator,matcher,true
 
@@ -23,6 +30,8 @@ If #checked = true and checkbox is checked action will not click to element.
 You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
 
 
+SENDKEYS
+========
 #action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear
 SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes
 
@@ -67,6 +76,8 @@ The keys and special codes can be combined in order to press a combination of ke
 #shift+9#
 
 
+WAITFORELEMENT
+==============
 #action,#seconds,#locator,#matcher
 WaitForElement,5,locator,matcher
 
@@ -74,6 +85,8 @@ Waits <seconds> seconds for element specified by <matcher>, element is found usi
 Useful to make sure that certain element has appeared (page has been loaded till this element) before doing something on the page.
 
 
+WAITFORNEW
+==========
 #action,#seconds,#checkmillis,#locator,#matcher
 WaitForNew,5,300,locator,matcher
 
@@ -81,6 +94,8 @@ Waits <seconds> seconds for new elements specified by <matcher> to appear, eleme
 Check for new elements is performed every <checkmillis> milliseconds.
 
 
+WAIT
+====
 #action,#seconds
 Wait,5
 
@@ -88,12 +103,16 @@ Makes a pause in execution for <seconds> seconds.
 Good to use this action when you're not sure which element to wait for and just want to give a page more time to be downloaded.
 
 
+GETELEMENT
+==========
 #action,#wait,#locator,#matcher
 GetElement,5,locator,matcher
 
 Optionally waits <wait> seconds for element specified by <matcher> and prints value of its outerHTML. Element is found using <locator>.
 
 
+GETDYNAMICTABLE
+===============
 #action,#wait,#locator,#matcher
 GetDynamicTable,5,locator,matcher
 
@@ -101,6 +120,8 @@ Optionally waits <wait> seconds for table element specified by <matcher> and pri
 If possible, action scrolls the table down to force it to be loaded completelly if lazy loading is enabled for the table.
 
 
+SCROLLTO
+========
 #action,#wait,#locator,#matcher
 ScrollTo,5,locator,matcher
 
@@ -108,6 +129,8 @@ Optionally waits <wait> seconds for element specified by <matcher> and scrolls b
 Note that all of actions working with elements (Click, SendKeys, etc.) will scroll to the element automatically if it is invisible.
 
 
+PAGESOURCE
+==========
 #action
 PageSource
 
@@ -115,12 +138,26 @@ Prints current URL, title and source code of the page.
 Useful for debugging, because source code of the page will contain elements seen only in browser window, JavaScript, Firebug, but not seen when the page is saved.
 
 
+REFRESH
+=======
 #action
 Refresh
 
 Refreshes current page, loading it again. Useful to collapse all tree nodes and other elements, which state is affected by page refresh.
 
 
+SELECT
+======
+#action,#wait,#locator,#matcher,#text,#default,#nooptionalfail
+Select,5,locator,matcher,selectedValue,defaultValue,true
+
+Selects specified in selectedValue value of drop down list. If there is no specified value in the list default value will be
+selected. If nooptionalfail is not in list ("y", "yes", "t", "true", "1", "+") action doesn't fail when selectedValue or default value are not founded.
+By default nooptionalfail is true.
+
+
+CLEARELEMENT
+============
 #action,#wait,#locator,#matcher
 ClearElement,5,locator,matcher
 
@@ -128,41 +165,62 @@ Optionally waits <wait> seconds for element specified by <matcher> and clears it
 Useful for input controls.
 
 
+OUTPUT
+======
 #action,#text
 Output,text
 
 Prints <text> to script output. Useful to divide outputs of actions like GetElement, GetDynamicTable etc.
 
 
+FINDELEMENT
+===========
 #action,#wait,#locator,#matcher,#id
 FindElement,5,locator,matcher,controlID
 
 Optionally waits <wait> seconds for element specified by <matcher> and <locator>. If element is found, "<id>=found" is printed in output. Else "<id>=notfound" is printed.
 
+
+PRESSKEY
+========
 #action,#key
 PressKey,#tab#
 
 Allow to send one of keys specified for SendKeys action without reference to locator.
 
+
+SENDKEYSTOACTIVE
+================
 #action,#text,#text2
 SendKeysToActive,text,text2
 
 Allow to send text to active element as SendKeys but without reference to locator.
 
+
+UPLOADFILE
+==========
 #action,#wait,#locator,#matcher,#absolutepath
 UploadFile,5,locator,matcher,absolutepath
 
 Upload the file by locator, use the absolute path to the file or the relative path of the RemoteHand directory.
 
+
+SWITCHWINDOW
+============
 #action,#window
 SwitchWindow,N
 The action switches the window. N is an order of opened window(e.g. 0 - is a parent window for all windows, 1 - next child window)
 
+
+CLOSEWINDOW
+===========
 #action
 CloseWindow
 The action closes currently opened window and focuses at the firstly opened window(0 window).
 
-2. Notes
+
+NOTES
+*****
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
 The exception can be supressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
 In case of FindElement, no exception is thrown because the action handles this case.
