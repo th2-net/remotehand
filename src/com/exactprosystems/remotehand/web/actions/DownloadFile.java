@@ -15,7 +15,6 @@ import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.openqa.jetty.util.StringUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -53,31 +52,34 @@ public class DownloadFile extends WebAction {
 			return null;
 		} else if ("download".equalsIgnoreCase(type)) {
 			File file;
+			boolean done;
+			boolean isTemp;
 			try {
 				String[] list = (String[]) context.getContextData().get(FILES_KEY);
 				if (list == null)
 					throw new ScriptExecuteException("Doesn't have a snapshot. Execute with type 'snapshot' first.");
-				file = waitForFile(list, downloadDir, 1000);
-				if (file == null)
-					throw new ScriptExecuteException("No new files in download dir");
-				getLogger().debug("Selected file: " + file.getName());
-				boolean isTemp = this.isTempFile(file);
-				String timeoutParam = params.get(PARAM_WAIT);
-				Integer timout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
-				boolean done = this.checkSize(file, timout);
+				int iteration = 0;
+				do {
+					iteration++;
+					file = waitForFile(list, downloadDir, 1000);
+					if (file == null)
+						throw new ScriptExecuteException("No new files in download dir");
+					getLogger().debug("Selected file: " + file.getName());
+					isTemp = this.isTempFile(file);
+					String timeoutParam = params.get(PARAM_WAIT);
+					Integer timout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
+					done = this.checkSize(file, iteration == 1 || isTemp ? timout : 50);
+				} while (iteration < 10 && !done && isTemp && !file.exists());
 				if (!done) {
-					if (isTemp && !file.exists())
-						file = waitForFile(list, downloadDir, 50);
-					else
-						throw new ScriptExecuteException("File wasn't downloaded.");
+					throw new ScriptExecuteException("File wasn't downloaded.");
 				}
 			} catch (InterruptedException e) {
 				throw new ScriptExecuteException("Interrupted.", e);
 			}
-			if (file == null)
-				throw new ScriptExecuteException("No new files in download dir");
+//			if (file == null)
+//				throw new ScriptExecuteException("No new files in download dir");
 			File configDownloadDir = ((WebConfiguration) Configuration.getInstance()).getDownloadsDir();
-			return "Downloaded_file=" + file.getPath().substring(configDownloadDir.getPath().length());
+			return "Downloaded_file=" + file.getPath().substring(configDownloadDir.getPath().length()).replaceAll(" ", "%20");
 		}
 		
 		throw new ScriptExecuteException("Unknown actionType: " + type);
