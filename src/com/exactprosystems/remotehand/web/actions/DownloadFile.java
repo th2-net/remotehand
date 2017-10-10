@@ -68,7 +68,8 @@ public class DownloadFile extends WebAction {
 					isTemp = this.isTempFile(file);
 					String timeoutParam = params.get(PARAM_WAIT);
 					Integer timout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
-					done = this.checkSize(file, iteration == 1 || isTemp ? timout : 50);
+					boolean fullSearch = iteration == 1 || isTemp;
+					done = this.checkSize(file, fullSearch ? timout : 50, fullSearch ? 10 : 1);
 				} while (iteration < 10 && !done && isTemp && !file.exists());
 				if (!done) {
 					throw new ScriptExecuteException("File wasn't downloaded.");
@@ -107,11 +108,11 @@ public class DownloadFile extends WebAction {
 		return filename.endsWith(".crdownload") || filename.endsWith(".tmp");
 	}
 
-	private boolean checkSize(File file, long timeout) throws InterruptedException {
+	private boolean checkSize(File file, long timeout, int iteration) throws InterruptedException {
 		long size = file.length();
 		long endTime = System.currentTimeMillis() + timeout;
 		int count = 0;
-		while (count < 10 && System.currentTimeMillis() <= endTime) {
+		while (count < iteration && System.currentTimeMillis() <= endTime) {
 			if (file.length() == size) {
 				count++;
 			} else {
@@ -120,10 +121,10 @@ public class DownloadFile extends WebAction {
 			}
 			if (size == 0 && !file.exists())
 				return false;
-			if (count < 10)
+			if (count < iteration)
 				Thread.sleep(250);
 		}
-		return (count == 10);
+		return (count == iteration);
 		
 	}
 
