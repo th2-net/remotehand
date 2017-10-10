@@ -96,7 +96,7 @@ public class DownloadFile extends WebAction {
 		if (old.length != tmp.length) {
 			logger.debug("Found files: " + Arrays.toString(tmp));
 			for (String s : tmp) {
-				if (ArrayUtils.contains(old, s)) {
+				if (!ArrayUtils.contains(old, s)) {
 					return new File(downloadDir, s);
 				}
 			}
