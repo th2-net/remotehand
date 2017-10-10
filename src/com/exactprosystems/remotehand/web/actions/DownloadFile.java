@@ -13,6 +13,7 @@ import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -95,7 +96,7 @@ public class DownloadFile extends WebAction {
 		if (old.length != tmp.length) {
 			logger.debug("Found files: " + Arrays.toString(tmp));
 			for (String s : tmp) {
-				if (Arrays.binarySearch(old, s) == -1) {
+				if (ArrayUtils.contains(old, s)) {
 					return new File(downloadDir, s);
 				}
 			}
