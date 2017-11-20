@@ -218,6 +218,12 @@ CLOSEWINDOW
 CloseWindow
 The action closes currently opened window and focuses at the firstly opened window(0 window).
 
+GetCurrentURL
+===========
+#action
+GetCurrentURL
+The Action returns active open window URL.
+
 
 NOTES
 *****
