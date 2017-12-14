@@ -32,6 +32,8 @@ public class ScriptProcessorThread implements Runnable
 	private final IRemoteHandManager rhmanager;
 	private final ScriptCompiler scriptCompiler;
 	private final SessionContext sessionContext;
+	private static ActionsLogger actionsLogger = new ActionsLogger();
+	private static final String CTH_ACTION_NAME = "ActionName";
 
 	public ScriptProcessorThread(String sessionId, IRemoteHandManager rhmanager) throws RhConfigurationException
 	{
@@ -76,6 +78,10 @@ public class ScriptProcessorThread implements Runnable
 	{
 		try
 		{
+			String actionName = extractActionName();
+			if (actionName != null)
+				actionsLogger.init(sessionId, actionName);
+
 			final List<Action> actions = scriptCompiler.build(script, sessionContext);
 			return launcher.runActions(actions, sessionContext);
 		}
@@ -84,6 +90,18 @@ public class ScriptProcessorThread implements Runnable
 			RhUtils.logError(logger, sessionId, ex1.getMessage(), ex1);
 			return ErrorRespondent.getRespondent().error(ex1);
 		}
+	}
+
+	private String extractActionName()
+	{
+		String actionName = null;
+		if (script.startsWith(CTH_ACTION_NAME))
+		{
+			String temp[] = script.split(":");
+			actionName = temp[0].split("=")[1];
+			script = script.substring(script.indexOf(":") + 1);
+		}
+		return actionName;
 	}
 
 	private void closeThread()
