@@ -13,15 +13,23 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import com.csvreader.CsvReader;
-import com.exactprosystems.remotehand.*;
-
+import com.exactprosystems.remotehand.Action;
+import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.RhUtils;
+import com.exactprosystems.remotehand.ScriptCompileException;
+import com.exactprosystems.remotehand.ScriptCompiler;
 import com.exactprosystems.remotehand.http.SessionContext;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
-import org.apache.log4j.Logger;
 
 public class WebScriptCompiler extends ScriptCompiler
 {
@@ -42,7 +50,7 @@ public class WebScriptCompiler extends ScriptCompiler
 	public static final String WEB_ID = "webid";
 	public static final String EXECUTE = "execute";
 	
-	public static final String DEFAULT_DICT_NAME = "webdictionary.csv"; 
+	public static final String DEFAULT_DICT_NAME = "webdictionary.csv";
 	
 	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
 	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
@@ -166,9 +174,11 @@ public class WebScriptCompiler extends ScriptCompiler
 		webAction = WebActionsMapping.getInstance().getByName(params.get(WEB_ACTION));
 		if (params.get(WEB_LOCATOR) != null)
 			webLocator = WebLocatorsMapping.getInstance().getByName(params.get(WEB_LOCATOR));
+		else if (webAction.isNeedLocator())
+			webLocator = WebLocatorsMapping.getInstance().getByName(((WebConfiguration)Configuration.getInstance()).getDefaultLocator());
 		params.remove(WEB_ACTION);
 		params.remove(WEB_LOCATOR);
-
+		
 		webAction.init(context, webLocator, params);
 		return webAction;
 	}

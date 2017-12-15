@@ -86,7 +86,7 @@ public class WebDriverManager {
 			System.setProperty("webdriver.chrome.driver", cfg.getChromeDriverFileName());
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--no-sandbox");
-			Map<String, String> prefs = new HashMap<>(2);
+			Map<String, String> prefs = new HashMap<String, String>(2);
 			prefs.put("profile.default_content_settings.popups", "0");
 			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
 			options.setExperimentalOption("prefs", prefs);

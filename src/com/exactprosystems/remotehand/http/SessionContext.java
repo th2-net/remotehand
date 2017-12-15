@@ -22,7 +22,7 @@ public class SessionContext
 	public SessionContext(String sessionId)
 	{
 		this.sessionId = sessionId;
-		this.contextData = new HashMap<>();
+		this.contextData = new HashMap<String, Object>();
 	}
 
 	public String getSessionId()

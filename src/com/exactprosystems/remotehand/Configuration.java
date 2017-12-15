@@ -26,10 +26,10 @@ public class Configuration
 	public final String PROPERTY_NOT_SET = "Property '%s' is not set. Using default value = '%s'";
 
 	public final String CONFIG_FILE_NAME = "config.ini";
-	public final int DEF_SRV_PORT = 8000;
+	public final int DEF_SRV_PORT = 8008;
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
-	public final int DEF_SESSION_EXPIRE = 60; // 1 hour
+	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
 	public final String DEF_FILE_STORAGE = "generated/";
 
 	public final String PARAM_PORT = "Port",

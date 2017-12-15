@@ -30,24 +30,26 @@ public class WebConfiguration extends Configuration{
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
 	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
 	public static final String DEF_PROXY = "";
+	public static final String DEF_LOCATOR = "xpath";
 	public static final String FORM_PARSER_CONFIG_FILE = "formParser.properties";
 	
 	public static final String PARAM_BROWSER = "Browser";
-	public static final String	PARAM_IEDRIVERPATH = "IEDriverPath";
-	public static final String	PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
+	public static final String PARAM_IEDRIVERPATH = "IEDriverPath";
+	public static final String PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
 	public static final String PARAM_HTTPPROXY = "HttpProxy";
 	public static final String PARAM_SSLPROXY = "SslProxy";
 	public static final String PARAM_FTPPROXY = "FtpProxy";
 	public static final String PARAM_SOCKSPROXY = "SocksProxy";
 	public static final String PARAM_NOPROXY = "NoProxy";
 	public static final String PARAM_PROFILE = "Profile";
-	public static final String BINARY_PARAM = "Binary";
+	public static final String PARAM_BINARY = "Binary";
+	public static final String PARAM_DEFAULT_LOCATOR = "DefaultLocator";
 	
 	public static final String SCREENSHOTS_DIR_NAME = "screenshots";
 
 	private volatile Browser browserToUse;
 	private final String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
-		ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary;
+		ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary, defaultLocator;
 	
 	private final Properties formParserProperties;
 	private boolean isProxySettingsSet;
@@ -67,7 +69,8 @@ public class WebConfiguration extends Configuration{
 		
 		ieDriverFileName = loadProperty(properties, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
 		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
-		binary = loadProperty(properties, BINARY_PARAM, "");
+		binary = loadProperty(properties, PARAM_BINARY, "");
+		defaultLocator = loadProperty(properties, PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
 
 		httpProxySetting = loadProxySetting(properties, PARAM_HTTPPROXY);
 		sslProxySetting = loadProxySetting(properties, PARAM_SSLPROXY);
@@ -93,10 +96,6 @@ public class WebConfiguration extends Configuration{
 		defProperties.setProperty(PARAM_SOCKSPROXY, DEF_PROXY);
 		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 		return defProperties;
-	}
-
-	public String getBinary() {
-		return binary;
 	}
 
 	private String loadProperty(Properties properties, String name, String defaultValue)
@@ -155,7 +154,6 @@ public class WebConfiguration extends Configuration{
 		}
 		return properties;
 	}
-	
 
 	public Browser getBrowserToUse()
 	{
@@ -206,13 +204,24 @@ public class WebConfiguration extends Configuration{
 	{
 		return profilePath;
 	}
+	
+	public String getBinary()
+	{
+		return binary;
+	}
+	
+	public String getDefaultLocator()
+	{
+		return defaultLocator;
+	}
 
 	public Properties getFormParserProperties()
 	{
 		return formParserProperties;
 	}
 
-	public File getDownloadsDir() {
+	public File getDownloadsDir()
+	{
 		return downloadsDir;
 	}
 }
