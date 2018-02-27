@@ -9,9 +9,9 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
+import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
-import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -76,7 +76,7 @@ public class Select extends WebAction
 
 	private boolean noOptionFail()
 	{
-		return !getParams().containsKey(NO_OPTION_FAIL_PARAM) || WebScriptCompiler.YES.contains(getParams().get(NO_OPTION_FAIL_PARAM));
+		return !getParams().containsKey(NO_OPTION_FAIL_PARAM) || RhUtils.YES.contains(getParams().get(NO_OPTION_FAIL_PARAM));
 	}
 
 	@Override

@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +50,6 @@ public class WebScriptCompiler extends ScriptCompiler
 	public static final String EXECUTE = "execute";
 	
 	public static final String DEFAULT_DICT_NAME = "webdictionary.csv";
-	
-	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
-	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
 
 	@Override
 	public List<Action> build(String script, SessionContext context) throws ScriptCompileException
@@ -218,7 +214,7 @@ public class WebScriptCompiler extends ScriptCompiler
 				break;
 			}
 		}
-		return foundAt == -1 || foundAt >= values.length || YES.contains(values[foundAt].toLowerCase());
+		return foundAt == -1 || foundAt >= values.length || RhUtils.YES.contains(values[foundAt].toLowerCase());
 	}
 	
 	private boolean isDictionaryUsed(String script)

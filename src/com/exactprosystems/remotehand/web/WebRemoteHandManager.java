@@ -52,7 +52,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		File downloadDir = WebUtils.createDownloadDirectory();
 		webSessionContext.setDonwloadDir(downloadDir);
 		webSessionContext.setWebDriverManager(webDriverManager);
-		webSessionContext.setWebDriver(webDriverManager.createWebDriver(downloadDir));
+		webSessionContext.setWebDriver(webDriverManager.createWebDriver(sessionId, downloadDir));
 		return webSessionContext;
 	}
 
@@ -69,7 +69,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		WebSessionContext webSessionContext = (WebSessionContext) sessionContext;
 		WebDriver webDriver = webSessionContext.getWebDriver();
 		if (webDriver != null)
-			webDriver.quit();
+			webDriverManager.closeWebDriver(webDriver, webSessionContext.getSessionId());
 		File donwloadDir = webSessionContext.getDonwloadDir();
 		File[] tmp;
 		if (donwloadDir != null && (tmp = donwloadDir.listFiles()) != null && tmp.length == 0) {

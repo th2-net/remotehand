@@ -62,7 +62,7 @@ public class WebActionsLauncher extends ActionsLauncher
 		catch (WebDriverException e)
 		{
 			logger.warn("Error received as result of checking browser state", e);
-			closeOldDriver(webDriver);
+			closeOldDriver(webDriver, context);
 			if (isBrowserNotReachable(e))
 				updateWebDriver(context);
 			else
@@ -70,22 +70,16 @@ public class WebActionsLauncher extends ActionsLauncher
 		}
 	}
 	
-	private void closeOldDriver(WebDriver driver)
+	private void closeOldDriver(WebDriver driver, WebSessionContext context)
 	{
-		try
-		{
-			driver.quit();
-		}
-		catch (Exception e)
-		{
-			logger.warn("Error while closing driver referenced to unreachable browser", e);
-		}
+		WebDriverManager manager = context.getWebDriverManager();
+		manager.closeWebDriver(driver, context.getSessionId());
 	}
 	
 	private void updateWebDriver(WebSessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
 		logger.info("Trying to create new driver...");
 		WebDriverManager driverManager = context.getWebDriverManager();
-		context.setWebDriver(driverManager.createWebDriver(context.getDonwloadDir()));
+		context.setWebDriver(driverManager.createWebDriver(context.getSessionId(), context.getDonwloadDir()));
 	}
 }

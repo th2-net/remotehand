@@ -8,9 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand.web.actions;
 
+import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
-import com.exactprosystems.remotehand.web.WebScriptCompiler;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -51,7 +51,7 @@ public class SetCheckbox extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement checkbox = findElement(webDriver, webLocator);
-		boolean shouldBeChecked = !WebScriptCompiler.NO.contains(params.get(PARAM_CHECKED));
+		boolean shouldBeChecked = !RhUtils.NO.contains(params.get(PARAM_CHECKED));
 		switchCheckbox(checkbox, shouldBeChecked);	
 		return null;
 	}

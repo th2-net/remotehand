@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Action;
+import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.actions.GetScreenshot;
@@ -88,7 +89,7 @@ public abstract class WebAction extends Action
 	
 	public boolean isElementMandatory()
 	{
-		return !params.containsKey(PARAM_NOTFOUNDFAIL) || WebScriptCompiler.YES.contains(params.get(PARAM_NOTFOUNDFAIL));
+		return !params.containsKey(PARAM_NOTFOUNDFAIL) || RhUtils.YES.contains(params.get(PARAM_NOTFOUNDFAIL));
 	}
 	
 	protected boolean waitForElement(WebDriver webDriver, int seconds, final By webLocator) throws ScriptExecuteException

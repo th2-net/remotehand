@@ -8,11 +8,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.exactprosystems.remotehand;
 
-import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
@@ -25,13 +26,16 @@ public class RhUtils
 {
 	public static final String SESSION_FOR_FILE_MODE = "Main";
 	
+	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
+	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
+
 	public static boolean getBooleanOrDefault(Map<String, String> params, String name, boolean defaultValue)
 	{
 		String value = params.get(name);
 		if (value == null || value.isEmpty())
 			return defaultValue;
 		else 
-			return WebScriptCompiler.YES.contains(value.toLowerCase());
+			return YES.contains(value.toLowerCase());
 	}
 	
 	public static void logError(Logger logger, String sessionId, String msg)

@@ -18,6 +18,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Level;
+
+import static java.lang.String.format;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -45,11 +48,24 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_BINARY = "Binary";
 	public static final String PARAM_DEFAULT_LOCATOR = "DefaultLocator";
 	
+	public static final String BROWSER_LOGGING_LEVEL = "BrowserLoggingLevel";
+	public static final String CLIENT_LOGGING_LEVEL = "ClientLoggingLevel";
+	public static final String DRIVER_LOGGING_LEVEL = "DriverLoggingLevel";
+	public static final String PERFORMANCE_LOGGING_LEVEL = "PerformanceLoggingLevel";
+	
 	public static final String SCREENSHOTS_DIR_NAME = "screenshots";
+	public static final String DRIVER_LOGS_DIR_NAME = "driverLogs";
+	
+	private static final Level DEF_LOG_LEVEL = Level.OFF;
 
 	private volatile Browser browserToUse;
 	private final String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
 		ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary, defaultLocator;
+	
+	private final Level browserLoggingLevel;
+	private final Level clientLoggingLevel;
+	private final Level driverLoggingLevel;
+	private final Level performanceLoggingLevel;
 	
 	private final Properties formParserProperties;
 	private boolean isProxySettingsSet;
@@ -61,7 +77,7 @@ public class WebConfiguration extends Configuration{
 		browserToUse = Browser.valueByLabel(properties.getProperty(PARAM_BROWSER));
 		if (browserToUse == Browser.INVALID)
 		{
-			logger.warn(String.format("Property '%s' is not set or has invalid value. Using default value = '%s'", PARAM_BROWSER, DEF_BROWSER.getLabel()));
+			logger.warn(format("Property '%s' is not set or has invalid value. Using default value = '%s'", PARAM_BROWSER, DEF_BROWSER.getLabel()));
 			browserToUse = DEF_BROWSER;
 		}
 		
@@ -71,6 +87,11 @@ public class WebConfiguration extends Configuration{
 		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
 		binary = loadProperty(properties, PARAM_BINARY, "");
 		defaultLocator = loadProperty(properties, PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
+		
+		browserLoggingLevel = loadLogLevel(properties, BROWSER_LOGGING_LEVEL);
+		clientLoggingLevel = loadLogLevel(properties, CLIENT_LOGGING_LEVEL);
+		driverLoggingLevel = loadLogLevel(properties, DRIVER_LOGGING_LEVEL);
+		performanceLoggingLevel = loadLogLevel(properties, PERFORMANCE_LOGGING_LEVEL);
 
 		httpProxySetting = loadProxySetting(properties, PARAM_HTTPPROXY);
 		sslProxySetting = loadProxySetting(properties, PARAM_SSLPROXY);
@@ -103,7 +124,7 @@ public class WebConfiguration extends Configuration{
 		String property = properties.getProperty(name, "");
 		if (property.isEmpty())
 		{
-			logger.warn(String.format(PROPERTY_NOT_SET, name, defaultValue));
+			logger.warn(format(PROPERTY_NOT_SET, name, defaultValue));
 			property = defaultValue;
 		}
 		else 
@@ -115,7 +136,7 @@ public class WebConfiguration extends Configuration{
 	{
 		String setting = properties.getProperty(propertyName, "");
 		if (setting.isEmpty())
-			logger.warn(String.format("Property '%s' is not set.", propertyName));
+			logger.warn(format("Property '%s' is not set.", propertyName));
 		else 
 		{
 			logger.info(propertyName + " = " + setting);
@@ -123,6 +144,25 @@ public class WebConfiguration extends Configuration{
 				isProxySettingsSet = true;
 		}
 		return setting;
+	}
+	
+	private Level loadLogLevel(Properties properties, String propertyName)
+	{
+		Level level = null;
+		if (properties.containsKey(propertyName))
+		{
+			String levelTxt = properties.getProperty(propertyName);
+			try
+			{
+				level = Level.parse(levelTxt);
+			}
+			catch (IllegalArgumentException e)
+			{
+				logger.warn(format("Invalid %s '%s'. Default level %s will be used.", 
+						propertyName, levelTxt, DEF_LOG_LEVEL));
+			}
+		}
+		return (level != null) ? level : DEF_LOG_LEVEL;
 	}
 	
 	protected Properties loadFormParserConfig(String fileName)
@@ -136,7 +176,7 @@ public class WebConfiguration extends Configuration{
 		}
 		catch (Exception e)
 		{
-			logger.warn(String.format("Unable to load config '%s' for the action '%s'.", fileName, 
+			logger.warn(format("Unable to load config '%s' for the action '%s'.", fileName, 
 					GetFormFields.class.getSimpleName()), e);
 			return null;
 		}
@@ -223,5 +263,33 @@ public class WebConfiguration extends Configuration{
 	public File getDownloadsDir()
 	{
 		return downloadsDir;
+	}
+
+	public Level getBrowserLoggingLevel()
+	{
+		return browserLoggingLevel;
+	}
+
+	public Level getClientLoggingLevel()
+	{
+		return clientLoggingLevel;
+	}
+
+	public Level getDriverLoggingLevel()
+	{
+		return driverLoggingLevel;
+	}
+
+	public Level getPerformanceLoggingLevel()
+	{
+		return performanceLoggingLevel;
+	}
+	
+	public boolean isDriverLoggingEnabled()
+	{
+		return browserLoggingLevel != Level.OFF
+				|| clientLoggingLevel != Level.OFF
+				|| driverLoggingLevel != Level.OFF
+				|| performanceLoggingLevel != Level.OFF;
 	}
 }

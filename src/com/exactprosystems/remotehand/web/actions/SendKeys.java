@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.RhUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 
@@ -82,7 +83,7 @@ public class SendKeys extends WebAction
 				enable(webDriver, input);
 			
 			String beforeClear = params.get(CLEAR_BEFORE);
-			if (beforeClear != null && WebScriptCompiler.YES.contains(beforeClear.toLowerCase()))
+			if (beforeClear != null && RhUtils.YES.contains(beforeClear.toLowerCase()))
 			{
 				input.clear();
 				logInfo("Text field has been cleared.");
@@ -210,7 +211,7 @@ public class SendKeys extends WebAction
 	protected boolean shouldBeEnabledAtFirst(WebElement element, Map<String, String> params)
 	{
 		String canBeDisabled = params.get(CAN_BE_DISABLED);
-		return canBeDisabled != null && !element.isEnabled() && WebScriptCompiler.YES.contains(canBeDisabled.toLowerCase());
+		return canBeDisabled != null && !element.isEnabled() && RhUtils.YES.contains(canBeDisabled.toLowerCase());
 	}
 	
 	protected void enable(WebDriver driver, WebElement input)
