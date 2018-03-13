@@ -224,6 +224,12 @@ GetCurrentURL
 GetCurrentURL
 The Action returns active open window URL.
 
+SetZoom
+=======
+#action,#value
+SetZoom,140%
+The Action set zoom value for current page. Possible formats: 140% / 1.4 .
+
 
 NOTES
 *****

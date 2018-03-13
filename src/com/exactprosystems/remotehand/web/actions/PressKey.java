@@ -20,6 +20,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.util.List;
 import java.util.Map;
 
+import static com.exactprosystems.remotehand.web.actions.SendKeys.getKeysByLabel;
 import static com.exactprosystems.remotehand.web.actions.SendKeys.processInputText;
 
 public class PressKey extends WebAction
@@ -47,7 +48,7 @@ public class PressKey extends WebAction
 		if (s.length() < 2)
 			return;
 		String name = s.substring(1);
-		CharSequence key = SendKeys.KEYS.get(name);
+		CharSequence key = getKeysByLabel(name);
 		if (key == null)
 			throw new ScriptExecuteException("Unknown key: " + name);
 		((RemoteWebDriver) webDriver).getKeyboard().pressKey(key);

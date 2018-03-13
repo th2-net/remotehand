@@ -190,7 +190,7 @@ public class SendKeys extends WebAction
 		return KEYS.containsKey(firstKey);
 	}
 
-	public CharSequence getKeysByLabel(String label)
+	public static CharSequence getKeysByLabel(String label)
 	{
 		if (label.contains("+"))
 		{
@@ -277,5 +277,7 @@ public class SendKeys extends WebAction
 		put("num7", Keys.NUMPAD7);
 		put("num8", Keys.NUMPAD8);
 		put("num9", Keys.NUMPAD9);
+		put("subtract", Keys.SUBTRACT);
+		put("add", Keys.ADD);
 	}};
 }
