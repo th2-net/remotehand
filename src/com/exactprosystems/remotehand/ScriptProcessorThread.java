@@ -82,7 +82,7 @@ public class ScriptProcessorThread implements Runnable
 			if (actionName != null)
 				actionsLogger.init(sessionId, actionName);
 
-			final List<Action> actions = scriptCompiler.build(script, sessionContext);
+			final List<Action> actions = scriptCompiler.build(script, null, sessionContext);
 			return launcher.runActions(actions, sessionContext);
 		}
 		catch (Exception ex1)

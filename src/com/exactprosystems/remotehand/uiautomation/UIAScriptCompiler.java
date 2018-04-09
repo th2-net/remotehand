@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alexey.karpukhin on 2/11/16.
@@ -35,7 +36,7 @@ public class UIAScriptCompiler extends ScriptCompiler {
 	private File tempDir;
 
 	@Override
-	public List<Action> build(String script, SessionContext context) throws ScriptCompileException {
+	public List<Action> build(String script, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException {
 		logger.info("Compiling script...");
 
 		tempDir = ((UIAConfiguration)Configuration.getInstance()).getScriptDir();

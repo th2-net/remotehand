@@ -9,13 +9,13 @@
 
 package com.exactprosystems.remotehand;
 
+import com.csvreader.CsvReader;
 import com.exactprosystems.remotehand.http.SessionContext;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -24,9 +24,9 @@ public abstract class ScriptCompiler {
 
 	public final String LINE_SEPARATOR = "line.separator";
 
-	public abstract List<Action> build(String scriptFile, SessionContext context) throws ScriptCompileException;
+	public abstract List<Action> build(String scriptFile, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException;
 
-	public List<Action> build(File scriptFile, SessionContext context) throws IOException, ScriptCompileException
+	public List<Action> build(File scriptFile, File inputParams, SessionContext context) throws IOException, ScriptCompileException
 	{
 		BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
 		StringBuffer sb = new StringBuffer();
@@ -47,7 +47,30 @@ public abstract class ScriptCompiler {
 
 		String script = sb.toString();
 
-		return build(script, context);
+		if (inputParams == null)
+			return build(script, null, context);
+		if (!inputParams.exists())
+			return build(script, null, context);
+		Map<String, String> params = readParamsFromFile(inputParams);
+		return build(script, params, context);
+	}
+
+	public Map<String, String> readParamsFromFile(File inputParams) throws IOException {
+		Map<String, String> params = new HashMap<>();
+		CsvReader csvReader = null;
+		try {
+			csvReader = new CsvReader(new FileReader(inputParams));
+			csvReader.setDelimiter(',');
+			csvReader.setTextQualifier('"');
+			while (csvReader.readRecord()) {
+				String[] param = csvReader.getValues();
+				params.put(param[0], param[1]);
+			}
+			return params;
+		} finally {
+			if (csvReader != null)
+				csvReader.close();
+		}
 	}
 
 }

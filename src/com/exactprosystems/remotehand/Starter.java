@@ -70,7 +70,8 @@ public class Starter
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
 				outputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify output path name.").create("output"),
-				dynamicInputName = OptionBuilder.withArgName("file").hasArg().withDescription("Dynamically added input file with further commands").create("dynamicinput");
+				dynamicInputName = OptionBuilder.withArgName("file").hasArg().withDescription("Dynamically added input file with further commands").create("dynamicinput"),
+				inputParamsName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input parameters path name.").create("inputparams");
 		
 		Option configFileOption = OptionBuilder.isRequired(false).withArgName("file").hasArg()
 				.withDescription("Specify configuration file").create(CONFIG_PARAM);
@@ -80,6 +81,7 @@ public class Starter
 		options.addOption(inputName);
 		options.addOption(outputName);
 		options.addOption(dynamicInputName);
+		options.addOption(inputParamsName);
 		options.addOption(configFileOption);
 
 		for (Option additional : manager.getAdditionalOptions()) {
@@ -104,6 +106,7 @@ public class Starter
 		String input = line.getOptionValue(inputName.getOpt());
 		String output = line.getOptionValue(outputName.getOpt());
 		String dynInput = line.getOptionValue(dynamicInputName.getOpt());
+		String inputParams = line.getOptionValue(inputParamsName.getOpt());
 
 		if (Configuration.getInstance() == null) {
 			manager.createConfiguration(line);
@@ -136,6 +139,8 @@ public class Starter
 			logger.info("Output file: '" + output + "'");
 			if (dynInput != null)
 				logger.info("Dynamic input file: '" + dynInput + "'");
+			if (inputParams != null)
+				logger.info("Input params file: '" + inputParams + "'");
 
 			ActionsLauncher launcher = manager.createActionsLauncher(null);
 			ScriptCompiler compiler = manager.createScriptCompiler();
@@ -151,7 +156,7 @@ public class Starter
 				closeApp();
 			}
 
-			processAllScriptsFromDirectory(input, output, launcher, compiler, sessionContext);
+			processAllScriptsFromDirectory(input, output, inputParams, launcher, compiler, sessionContext);
 			if (dynInput != null)
 			{
 				File dynFile = new File(dynInput);
@@ -161,7 +166,7 @@ public class Starter
 					if (dynFile.exists())
 					{
 						firstWait = true;
-						processAllScriptsFromDirectory(dynInput, output, launcher, compiler, sessionContext);
+						processAllScriptsFromDirectory(dynInput, output, inputParams, launcher, compiler, sessionContext);
 
 						if (dynFile.isFile())
 						{
@@ -205,7 +210,7 @@ public class Starter
 		}
 	}
 
-	private static void processAllScriptsFromDirectory(String input, String output, 
+	private static void processAllScriptsFromDirectory(String input, String output, String inputParams,
 			ActionsLauncher launcher, ScriptCompiler compiler, SessionContext sessionContext)
 	{
 		File[] fileList;
@@ -216,6 +221,10 @@ public class Starter
 			logger.error("Input file or directory '" + input + "' does not exist");
 			closeApp();
 		}
+
+		File inputParamsFile = null;
+		if (inputParams != null)
+			inputParamsFile = new File(inputParams);
 
 		if (inputFile.isDirectory())
 		{
@@ -236,7 +245,7 @@ public class Starter
 		{
 			try
 			{
-				final List<Action> actions = compiler.build(scriptFile, sessionContext);
+				final List<Action> actions = compiler.build(scriptFile, inputParamsFile, sessionContext);
 				RhScriptResult result = launcher.runActions(actions, sessionContext);
 
 				TextFileWriter.getInstance().setContent(resultToText(result));
@@ -269,7 +278,7 @@ public class Starter
 		{
 			try
 			{
-				List<Action> actions = compiler.build(file, context);
+				List<Action> actions = compiler.build(file, null, context);
 				launcher.runActions(actions, context);
 			}
 			catch (Exception e)

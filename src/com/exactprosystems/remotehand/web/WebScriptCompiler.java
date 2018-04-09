@@ -52,7 +52,7 @@ public class WebScriptCompiler extends ScriptCompiler
 	public static final String DEFAULT_DICT_NAME = "webdictionary.csv";
 
 	@Override
-	public List<Action> build(String script, SessionContext context) throws ScriptCompileException
+	public List<Action> build(String script, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException
 	{
 		WebSessionContext webSessionContext = (WebSessionContext) context;
 		String sessionId = webSessionContext.getSessionId();
@@ -93,6 +93,15 @@ public class WebScriptCompiler extends ScriptCompiler
 
 					if (isExecutable(header, values))
 					{
+						if (inputParams != null) {
+							for (int i = 0; i < values.length; i++) {
+								if (values[i].startsWith("%") && values[i].endsWith("%")) {
+									String key = values[i].substring(1, values[i].length() - 1);
+									values[i] = inputParams.get(key);
+								}
+							}
+						}
+
 						final WebAction action = generateAction(header, values, lineNumber, webSessionContext);
 
 						WebScriptChecker checker = new WebScriptChecker();
