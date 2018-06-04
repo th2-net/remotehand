@@ -64,14 +64,17 @@ public class DownloadFile extends WebAction {
 				do {
 					iteration++;
 					file = waitForFile(list, downloadDir, 1000);
-					if (file == null)
+					if (file == null && isElementMandatory())
 						throw new ScriptExecuteException("No new files in download dir");
+					else if(file == null)
+						return "";
+
 					getLogger().debug("Selected file: " + file.getName());
 					isTemp = this.isTempFile(file);
 					String timeoutParam = params.get(PARAM_WAIT);
-					Integer timout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
+					Integer timeout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
 					boolean fullSearch = iteration == 1 || isTemp;
-					done = this.checkSize(file, fullSearch ? timout : 50, fullSearch ? 10 : 1);
+					done = this.checkSize(file, fullSearch ? timeout : 50, fullSearch ? 10 : 1);
 				} while (iteration < 10 && !done && isTemp && !file.exists());
 				if (!done) {
 					throw new ScriptExecuteException("File wasn't downloaded.");
