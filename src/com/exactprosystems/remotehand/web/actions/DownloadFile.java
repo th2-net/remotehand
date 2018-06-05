@@ -21,6 +21,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -82,15 +84,26 @@ public class DownloadFile extends WebAction {
 			} catch (InterruptedException e) {
 				throw new ScriptExecuteException("Interrupted.", e);
 			}
-//			if (file == null)
-//				throw new ScriptExecuteException("No new files in download dir");
-			File configDownloadDir = ((WebConfiguration) Configuration.getInstance()).getDownloadsDir();
-			return "Downloaded_file=" + file.getPath().substring(configDownloadDir.getPath().length()).replaceAll(" ", "%20");
+
+			return "Downloaded_file=" + createUrl(file);
 		}
 		
 		throw new ScriptExecuteException("Unknown actionType: " + type);
 	}
-	
+
+	private String createUrl(File file) throws ScriptExecuteException
+	{
+		File configDownloadDir = ((WebConfiguration) Configuration.getInstance()).getDownloadsDir();
+		String filePath = file.getPath().substring(configDownloadDir.getPath().length());
+		try
+		{
+			return URLEncoder.encode(filePath, "UTF-8");
+		} catch (UnsupportedEncodingException e)
+		{
+			throw new ScriptExecuteException("Cannot create URL for path: " + filePath, e);
+		}
+	}
+
 	@SuppressWarnings("ConstantConditions")
 	private File waitForFile(String[] old, File downloadDir, long timeout) throws InterruptedException {
 		long endTime = System.currentTimeMillis() + timeout;
