@@ -40,6 +40,7 @@ public class ActionsLauncher
 		
 		for (Action action : scriptActions)
 		{
+			action.beforeExecute();
 			final String actionResult = action.execute();
 			if (actionResult != null)
 				processActionResult(result, action, actionResult);

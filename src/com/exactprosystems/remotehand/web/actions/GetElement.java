@@ -53,10 +53,12 @@ public class GetElement extends WebAction
 		String id = params.get(FindElement.PARAM_ID);
 		if (id == null || id.isEmpty())
 			id = "";
-		else 
+		else
+		{
+			context.getContextData().put(id, element.getText());
 			id += "=";
-		
-		
+		}
+
 		return id + elementHTML;
 	}
 }

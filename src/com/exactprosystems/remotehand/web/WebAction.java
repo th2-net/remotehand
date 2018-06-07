@@ -28,6 +28,7 @@ import com.exactprosystems.remotehand.web.actions.GetScreenshot;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.internal.Locatable;
@@ -119,6 +120,30 @@ public abstract class WebAction extends Action
 		return true;
 	}
 	
+	@Override
+	public void beforeExecute()
+	{
+		if(context.getContextData().isEmpty())
+			return;
+
+		for (Map.Entry<String, String> param : params.entrySet())
+		{
+			int start;
+			String value = param.getValue();
+			if((start = value.indexOf("@{")) < 0)
+				continue;
+
+			int end = value.lastIndexOf("}");
+			String name = value.substring(start + 2, end);
+			String contextValue = (String) context.getContextData().get(name);
+
+			if(StringUtils.isNotEmpty(contextValue))
+				value = value.substring(0, start) + contextValue + value.substring(end + 1);
+
+			param.setValue(value);
+		}
+	}
+
 	@Override
 	public String execute() throws ScriptExecuteException
 	{

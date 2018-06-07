@@ -17,4 +17,6 @@ package com.exactprosystems.remotehand;
 public abstract class Action {
 
 	public abstract String execute() throws ScriptExecuteException;
+
+	public void beforeExecute() {}
 }
