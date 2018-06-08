@@ -10,12 +10,15 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +35,7 @@ import java.util.Map;
 public class DownloadFile extends WebAction {
 	
 	public static final String FILES_KEY = "DownloadDirFiles";
+	public static final String FILE_NAME = "filename";
 
 	private static final Logger logger = Logger.getLogger(DownloadFile.class);
 
@@ -59,7 +63,7 @@ public class DownloadFile extends WebAction {
 			boolean done;
 			boolean isTemp;
 			try {
-				String[] list = (String[]) context.getContextData().get(FILES_KEY);
+				String[] list = (String[]) context.getContextData().remove(FILES_KEY);
 				if (list == null)
 					throw new ScriptExecuteException("Doesn't have a snapshot. Execute with type 'snapshot' first.");
 				int iteration = 0;
@@ -74,7 +78,7 @@ public class DownloadFile extends WebAction {
 					getLogger().debug("Selected file: " + file.getName());
 					isTemp = this.isTempFile(file);
 					String timeoutParam = params.get(PARAM_WAIT);
-					Integer timeout = Integer.parseInt(StringUtils.isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
+					Integer timeout = Integer.parseInt(isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
 					boolean fullSearch = iteration == 1 || isTemp;
 					done = this.checkSize(file, fullSearch ? timeout : 50, fullSearch ? 10 : 1);
 				} while (iteration < 10 && !done && isTemp && !file.exists());
@@ -85,10 +89,26 @@ public class DownloadFile extends WebAction {
 				throw new ScriptExecuteException("Interrupted.", e);
 			}
 
+			renameFile(file, params);
+
 			return "Downloaded_file=" + createUrl(file);
 		}
 		
 		throw new ScriptExecuteException("Unknown actionType: " + type);
+	}
+
+	private void renameFile(File file, Map<String,String> params) throws ScriptExecuteException
+	{
+		String newFileName = params.get(FILE_NAME);
+		if(isEmpty(newFileName))
+			return;
+
+		String extension = FilenameUtils.getExtension(newFileName);
+		if(isEmpty(extension))
+			newFileName = newFileName + "." + FilenameUtils.getExtension(file.getName());
+
+		if(!file.renameTo(new File(file.getParent(), newFileName)))
+			throw new ScriptExecuteException("Cannot rename file to " + newFileName);
 	}
 
 	private String createUrl(File file) throws ScriptExecuteException
