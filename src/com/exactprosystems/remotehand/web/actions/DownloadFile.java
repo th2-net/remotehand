@@ -108,6 +108,7 @@ public class DownloadFile extends WebAction {
 			newFileName = newFileName + "." + FilenameUtils.getExtension(file.getName());
 
 		File newFile = new File(file.getParent(), newFileName);
+		newFile.getParentFile().mkdirs();
 		if(!file.renameTo(newFile))
 			throw new ScriptExecuteException("Cannot rename file to " + newFileName);
 
