@@ -89,7 +89,7 @@ public class DownloadFile extends WebAction {
 				throw new ScriptExecuteException("Interrupted.", e);
 			}
 
-			renameFile(file, params);
+			file = renameFile(file, params);
 
 			return "Downloaded_file=" + createUrl(file);
 		}
@@ -97,18 +97,21 @@ public class DownloadFile extends WebAction {
 		throw new ScriptExecuteException("Unknown actionType: " + type);
 	}
 
-	private void renameFile(File file, Map<String,String> params) throws ScriptExecuteException
+	private File renameFile(File file, Map<String,String> params) throws ScriptExecuteException
 	{
 		String newFileName = params.get(FILE_NAME);
 		if(isEmpty(newFileName))
-			return;
+			return file;
 
 		String extension = FilenameUtils.getExtension(newFileName);
 		if(isEmpty(extension))
 			newFileName = newFileName + "." + FilenameUtils.getExtension(file.getName());
 
-		if(!file.renameTo(new File(file.getParent(), newFileName)))
+		File newFile = new File(file.getParent(), newFileName);
+		if(!file.renameTo(newFile))
 			throw new ScriptExecuteException("Cannot rename file to " + newFileName);
+
+		return newFile;
 	}
 
 	private String createUrl(File file) throws ScriptExecuteException
