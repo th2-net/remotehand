@@ -97,7 +97,7 @@ public class WebDriverManager
 		{
 			case IE :       return createIeDriver(configuration, dc);
 			case CHROME :   return createChromeDriver(configuration, dc, downloadDir);
-			default :       return createFireFoxDriver(configuration, dc);
+			default :       return createFirefoxDriver(configuration, dc);
 		}
 	}
 
@@ -151,7 +151,7 @@ public class WebDriverManager
 		}
 	}
 	
-	private FirefoxDriver createFireFoxDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
 	{
 		try
 		{
