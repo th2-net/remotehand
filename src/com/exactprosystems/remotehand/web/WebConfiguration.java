@@ -10,10 +10,7 @@
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.web.actions.GetFormFields;
-import org.apache.commons.cli.CommandLine;
-import org.apache.log4j.Logger;
+import static java.lang.String.format;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +18,11 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import static java.lang.String.format;
+import org.apache.commons.cli.CommandLine;
+import org.apache.log4j.Logger;
+
+import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.web.actions.GetFormFields;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -33,6 +34,7 @@ public class WebConfiguration extends Configuration{
 	public static final Browser DEF_BROWSER = Browser.FIREFOX;
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
 	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
+	public static final String DEF_FIREFOXDRIVER_PATH = "geckodriver.exe";
 	public static final String DEF_PROXY = "";
 	public static final String DEF_LOCATOR = "xpath";
 	public static final String FORM_PARSER_CONFIG_FILE = "formParser.properties";
@@ -40,6 +42,7 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_BROWSER = "Browser";
 	public static final String PARAM_IEDRIVERPATH = "IEDriverPath";
 	public static final String PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
+	public static final String PARAM_FIREFOXDRIVERPATH = "FirefoxDriverPath";
 	public static final String PARAM_HTTPPROXY = "HttpProxy";
 	public static final String PARAM_SSLPROXY = "SslProxy";
 	public static final String PARAM_FTPPROXY = "FtpProxy";
@@ -60,7 +63,7 @@ public class WebConfiguration extends Configuration{
 	private static final Level DEF_LOG_LEVEL = Level.OFF;
 
 	private volatile Browser browserToUse;
-	private final String ieDriverFileName, chromeDriverFileName, httpProxySetting, sslProxySetting, 
+	private final String ieDriverFileName, chromeDriverFileName, firefoxDriverFileName, httpProxySetting, sslProxySetting, 
 		ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary, defaultLocator;
 	
 	private final Level browserLoggingLevel;
@@ -86,6 +89,7 @@ public class WebConfiguration extends Configuration{
 		
 		ieDriverFileName = loadProperty(properties, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
 		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
+		firefoxDriverFileName = loadProperty(properties, PARAM_FIREFOXDRIVERPATH, DEF_FIREFOXDRIVER_PATH);
 		binary = loadProperty(properties, PARAM_BINARY, "");
 		defaultLocator = loadProperty(properties, PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
 		
@@ -209,6 +213,11 @@ public class WebConfiguration extends Configuration{
 	public String getChromeDriverFileName()
 	{
 		return chromeDriverFileName;
+	}
+	
+	public String getFirefoxDriverFileName()
+	{
+		return firefoxDriverFileName;
 	}
 
 	public boolean isProxySettingsSet()

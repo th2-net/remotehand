@@ -10,30 +10,31 @@
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.RhConfigurationException;
-import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
+import static java.lang.Thread.currentThread;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static java.lang.Thread.currentThread;
+import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.RhConfigurationException;
+import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -96,7 +97,6 @@ public class WebDriverManager
 		{
 			case IE :       return createIeDriver(configuration, dc);
 			case CHROME :   return createChromeDriver(configuration, dc, downloadDir);
-			case HEADLESS:  return createPhantomJsDriver(dc);
 			default :       return createFireFoxDriver(configuration, dc);
 		}
 	}
@@ -110,7 +110,7 @@ public class WebDriverManager
 		try
 		{
 			System.setProperty("webdriver.ie.driver", cfg.getIeDriverFileName());
-			return (dc != null) ? new InternetExplorerDriver(dc) : new InternetExplorerDriver();
+			return (dc != null) ? new InternetExplorerDriver(new InternetExplorerOptions(dc)) : new InternetExplorerDriver();
 		}
 		catch (Exception e)
 		{
@@ -139,8 +139,11 @@ public class WebDriverManager
 			}
 
 			if (dc != null)
-				dc.setCapability(ChromeOptions.CAPABILITY, options);
-			return (dc != null) ? new ChromeDriver(dc) : new ChromeDriver(options);
+			{
+				for (Entry<String, Object> capability : dc.asMap().entrySet())
+					options.setCapability(capability.getKey(), capability.getValue());
+			}
+			return new ChromeDriver(options);
 		}
 		catch (Exception e)
 		{
@@ -148,48 +151,12 @@ public class WebDriverManager
 		}
 	}
 	
-	private PhantomJSDriver createPhantomJsDriver(DesiredCapabilities dc) throws RhConfigurationException
-	{
-		try
-		{
-			return (dc != null) ? new PhantomJSDriver(dc) : new PhantomJSDriver();
-		}
-		catch (Exception e)
-		{
-			throw new RhConfigurationException("Unable to create PhantomJS (Headless) driver: " + e.getMessage(), e);
-		}
-	}
-	
 	private FirefoxDriver createFireFoxDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
 	{
 		try
 		{
-			String profile = cfg.getProfilePath();
-			if (profile != null && !profile.isEmpty())
-			{
-				File profileDir = new File(profile);
-				if (profileDir.exists())
-				{
-					FirefoxProfile fxProfile = new FirefoxProfile(profileDir);
-					if (dc == null)
-						dc = new DesiredCapabilities();
-					dc.setCapability(FirefoxDriver.PROFILE, fxProfile);
-				}
-			}
-
-			String ffBinaryParam = cfg.getBinary();
-			if (ffBinaryParam != null && !ffBinaryParam.isEmpty()) {
-				File ffBinaryFile = new File(ffBinaryParam);
-				if (ffBinaryFile.exists())
-				{
-					FirefoxBinary ffBinary = new FirefoxBinary(ffBinaryFile);
-					if (dc == null)
-						dc = new DesiredCapabilities();
-					dc.setCapability(FirefoxDriver.BINARY, ffBinary);
-				}
-			}
-
-			return (dc != null) ? new FirefoxDriver(dc) : new FirefoxDriver();
+			System.setProperty("webdriver.gecko.driver", cfg.getFirefoxDriverFileName());
+			return (dc != null) ? new FirefoxDriver(new FirefoxOptions(dc)) : new FirefoxDriver();
 		}
 		catch (Exception e)
 		{
