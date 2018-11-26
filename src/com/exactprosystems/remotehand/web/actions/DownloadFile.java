@@ -24,8 +24,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -107,12 +111,15 @@ public class DownloadFile extends WebAction {
 		if(isEmpty(extension))
 			newFileName = newFileName + "." + FilenameUtils.getExtension(file.getName());
 
-		File newFile = new File(file.getParent(), newFileName);
-		newFile.getParentFile().mkdirs();
-		if(!file.renameTo(newFile))
-			throw new ScriptExecuteException("Cannot rename file to " + newFileName);
-
-		return newFile;
+		try
+		{
+			Path newFile = Paths.get(file.getParent(), newFileName);
+			Files.createDirectories(newFile);
+			return Files.move(file.toPath(), newFile).toFile();
+		} catch (IOException e)
+		{
+			throw new ScriptExecuteException("Cannot rename file to " + newFileName, e);
+		}
 	}
 
 	private String createUrl(File file) throws ScriptExecuteException
