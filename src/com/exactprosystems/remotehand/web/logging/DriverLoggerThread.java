@@ -10,10 +10,11 @@
 
 package com.exactprosystems.remotehand.web.logging;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.Logs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -33,7 +34,7 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  */
 public class DriverLoggerThread extends Thread
 {
-	private static final Logger logger = Logger.getLogger(DriverLoggerThread.class);
+	private static final Logger logger = LoggerFactory.getLogger(DriverLoggerThread.class);
 	
 	private final String sessionId;
 	private final WebDriver driver;

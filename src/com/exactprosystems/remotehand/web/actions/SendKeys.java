@@ -17,8 +17,9 @@ import java.util.Map;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
@@ -28,7 +29,7 @@ import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 
 public class SendKeys extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(SendKeys.class);
+	private static final Logger logger = LoggerFactory.getLogger(SendKeys.class);
 	private static final String PARAM_TEXT = "text",
 			PARAM_TEXT2 = PARAM_TEXT+"2",
 			PARAM_WAIT2 = PARAM_WAIT+"2",

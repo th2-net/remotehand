@@ -13,13 +13,15 @@ package com.exactprosystems.remotehand;
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.http.SessionContext;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class ScriptProcessorThread implements Runnable
 {
-	private static final Logger logger = Logger.getLogger(ScriptProcessorThread.class);
+	private static final Logger logger = LoggerFactory.getLogger(ScriptProcessorThread.class);
 
 	private boolean switchOn = true, 
 			busy = true, 

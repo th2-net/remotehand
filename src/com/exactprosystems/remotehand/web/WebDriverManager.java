@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -31,6 +30,8 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhConfigurationException;
@@ -41,7 +42,7 @@ import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
  */
 public class WebDriverManager 
 {
-	private static final Logger log = Logger.getLogger(WebDriverManager.class);
+	private static final Logger log = LoggerFactory.getLogger(WebDriverManager.class);
 	
 	private final Map<String, DriverLoggerThread> loggers = new ConcurrentHashMap<>();
 	

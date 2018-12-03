@@ -19,11 +19,12 @@ import com.exactprosystems.remotehand.web.ActionOutputType;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
 import com.exactprosystems.remotehand.RhUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ import static java.lang.String.format;
  */
 public class GetFormFields extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(GetFormFields.class);
+	private static final Logger logger = LoggerFactory.getLogger(GetFormFields.class);
 	
 	private static final String CHECK_REQUIRED_FLAG_PARAM = "checkRequiredFlag".toLowerCase();
 	private static final String CHECK_DISABLED_FLAG_PARAM = "checkDisabledFlag".toLowerCase();

@@ -14,13 +14,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
@@ -30,7 +31,7 @@ import com.exactprosystems.remotehand.web.WebAction;
  */
 public class SwitchWindow extends WebAction
 {
-	private final static Logger logger = Logger.getLogger(SwitchWindow.class);
+	private final static Logger logger = LoggerFactory.getLogger(SwitchWindow.class);
 	private final static String WINDOW = "window";
 	
 	public SwitchWindow()

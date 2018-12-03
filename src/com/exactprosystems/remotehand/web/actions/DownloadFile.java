@@ -19,9 +19,10 @@ import com.exactprosystems.remotehand.web.WebConfiguration;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class DownloadFile extends WebAction {
 	public static final String FILES_KEY = "DownloadDirFiles";
 	public static final String FILE_NAME = "filename";
 
-	private static final Logger logger = Logger.getLogger(DownloadFile.class);
+	private static final Logger logger = LoggerFactory.getLogger(DownloadFile.class);
 
 	@Override
 	public boolean isNeedLocator() {
@@ -82,7 +83,7 @@ public class DownloadFile extends WebAction {
 					getLogger().debug("Selected file: " + file.getName());
 					isTemp = this.isTempFile(file);
 					String timeoutParam = params.get(PARAM_WAIT);
-					Integer timeout = Integer.parseInt(isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
+					int timeout = Integer.parseInt(isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
 					boolean fullSearch = iteration == 1 || isTemp;
 					done = this.checkSize(file, fullSearch ? timeout : 50, fullSearch ? 10 : 1);
 				} while (iteration < 10 && !done && isTemp && !file.exists());
@@ -114,7 +115,9 @@ public class DownloadFile extends WebAction {
 		try
 		{
 			Path newFile = Paths.get(file.getParent(), newFileName);
-			Files.createDirectories(newFile);
+			Files.createDirectories(newFile.getParent());
+			logger.trace("Old file name: {}", file.getAbsoluteFile());
+			logger.trace("New file name: {}", newFile.toAbsolutePath());
 			return Files.move(file.toPath(), newFile).toFile();
 		} catch (IOException e)
 		{

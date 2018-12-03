@@ -12,17 +12,18 @@ package com.exactprosystems.remotehand.web.actions;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 
 public class GetElement extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(GetElement.class);
+	private static final Logger logger = LoggerFactory.getLogger(GetElement.class);
 	
 	@Override
 	public boolean isNeedLocator()

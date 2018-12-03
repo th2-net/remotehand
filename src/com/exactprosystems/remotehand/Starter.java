@@ -32,12 +32,13 @@ import org.apache.commons.io.FileUtils;
 import com.exactprosystems.remotehand.http.HTTPServer;
 import com.exactprosystems.remotehand.http.SessionWatcher;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Starter
 {
-	private static final Logger logger = Logger.getLogger(Starter.class);
+	private static final Logger logger = LoggerFactory.getLogger(Starter.class);
 
 	private static final String DEFAULT_VERSION = "local_build";
 	

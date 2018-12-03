@@ -12,15 +12,16 @@ package com.exactprosystems.remotehand.web.actions;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.web.WebAction;
 
 public class Open extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(Open.class);
+	private static final Logger logger = LoggerFactory.getLogger(Open.class);
 	private static final String PARAM_URL = "url";
 	
 	public Open()

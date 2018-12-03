@@ -20,7 +20,8 @@ import com.exactprosystems.remotehand.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.exactprosystems.remotehand.RhUtils.logError;
 import static com.exactprosystems.remotehand.RhUtils.logInfo;
@@ -29,7 +30,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SessionHandler implements HttpHandler
 {
-	private static final Logger logger = Logger.getLogger(SessionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(SessionHandler.class);
 
 	private final String id;
 

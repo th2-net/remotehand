@@ -12,13 +12,16 @@ package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class SetZoom extends WebAction
 {
+    private static final Logger logger = LoggerFactory.getLogger(SetZoom.class);
+
     @Override
     public boolean isNeedLocator()
     {
@@ -45,6 +48,6 @@ public class SetZoom extends WebAction
     @Override
     protected Logger getLogger()
     {
-        return getLogger();
+        return logger;
     }
 }

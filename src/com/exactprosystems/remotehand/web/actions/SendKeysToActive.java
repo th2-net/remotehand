@@ -10,11 +10,12 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SendKeysToActive extends SendKeys
 {
-	private static final Logger logger = Logger.getLogger(SendKeysToActive.class);
+	private static final Logger logger = LoggerFactory.getLogger(SendKeysToActive.class);
 	
 	@Override
 	public boolean isNeedLocator()

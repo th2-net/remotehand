@@ -12,10 +12,11 @@ package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Map;
  */
 public class UploadFile  extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(UploadFile.class);
+	private static final Logger logger = LoggerFactory.getLogger(UploadFile.class);
 	private static final String ABSOLUT_PATH = "absolutepath";
 
 	@Override

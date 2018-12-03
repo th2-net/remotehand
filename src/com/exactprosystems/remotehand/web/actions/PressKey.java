@@ -13,10 +13,11 @@ package com.exactprosystems.remotehand.web.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ import static com.exactprosystems.remotehand.web.actions.SendKeys.processInputTe
 
 public class PressKey extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(PressKey.class);
+	private static final Logger logger = LoggerFactory.getLogger(PressKey.class);
 	
 	private static final String PARAM_KEY = "key";
 

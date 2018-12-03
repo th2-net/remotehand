@@ -15,7 +15,9 @@ import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptCompiler;
 import com.exactprosystems.remotehand.http.SessionContext;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,7 +31,7 @@ import java.util.Map;
  */
 public class UIAScriptCompiler extends ScriptCompiler {
 
-	private static final Logger logger = Logger.getLogger(UIAScriptCompiler.class);
+	private static final Logger logger = LoggerFactory.getLogger(UIAScriptCompiler.class);
 
 	public static final String COMMENT_INDICATOR = "//";
 	public static final String oldLineSeporator = "&#13";

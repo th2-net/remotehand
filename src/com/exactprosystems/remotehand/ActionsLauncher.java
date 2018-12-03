@@ -12,14 +12,16 @@ package com.exactprosystems.remotehand;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.http.SessionContext;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ActionsLauncher
 {
-	private static final Logger logger = Logger.getLogger(ActionsLauncher.class);
+	private static final Logger logger = LoggerFactory.getLogger(ActionsLauncher.class);
 
 	ScriptProcessorThread parent = null;
 

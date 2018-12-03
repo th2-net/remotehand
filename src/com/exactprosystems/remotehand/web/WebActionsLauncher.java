@@ -13,9 +13,10 @@ package com.exactprosystems.remotehand.web;
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.http.SessionContext;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 
@@ -24,7 +25,7 @@ import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
  */
 public class WebActionsLauncher extends ActionsLauncher
 {
-	private static final Logger logger = Logger.getLogger(WebActionsLauncher.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebActionsLauncher.class);
 	
 	public WebActionsLauncher(ScriptProcessorThread parentThread)
 	{

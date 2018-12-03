@@ -14,11 +14,12 @@ import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public class SetCheckbox extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(SetCheckbox.class);
+	private static final Logger logger = LoggerFactory.getLogger(SetCheckbox.class);
 	
 	public static final String PARAM_CHECKED = "checked";
 

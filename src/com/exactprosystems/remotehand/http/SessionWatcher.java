@@ -15,11 +15,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Configuration;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SessionWatcher implements Runnable
 {
-	private static final Logger logger = Logger.getLogger(SessionWatcher.class);
+	private static final Logger logger = LoggerFactory.getLogger(SessionWatcher.class);
 	private static final long SESSION_EXPIRE_IN_MINUTES = Configuration.getInstance().getSessionExpire();
 	private static final long SESSION_EXPIRE = SESSION_EXPIRE_IN_MINUTES * 60 * 1000;  //In configuration it is set in minutes, we need it in milliseconds 
 	private static volatile SessionWatcher watcher = null;

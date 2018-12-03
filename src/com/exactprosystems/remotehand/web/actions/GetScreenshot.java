@@ -13,9 +13,10 @@ package com.exactprosystems.remotehand.web.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.ActionOutputType;
 import com.exactprosystems.remotehand.web.WebAction;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -24,7 +25,7 @@ import java.util.Map;
  */
 public class GetScreenshot extends WebAction
 {
-	private static final Logger log = Logger.getLogger(GetScreenshot.class);
+	private static final Logger log = LoggerFactory.getLogger(GetScreenshot.class);
 	
 	public static final String NAME_PARAM = "name";
 

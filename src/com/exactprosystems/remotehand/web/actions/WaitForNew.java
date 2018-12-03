@@ -13,20 +13,21 @@ package com.exactprosystems.remotehand.web.actions;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 
 public class WaitForNew extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(WaitForNew.class);
+	private static final Logger logger = LoggerFactory.getLogger(WaitForNew.class);
 	private static final String PARAM_SECONDS = "seconds", 
 			PARAM_CHECKMILLIS = "checkmillis";
 	

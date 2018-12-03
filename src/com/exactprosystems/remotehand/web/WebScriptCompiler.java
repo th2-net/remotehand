@@ -19,9 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.csvreader.CsvReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
@@ -33,7 +34,7 @@ import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 
 public class WebScriptCompiler extends ScriptCompiler
 {
-	private static final Logger logger = Logger.getLogger(WebScriptCompiler.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebScriptCompiler.class);
 
 	private static final String SCRIPT_LINE_SEPARATOR = "&#13";
 	

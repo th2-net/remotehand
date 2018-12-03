@@ -13,7 +13,9 @@ package com.exactprosystems.remotehand.web;
 import com.csvreader.CsvReader;
 
 import static com.exactprosystems.remotehand.web.WebScriptCompiler.*;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -26,7 +28,7 @@ import java.util.Map;
 
 public class WebElementsDictionary
 {
-	private static final Logger logger = Logger.getLogger(WebElementsDictionary.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebElementsDictionary.class);
 	
 	private static final String ID      = "#webId";
 	private static final String LOCATOR = "#locator";

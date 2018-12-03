@@ -11,7 +11,8 @@
 package com.exactprosystems.remotehand;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +21,7 @@ import java.util.Properties;
 
 public class Configuration
 {
-	private static final Logger logger = Logger.getLogger(Configuration.class);
+	private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 	protected static volatile Configuration instance = null;
 	protected volatile Properties properties;
 

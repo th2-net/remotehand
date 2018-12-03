@@ -16,9 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
@@ -30,7 +31,7 @@ import com.exactprosystems.remotehand.web.WebAction;
 public class MTableGetRow extends WebAction
 {
 	
-	private static final Logger logger = Logger.getLogger(MTableGetRow.class);
+	private static final Logger logger = LoggerFactory.getLogger(MTableGetRow.class);
 	@Override
 	public boolean isNeedLocator()
 	{

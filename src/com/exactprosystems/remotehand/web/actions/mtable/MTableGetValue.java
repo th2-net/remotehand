@@ -12,9 +12,10 @@ package com.exactprosystems.remotehand.web.actions.mtable;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
@@ -25,7 +26,7 @@ import com.exactprosystems.remotehand.web.WebAction;
  */
 public class MTableGetValue extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(MTableGetValue.class);
+	private static final Logger logger = LoggerFactory.getLogger(MTableGetValue.class);
 	
 	@Override
 	public boolean isNeedLocator()

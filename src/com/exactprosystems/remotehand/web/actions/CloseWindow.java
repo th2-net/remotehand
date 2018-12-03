@@ -12,9 +12,10 @@ package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
-import org.apache.log4j.Logger;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;

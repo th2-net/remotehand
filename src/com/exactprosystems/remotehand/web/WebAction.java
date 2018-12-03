@@ -29,11 +29,11 @@ import com.exactprosystems.remotehand.web.webelements.WebLocator;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 import static java.lang.String.format;

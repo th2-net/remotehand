@@ -15,18 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.web.actions.WaitForElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author daria.plotnikova
@@ -34,7 +27,7 @@ import com.exactprosystems.remotehand.web.actions.WaitForElement;
  */
 public class MTableUtils
 {
-	private static final Logger logger = Logger.getLogger(MTableUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(MTableUtils.class);
 	
 	public static final String TABLE_ID = "tableid", 
 			TABLE_INDEX = "tableindex",

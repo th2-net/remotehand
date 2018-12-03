@@ -13,7 +13,6 @@ package com.exactprosystems.remotehand.web.actions;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -21,10 +20,12 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Click extends WebAction
 {
-	private static final Logger logger = Logger.getLogger(Click.class);
+	private static final Logger logger = LoggerFactory.getLogger(Click.class);
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", BUTTON = "button",
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
 	

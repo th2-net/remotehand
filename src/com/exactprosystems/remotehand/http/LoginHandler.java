@@ -16,13 +16,14 @@ import java.io.OutputStream;
 import com.exactprosystems.remotehand.IRemoteHandManager;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.UUID.randomUUID;
 
 public class LoginHandler implements HttpHandler
 {
-	private static final Logger logger = Logger.getLogger(LoginHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoginHandler.class);
 	private IRemoteHandManager manager;
 
 	public LoginHandler (IRemoteHandManager manager) {

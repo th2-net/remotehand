@@ -15,11 +15,12 @@ import java.net.InetSocketAddress;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HTTPServer
 {
-	private static final Logger logger = Logger.getLogger(HTTPServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
 	private static final int HTTP_SRV_PORT = Configuration.getInstance().getHttpServerPort();
 	private static final String LOGIN_LISTENER = "/login";
 	private static final String DOWNLOAD_LISTENER = "/download";

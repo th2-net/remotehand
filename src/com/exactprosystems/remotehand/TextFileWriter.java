@@ -10,7 +10,8 @@
 
 package com.exactprosystems.remotehand;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,7 +20,7 @@ import java.io.IOException;
 
 public class TextFileWriter
 {
-	private static final Logger logger = Logger.getLogger(TextFileWriter.class);
+	private static final Logger logger = LoggerFactory.getLogger(TextFileWriter.class);
 	
 	private static TextFileWriter writer = new TextFileWriter();
 

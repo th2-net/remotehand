@@ -10,9 +10,9 @@
 
 package com.exactprosystems.remotehand;
 
-import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;

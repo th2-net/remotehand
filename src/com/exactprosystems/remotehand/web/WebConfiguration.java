@@ -19,7 +19,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.web.actions.GetFormFields;
@@ -29,7 +30,7 @@ import com.exactprosystems.remotehand.web.actions.GetFormFields;
  */
 public class WebConfiguration extends Configuration{
 
-	private static final Logger logger = Logger.getLogger(WebConfiguration.class);
+	private static final Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
 
 	public static final Browser DEF_BROWSER = Browser.FIREFOX;
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
@@ -194,7 +195,7 @@ public class WebConfiguration extends Configuration{
 				}
 				catch (IOException e)
 				{
-					logger.error(e);
+					logger.error("Exception during close connection to file: {}.", fileName, e);
 				}
 		}
 		return properties;
