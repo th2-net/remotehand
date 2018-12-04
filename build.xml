@@ -61,7 +61,10 @@
 						lib/jackson-core-2.4.2.jar
 						lib/jackson-annotations-2.4.0.jar
 						lib/jackson-databind-2.4.2.jar
-						lib/clearth_core_rh_data.jar" />
+						lib/clearth_core_rh_data.jar
+						lib/slf4j-api-1.6.4.jar
+						lib/slf4j-log4j12-1.6.4.jar"
+				/>
 				<attribute name="Implementation-Title" value="RemoteHand" />
 				<attribute name="Implementation-Vendor" value="Exactpro Systems" />
 				<attribute name="Implementation-Vendor-Id" value="com.exactprosystems" />
