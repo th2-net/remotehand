@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2018, Exactpro Systems LLC
+ * Copyright (c) 2009-2019, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
