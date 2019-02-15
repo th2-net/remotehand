@@ -70,7 +70,7 @@ public class DownloadFile extends WebAction {
 			try {
 				String[] list = (String[]) context.getContextData().remove(FILES_KEY);
 				if (list == null)
-					throw new ScriptExecuteException("Doesn't have a snapshot. Execute with type 'snapshot' first.");
+					throw new ScriptExecuteException("No snapshot. Execute with type 'snapshot' first.");
 				int iteration = 0;
 				do {
 					iteration++;
