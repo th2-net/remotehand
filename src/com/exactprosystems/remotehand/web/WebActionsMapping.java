@@ -26,8 +26,9 @@ public class WebActionsMapping
 	private enum WebActionName
 	{
 		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox,
-		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot, SwitchWindow, UploadFile, CloseWindow
-		, Select, DownloadFile, GetCurrentURL, SetZoom;
+		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot, SwitchWindow, UploadFile, CloseWindow, 
+		Select, DownloadFile, GetCurrentURL, SetZoom,
+		DurationStart, GetDuration;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -70,10 +71,12 @@ public class WebActionsMapping
 		case SwitchWindow:         return new SwitchWindow();
 		case UploadFile:           return new UploadFile();
 		case CloseWindow:          return new CloseWindow();
-		case Select: 			   return new Select();
-		case DownloadFile: 		   return new DownloadFile();
-		case GetCurrentURL: 	   return new GetCurrentURL();
-		case SetZoom: 	   		   return new SetZoom();
+		case Select:			 			   return new Select();
+		case DownloadFile:	 		   return new DownloadFile();
+		case GetCurrentURL: 		   return new GetCurrentURL();
+		case SetZoom: 	   			   return new SetZoom();
+		case DurationStart:				 return new DurationStart();
+		case GetDuration:					 return new GetDuration();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}

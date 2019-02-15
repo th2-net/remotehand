@@ -187,7 +187,7 @@ PRESSKEY
 #action,#key
 PressKey,#tab#
 
-Allow to send one of keys specified for SendKeys action without reference to locator.
+Allows to send one of keys specified for SendKeys action without reference to locator.
 
 
 SENDKEYSTOACTIVE
@@ -195,7 +195,7 @@ SENDKEYSTOACTIVE
 #action,#text,#text2
 SendKeysToActive,text,text2
 
-Allow to send text to active element as SendKeys but without reference to locator.
+Allows to send text to active element like SendKeys but without reference to locator.
 
 
 UPLOADFILE
@@ -203,33 +203,54 @@ UPLOADFILE
 #action,#wait,#locator,#matcher,#absolutepath
 UploadFile,5,locator,matcher,absolutepath
 
-Upload the file by locator, use the absolute path to the file or the relative path of the RemoteHand directory.
+Uploads file by locator, using absolute path to the file or path relative to RemoteHand directory.
 
 
 SWITCHWINDOW
 ============
 #action,#window
 SwitchWindow,N
-The action switches the window. N is an order of opened window(e.g. 0 - is a parent window for all windows, 1 - next child window)
+
+Switches the window. N is an order of opened window (e.g. 0 - is a parent window for all windows, 1 - next child window)
 
 
 CLOSEWINDOW
 ===========
 #action
 CloseWindow
-The action closes currently opened window and focuses at the firstly opened window(0 window).
+
+Closes currently opened window and focuses at the firstly opened window (0 window).
 
 GetCurrentURL
 ===========
 #action
 GetCurrentURL
-The Action returns active open window URL.
+
+Returns URL of active open window
 
 SetZoom
 =======
 #action,#value
 SetZoom,140%
-The Action set zoom value for current page. Possible formats: 140% / 1.4 .
+
+Sets zoom value for current page. Possible formats: 140% / 1.4 .
+
+DurationStart
+=======
+#action,#id
+DurationStart,Start1
+
+Sets start of period to measure duration. ID is used for reference in further GetDuration actions.
+
+GetDuration
+=======
+#action,#StartId,#Name
+GetDuration,Start1,Period1
+
+Returns duration of period from DurationStart action till this action. 
+DurationStart action is taken by ID specified in optional StartId parameter. If no StartId is specified, last DurationStart action is taken.
+Name parameter is used in action result. Example of result:
+Duration Period1: 20275
 
 
 NOTES
