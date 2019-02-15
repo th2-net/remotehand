@@ -18,6 +18,7 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.exactprosystems.remotehand.ActionsLauncher;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
@@ -26,7 +27,8 @@ public class GetDuration extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(GetDuration.class);
 	protected static final String PARAM_STARTID = "startid",
-			PARAM_NAME = "name";
+			PARAM_NAME = "name",
+			CONTEXT_LAST_GET_DURATION = "LastGetDuration";
 	
 	@Override
 	public boolean isNeedLocator()
@@ -61,9 +63,13 @@ public class GetDuration extends WebAction
 		String id = params.get(PARAM_STARTID);
 		if (StringUtils.isEmpty(id))
 		{
-			start = (Long)context.getContextData().get(DurationStart.CONTEXT_LAST_DURATION_START);
+			start = (Long)context.getContextData().get(CONTEXT_LAST_GET_DURATION);
 			if (start == null)
-				throw new ScriptExecuteException("No 'DurationStart' action executed to measure duration");
+			{
+				start = (Long)context.getContextData().get(DurationStart.CONTEXT_LAST_DURATION_START);
+				if (start == null)
+					start = (Long)context.getContextData().get(ActionsLauncher.CONTEXT_SCRIPT_START);
+			}
 		}
 		else
 		{

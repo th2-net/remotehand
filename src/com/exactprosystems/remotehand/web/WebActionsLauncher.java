@@ -35,6 +35,7 @@ public class WebActionsLauncher extends ActionsLauncher
 	@Override
 	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
+		super.beforeActions(context);
 		checkWebDriver((WebSessionContext) context);
 	}
 
