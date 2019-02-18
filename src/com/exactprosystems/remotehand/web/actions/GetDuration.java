@@ -51,7 +51,7 @@ public class GetDuration extends WebAction
 	@Override
 	public String[] getMandatoryParams() throws ScriptCompileException
 	{
-		return new String[] {PARAM_NAME};
+		return new String[] {PARAM_NAME, PARAM_STARTID};
 	}
 	
 	@Override
@@ -61,22 +61,9 @@ public class GetDuration extends WebAction
 				end = System.currentTimeMillis();
 		
 		String id = params.get(PARAM_STARTID);
-		if (StringUtils.isEmpty(id))
-		{
-			start = (Long)context.getContextData().get(CONTEXT_LAST_GET_DURATION);
-			if (start == null)
-			{
-				start = (Long)context.getContextData().get(DurationStart.CONTEXT_LAST_DURATION_START);
-				if (start == null)
-					start = (Long)context.getContextData().get(ActionsLauncher.CONTEXT_SCRIPT_START);
-			}
-		}
-		else
-		{
-			start = (Long)context.getContextData().get(DurationStart.buildDurationStartId(id));
-			if (start == null)
-				throw new ScriptExecuteException("No 'DurationStart' action executed with ID='"+id+"'");
-		}
+		start = (Long)context.getContextData().get(DurationStart.buildDurationStartId(id));
+		if (start == null)
+			throw new ScriptExecuteException("No 'DurationStart' action executed with ID='"+id+"'");
 		
 		return "Duration "+params.get(PARAM_NAME)+": "+(end-start);
 	}
