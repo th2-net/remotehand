@@ -1,3 +1,52 @@
+ABOUT REMOTEHAND
+****************
+RemoteHand is a tool to automate web GUI actions.
+It is written in Java and uses Selenium to interact with web GUI via browser.
+RemoteHand can be used by supplying it a script to execute. Or it can receive scripts from external source, e.g. ClearTH.
+Anyway, scripts are multiheader CSV files similar to (but not the same as) ClearTH matrices.
+
+
+STARTING REMOTEHAND
+*******************
+RemoteHand is written in Java and is started as usual Java application:
+java -jar remotehand.jar
+
+There are two modes for RemoteHand to work: 
+1. to execute actions from given script file;
+2. to wait for commands from external source, e.g. ClearTH.
+
+
+To start RemoteHand in 1st mode, use the following command:
+java -jar remotehand.jar -input <script file> -output <file for script output>
+
+Optional parameter is:
+-dynamicinput <additional script file>
+
+It makes RemoteHand wait for new script to arrive in specified file. After executing this script, RemoteHand will remove it and wait for new one.
+
+
+To start RemoteHand in 2nd mode, use the following command:
+java -jar remotehand.jar -httpserver
+
+In this mode RemoteHand will wait for script from HTTP request and send its output as HTTP response. In this mode ClearTH triggers RemoteHand to operate.
+
+
+CONFIGURATION
+*************
+RemoteHand can be configured by using config.ini file.
+Alternative configuration file can be specified in optional -config parameter like this:
+java -jar remotehand.jar -input <script file> -output <file for script output> -config <path to config>
+
+
+A WORD ABOUT SELENIUM DRIVERS
+*****************************
+RemoteHand uses Selenium to interact with web GUI, thus it needs a browser available for automation.
+Automation via Selenium is done by using special drivers, sometimes specific for particular version of browser.
+Please use the following URL to find the latest drivers for your browser:
+https://www.seleniumhq.org/download/
+
+
+
 LIST OF ACTIONS
 ***************
 Here is the list of currently supported actions of RemoteHand with possible parameters and descriptions.
