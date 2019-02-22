@@ -64,7 +64,7 @@ public class WaitForNew extends WebAction
 		{
 			(new WebDriverWait(webDriver, seconds)).until(new ExpectedCondition<Boolean>()
 			{
-				List<WebElement> previusElements = null;
+				List<WebElement> previousElements = null;
 
 				@Override
 				public Boolean apply(WebDriver driver)
@@ -72,9 +72,9 @@ public class WaitForNew extends WebAction
 					List<WebElement> elements = driver.findElements(webLocator);
 
 					boolean foundEquals = false;
-					if (previusElements != null)
+					if (previousElements != null)
 					{
-						foundEquals = elements.equals(previusElements);
+						foundEquals = elements.equals(previousElements);
 
 						if (!foundEquals)
 							try
@@ -87,7 +87,7 @@ public class WaitForNew extends WebAction
 							}
 					}
 
-					previusElements = elements;
+					previousElements = elements;
 
 					return foundEquals;
 				}
