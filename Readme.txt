@@ -270,29 +270,31 @@ CloseWindow
 
 Closes currently opened window and focuses at the firstly opened window (0 window).
 
-GetCurrentURL
+
+GETCURRENTURL
 ===========
 #action
 GetCurrentURL
 
 Returns URL of active open window
 
-SetZoom
+
+SETZOOM
 =======
 #action,#value
 SetZoom,140%
 
 Sets zoom value for current page. Possible formats: 140% / 1.4 .
 
-DurationStart
-=======
+DURATIONSTART
+=============
 #action,#id
 DurationStart,Start1
 
 Sets start of period to measure duration. ID is used for reference in further GetDuration actions.
 
-GetDuration
-=======
+GETDURATION
+===========
 #action,#StartId,#Name
 GetDuration,Start1,Period1
 
@@ -300,6 +302,25 @@ Returns duration of period from DurationStart action till this action.
 DurationStart action is taken by ID specified in optional StartId parameter. If no StartId is specified, last DurationStart action is taken.
 Name parameter is used in action result. Example of result:
 Duration Period1: 20275
+
+
+GETELEMENTSCREENSHOT
+===========
+#action,#wait,#locator,#matcher,#id
+GetElementScreenshot,5,locator,matcher,screen_id
+
+Optionally waits <wait> seconds for element specified by <matcher> and takes its screenshot, storing it under <id>. Element is found using <locator>.
+Streenshot is stored for furhter verification for changes via WaitForChanges action.
+
+
+WAITFORCHANGES
+===========
+#action,#seconds,#checkmillis,#locator,#matcher,#screenshotId
+WaitForChanges,20,50,locator,matcher,screen_id
+
+Waits <seconds> for changes in element specified by <matcher> and found by using <locator>. 
+Changes are found by comparing element screenshot with the one stored under <id>.
+Check for changes is performed (i.e. new screenshot is taken) every <checkmillis> milliseconds.
 
 
 NOTES

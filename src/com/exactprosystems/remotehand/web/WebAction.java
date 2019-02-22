@@ -10,8 +10,11 @@
 
 package com.exactprosystems.remotehand.web;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.RhUtils;
@@ -37,6 +42,8 @@ import org.slf4j.Logger;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 import static java.lang.String.format;
+
+import java.awt.image.BufferedImage;
 
 public abstract class WebAction extends Action
 {
@@ -306,6 +313,69 @@ public abstract class WebAction extends Action
 			return null;
 		}
 	}
+	
+	
+	private BufferedImage bytesToImage(byte[] bytes) throws IOException
+	{
+		InputStream is = new ByteArrayInputStream(bytes);
+		try
+		{
+			return ImageIO.read(is);
+		}
+		finally
+		{
+			is.close();
+		}
+	}
+	
+	private byte[] imageToBytes(BufferedImage image) throws IOException
+	{
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try
+		{
+			ImageIO.write(image, "jpg", os);
+		}
+		finally
+		{
+			os.close();
+		}
+		return os.toByteArray();
+	}
+	
+	protected byte[] takeElementScreenshot(WebDriver webDriver, WebElement element) throws ScriptExecuteException
+	{
+		TakesScreenshot takesScreenshot = (TakesScreenshot)webDriver;
+		try
+		{
+			BufferedImage fullscreen = bytesToImage(takesScreenshot.getScreenshotAs(OutputType.BYTES));
+			
+			Point p = element.getLocation();
+			Dimension size = element.getSize();
+			BufferedImage elementImage = fullscreen.getSubimage(p.getX(), p.getY(), size.getWidth(), size.getHeight());
+			return imageToBytes(elementImage);
+		}
+		catch (WebDriverException wde)
+		{
+			throw new ScriptExecuteException("Unable to create screenshot of element: " + wde.getMessage(), wde);
+		}
+		catch (IOException e)
+		{
+			throw new ScriptExecuteException("Error while processing screenshot of element", e);
+		}
+		catch (RuntimeException e)
+		{
+			String msg = "Unexpected error while trying to create screenshot of element";
+			logError(msg, e);
+			throw new ScriptExecuteException(msg);
+		}
+	}
+	
+	protected byte[] takeElementScreenshot(WebDriver webDriver, By webLocator) throws ScriptExecuteException
+	{
+		WebElement element = findElement(webDriver, webLocator);
+		return takeElementScreenshot(webDriver, element);
+	}
+	
 	
 	protected void logError(String msg)
 	{
