@@ -22,8 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class ActionsLauncher
 {
 	private static final Logger logger = LoggerFactory.getLogger(ActionsLauncher.class);
-	public static final String CONTEXT_SCRIPT_START = "ScriptStart";
-
+	
 	ScriptProcessorThread parent = null;
 
 	public ActionsLauncher(ScriptProcessorThread parentThread)
@@ -71,8 +70,5 @@ public class ActionsLauncher
 		return parent != null ? parent.getSessionId() : RhUtils.SESSION_FOR_FILE_MODE;
 	}
 	
-	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException
-	{
-		context.getContextData().put(CONTEXT_SCRIPT_START, System.currentTimeMillis());
-	}
+	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException { }
 }

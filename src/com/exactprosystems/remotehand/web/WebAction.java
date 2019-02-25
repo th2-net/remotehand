@@ -130,8 +130,14 @@ public abstract class WebAction extends Action
 	@Override
 	public void beforeExecute()
 	{
-		if(context.getContextData().isEmpty())
+		if(context == null || context.getContextData() == null || context.getContextData().isEmpty())
+		{
+			if (context == null)
+				getLogger().warn("Context is null");
+			else if (context.getContextData() == null)
+				getLogger().warn("ContextData is null");
 			return;
+		}
 
 		for (Map.Entry<String, String> param : params.entrySet())
 		{
