@@ -348,6 +348,17 @@ public abstract class WebAction extends Action
 		return os.toByteArray();
 	}
 	
+	private int getElementScreenshotSize(int elementPos, int elementSize, int screenSize) throws ScriptExecuteException
+	{
+		if (elementPos > screenSize)
+			throw new ScriptExecuteException("Element position ("+elementPos+") is outside of screen ("+screenSize+")");
+		
+		if (elementPos+elementSize <= screenSize)
+			return elementSize;
+		else
+			return screenSize-elementPos;
+	}
+	
 	protected byte[] takeElementScreenshot(WebDriver webDriver, WebElement element) throws ScriptExecuteException
 	{
 		TakesScreenshot takesScreenshot = (TakesScreenshot)webDriver;
@@ -357,7 +368,10 @@ public abstract class WebAction extends Action
 			
 			Point p = element.getLocation();
 			Dimension size = element.getSize();
-			BufferedImage elementImage = fullscreen.getSubimage(p.getX(), p.getY(), size.getWidth(), size.getHeight());
+			int width = getElementScreenshotSize(p.getX(), size.getWidth(), fullscreen.getWidth()),
+					height = getElementScreenshotSize(p.getY(), size.getHeight(), fullscreen.getHeight());
+			BufferedImage elementImage = fullscreen.getSubimage(p.getX(), p.getY(), 
+					width, height);
 			return imageToBytes(elementImage);
 		}
 		catch (WebDriverException wde)
