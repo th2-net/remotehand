@@ -35,7 +35,7 @@ public class Configuration
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
 	public final String DEF_FILE_STORAGE = "generated/";
 
-	public final String PARAM_PARAM_PORT = "Port",
+	public final String PARAM_PORT = "Port",
 			PARAM_DELIMITER = "Delimiter",
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire",
