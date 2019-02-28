@@ -57,7 +57,7 @@ public class DownloadFile extends WebAction {
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		String type = params.get("actiontype");
-		File downloadDir = this.context.getDonwloadDir();
+		File downloadDir = this.context.getDownloadDir();
 		if ("snapshot".equalsIgnoreCase(type)) {
 			String[] fileList = downloadDir.list();
 			context.getContextData().put(FILES_KEY, fileList);

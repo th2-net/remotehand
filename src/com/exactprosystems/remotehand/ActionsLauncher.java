@@ -11,7 +11,7 @@
 package com.exactprosystems.remotehand;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

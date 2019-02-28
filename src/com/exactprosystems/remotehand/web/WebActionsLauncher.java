@@ -12,7 +12,8 @@ package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.*;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionContext;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
@@ -84,6 +85,6 @@ public class WebActionsLauncher extends ActionsLauncher
 	{
 		logger.info("Trying to create new driver...");
 		WebDriverManager driverManager = context.getWebDriverManager();
-		context.setWebDriver(driverManager.createWebDriver(context.getSessionId(), context.getDonwloadDir()));
+		context.setWebDriver(driverManager.createWebDriver(context.getSessionId(), context.getDownloadDir()));
 	}
 }

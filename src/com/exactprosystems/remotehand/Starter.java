@@ -18,7 +18,9 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionWatcher;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -29,8 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 
-import com.exactprosystems.remotehand.http.HTTPServer;
-import com.exactprosystems.remotehand.http.SessionWatcher;
+import com.exactprosystems.remotehand.http.HTTPServerMode;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
@@ -124,16 +125,9 @@ public class Starter
 		if (serverMode)
 		{
 			// starting HTTP Server
-			if (!HTTPServer.createServer(manager.createLoginHandler()))
+			if (!HTTPServerMode.init(manager.createLogonHandler()))
 				logger.info("Application stopped with error");
-
-			// starting threads watcher
-			final SessionWatcher watcher;
-			if ((watcher = SessionWatcher.getWatcher()) != null)
-				new Thread(watcher).start();
-			else
-				logger.info("Thread watcher is not running");
-
+			startSessionWatcher();
 		}
 		else
 		{
@@ -271,6 +265,15 @@ public class Starter
 	{
 		logger.info("Application stopped");
 		System.exit(1);
+	}
+	
+	private static void startSessionWatcher()
+	{
+		SessionWatcher watcher;
+		if ((watcher = SessionWatcher.getWatcher()) != null)
+			new Thread(watcher).start();
+		else
+			logger.info("Thread watcher is not running");
 	}
 	
 	private static void cleanUpAfterFail(ActionsLauncher launcher, ScriptCompiler compiler, SessionContext context)

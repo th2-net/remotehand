@@ -11,8 +11,10 @@
 package com.exactprosystems.remotehand.uiautomation;
 
 import com.exactprosystems.remotehand.*;
-import com.exactprosystems.remotehand.http.LoginHandler;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.http.HttpLogonHandler;
+import com.exactprosystems.remotehand.sessions.LogonHandler;
+import com.exactprosystems.remotehand.sessions.SessionContext;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
@@ -56,7 +58,7 @@ public class UIARemoteHandManager implements IRemoteHandManager{
 	}
 
 	@Override
-	public LoginHandler createLoginHandler() {
-		return new LoginHandler(this);
+	public LogonHandler createLogonHandler() {
+		return new HttpLogonHandler(this);
 	}
 }

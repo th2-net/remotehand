@@ -10,8 +10,9 @@
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.remotehand.http.SessionContext;
 import org.openqa.selenium.WebDriver;
+
+import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import java.io.File;
 
@@ -23,7 +24,7 @@ public class WebSessionContext extends SessionContext
 	private WebDriverManager webDriverManager;
 	private WebDriver webDriver;
 	private WebElementsDictionary dictionary;
-	private File donwloadDir;
+	private File downloadDir;
 
 	public WebSessionContext(String sessionId)
 	{
@@ -60,11 +61,11 @@ public class WebSessionContext extends SessionContext
 		this.dictionary = dictionary;
 	}
 
-	public File getDonwloadDir() {
-		return donwloadDir;
+	public File getDownloadDir() {
+		return downloadDir;
 	}
 
-	public void setDonwloadDir(File donwloadDir) {
-		this.donwloadDir = donwloadDir;
+	public void setDownloadDir(File donwloadDir) {
+		this.downloadDir = donwloadDir;
 	}
 }

@@ -11,7 +11,7 @@
 package com.exactprosystems.remotehand;
 
 import com.csvreader.CsvReader;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import java.io.*;
 import java.util.HashMap;

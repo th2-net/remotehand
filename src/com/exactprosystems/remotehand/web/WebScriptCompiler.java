@@ -28,7 +28,7 @@ import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptCompiler;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 

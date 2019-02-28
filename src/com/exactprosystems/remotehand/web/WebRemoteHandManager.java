@@ -11,8 +11,10 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.*;
-import com.exactprosystems.remotehand.http.LoginHandler;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.http.HttpLogonHandler;
+import com.exactprosystems.remotehand.sessions.LogonHandler;
+import com.exactprosystems.remotehand.sessions.SessionContext;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.openqa.selenium.WebDriver;
@@ -51,7 +53,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	{
 		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
 		File downloadDir = WebUtils.createDownloadDirectory();
-		webSessionContext.setDonwloadDir(downloadDir);
+		webSessionContext.setDownloadDir(downloadDir);
 		webSessionContext.setWebDriverManager(webDriverManager);
 		webSessionContext.setWebDriver(webDriverManager.createWebDriver(sessionId, downloadDir));
 		return webSessionContext;
@@ -66,20 +68,20 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public void close(SessionContext sessionContext) 
 	{
 		if (sessionContext == null)
-			return;		
+			return;
 		WebSessionContext webSessionContext = (WebSessionContext) sessionContext;
 		WebDriver webDriver = webSessionContext.getWebDriver();
 		if (webDriver != null)
 			webDriverManager.closeWebDriver(webDriver, webSessionContext.getSessionId());
-		File donwloadDir = webSessionContext.getDonwloadDir();
+		File downloadDir = webSessionContext.getDownloadDir();
 		File[] tmp;
-		if (donwloadDir != null && (tmp = donwloadDir.listFiles()) != null && tmp.length == 0) {
-			donwloadDir.delete();
+		if (downloadDir != null && (tmp = downloadDir.listFiles()) != null && tmp.length == 0) {
+			downloadDir.delete();
 		}
 	}
 
 	@Override
-	public LoginHandler createLoginHandler() {
-		return new WebLoginHandler(this);
+	public LogonHandler createLogonHandler() {
+		return new HttpLogonHandler(this);
 	}
 }

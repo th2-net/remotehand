@@ -14,7 +14,7 @@ import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptCompiler;
-import com.exactprosystems.remotehand.http.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
