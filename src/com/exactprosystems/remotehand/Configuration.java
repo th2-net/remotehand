@@ -11,6 +11,7 @@
 package com.exactprosystems.remotehand;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,24 +29,24 @@ public class Configuration
 	public final String PROPERTY_NOT_SET = "Property '%s' is not set. Using default value = '%s'";
 
 	public final String CONFIG_FILE_NAME = "config.ini";
-	public final int DEF_SRV_PORT = 8008;
+	public final int DEF_PORT = 8008;
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
 	public final String DEF_FILE_STORAGE = "generated/";
 
-	public final String PARAM_PORT = "Port",
+	public final String PARAM_PARAM_PORT = "Port",
 			PARAM_DELIMITER = "Delimiter",
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire",
 			PARAM_FILE_STORAGE = "DefaultFileStorage";
-
-	private volatile int httpServerPort;
+	
+	private volatile int port;
 	private volatile char scriptDelimiter;
 	private volatile char scriptTextQualifier;
 	private volatile int sessionExpire;
 	private volatile File fileStorage;
-
+	
 	protected Configuration(CommandLine commandLine)
 	{
 		if (instance != null) {
@@ -83,12 +84,12 @@ public class Configuration
 
 		try
 		{
-			httpServerPort = Integer.parseInt(properties.getProperty(PARAM_PORT));
+			port = Integer.parseInt(properties.getProperty(PARAM_PORT));
 		}
 		catch (Exception ex)
 		{
-			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_PORT, DEF_SRV_PORT));
-			httpServerPort = DEF_SRV_PORT;
+			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_PORT, DEF_PORT));
+			port = DEF_PORT;
 		}
 
 		final String delim = getProperty(PARAM_DELIMITER);
@@ -134,13 +135,12 @@ public class Configuration
 			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
 			fileStorage = new File(DEF_FILE_STORAGE);
 		}
-
 	}
 	
 	protected Properties getDefaultProperties()
 	{
 		Properties defProperties = new Properties();
-		defProperties.setProperty(PARAM_PORT, String.valueOf(DEF_SRV_PORT));
+		defProperties.setProperty(PARAM_PORT, String.valueOf(DEF_PORT));
 		defProperties.setProperty(PARAM_DELIMITER, String.valueOf(DEF_DELIMITER));
 		defProperties.setProperty(PARAM_TEXT_QUALIFIER, String.valueOf(DEF_TEXT_QUALIFIER));
 		defProperties.setProperty(PARAM_SESSIONEXPIRE, String.valueOf(DEF_SESSION_EXPIRE));
@@ -168,9 +168,9 @@ public class Configuration
 		return scriptTextQualifier;
 	}
 
-	public int getHttpServerPort()
+	public int getPort()
 	{
-		return httpServerPort;
+		return port;
 	}
 
 	public int getSessionExpire()
