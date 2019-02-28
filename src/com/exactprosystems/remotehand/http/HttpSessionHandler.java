@@ -27,7 +27,7 @@ import com.exactprosystems.remotehand.sessions.SessionHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import io.netty.util.CharsetUtil;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static com.exactprosystems.remotehand.RhUtils.logInfo;
 
@@ -65,7 +65,7 @@ public class HttpSessionHandler extends SessionHandler implements HttpHandler
 		String method = exchange.getRequestMethod();
 		if (method.equalsIgnoreCase("POST"))
 		{
-			String body = IOUtils.toString(exchange.getRequestBody(), CharsetUtil.UTF_8);
+			String body = IOUtils.toString(exchange.getRequestBody(), UTF_8);
 			List<String> contTypeList = exchange.getRequestHeaders().get("Content-type");
 			List<String> transFNs = exchange.getRequestHeaders().get("Transfer-filename");
 			if (contTypeList != null && !contTypeList.isEmpty() && "application/octet-stream".equals(contTypeList.get(0)) 
