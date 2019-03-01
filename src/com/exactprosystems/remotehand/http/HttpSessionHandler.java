@@ -29,8 +29,6 @@ import com.sun.net.httpserver.HttpHandler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import static com.exactprosystems.remotehand.RhUtils.logInfo;
-
 public class HttpSessionHandler extends SessionHandler implements HttpHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(HttpSessionHandler.class);
