@@ -42,6 +42,12 @@ public abstract class SessionHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(SessionHandler.class);
 	
+	//Result codes are the same as for HTTP as it is main interaction protocol for RemoteHand
+	public static final int CODE_SUCCESS = 200,
+			CODE_ERROR = 500,
+			CODE_BAD = 400,
+			CODE_NOTFOUND = 404;
+	
 	private final String id;
 
 	private ScriptProcessorThread scriptProcessor = null;
@@ -176,12 +182,12 @@ public abstract class SessionHandler
 	
 	protected void sendSuccessMessage(SessionExchange exchange, String message) throws IOException
 	{
-		sendMessage(exchange, 200, message);
+		sendMessage(exchange, CODE_SUCCESS, message);
 	}
 	
 	protected void sendErrorMessage(SessionExchange exchange, String message) throws IOException
 	{
-		sendMessage(exchange, 500, message);
+		sendMessage(exchange, CODE_ERROR, message);
 	}
 	
 	protected void sendBusyMessage(SessionExchange exchange) throws IOException

@@ -10,8 +10,10 @@
 
 package com.exactprosystems.remotehand.http;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 import com.exactprosystems.remotehand.sessions.SessionExchange;
 import com.sun.net.httpserver.HttpExchange;
@@ -36,6 +38,18 @@ public class HttpSessionExchange implements SessionExchange
 		OutputStream os = exchange.getResponseBody();
 		os.write(message.getBytes());
 		os.close();
+	}
+	
+	@Override
+	public void sendFile(int code, File f, String type, String name) throws IOException
+	{
+		exchange.sendResponseHeaders(200, f.length());
+		exchange.getResponseHeaders().set("Content-Type", type);
+		exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename="+name);
+		try (OutputStream os = exchange.getResponseBody())
+		{
+			Files.copy(f.toPath(), os);
+		}
 	}
 	
 	@Override

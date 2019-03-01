@@ -8,17 +8,12 @@
  * information which is the property of Exactpro Systems LLC or its licensors.
  ******************************************************************************/
 
-package com.exactprosystems.remotehand.sessions;
-
-import java.io.File;
-import java.io.IOException;
+package com.exactprosystems.remotehand.requests;
 
 /**
- * Adapter for various mechanisms to interact with requestor
+ * This class is not used by HTTP server mode as logon requests are handled by separate HTTP handler bound to particular URL.
+ * Useful for other protocols like TCP/IP
  */
-public interface SessionExchange
+public class LogonRequest implements RhRequest
 {
-	void sendResponse(int code, String message) throws IOException;
-	void sendFile(int code, File f, String type, String name) throws IOException;
-	String getRemoteAddress();
 }

@@ -45,7 +45,7 @@ public abstract class LogonHandler
 	
 	protected void sendResponse(SessionExchange exchange, String response) throws IOException
 	{
-		exchange.sendResponse(200, response);
+		exchange.sendResponse(SessionHandler.CODE_SUCCESS, response);
 	}
 	
 	public IRemoteHandManager getManager()

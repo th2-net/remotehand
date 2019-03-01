@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.sessions.DownloadHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class HTTPServerMode
 		try {
 			server = HttpServer.create(new InetSocketAddress(HTTP_SRV_PORT), 0);
 			server.createContext(LOGIN_LISTENER, (HttpLogonHandler)logonHandler);
-			server.createContext(DOWNLOAD_LISTENER, new DownloadHandler());
+			server.createContext(DOWNLOAD_LISTENER, new HttpDownloadHandler(new DownloadHandler()));
 			server.setExecutor(null); // creates a default executor
 			server.start();
 
