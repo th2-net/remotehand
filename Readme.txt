@@ -160,6 +160,13 @@ GetElement,5,locator,matcher
 Optionally waits <wait> seconds for element specified by <matcher> and prints value of its outerHTML. Element is found using <locator>.
 Optional parameter <id> defines identifier to make references to element text in next actions: if <id>="Button", @{Button} is a reference to text of found element.
 
+GETELEMENTVALUE
+==========
+#action,#wait,#locator,#matcher
+GetElementValue,5,locator,matcher
+
+Allow to obtain element value. For example value of tag <input>
+
 
 GETDYNAMICTABLE
 ===============

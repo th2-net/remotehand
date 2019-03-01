@@ -25,10 +25,10 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetDynamicTable, ScrollTo, PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox,
-		GetFromCanvasTable, MTableGetValue, MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot, SwitchWindow, UploadFile, CloseWindow, 
-		Select, DownloadFile, GetCurrentURL, SetZoom,
-		DurationStart, GetDuration,
+		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetElementValue, GetDynamicTable, ScrollTo,
+		PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox, GetFromCanvasTable, MTableGetValue,
+		MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot,
+		SwitchWindow, UploadFile, CloseWindow, Select, DownloadFile, GetCurrentURL, SetZoom, DurationStart, GetDuration,
 		GetElementScreenshot, WaitForChanges;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
@@ -52,6 +52,7 @@ public class WebActionsMapping
 		case WaitForNew :          return new WaitForNew();
 		case Wait :	               return new Wait();
 		case GetElement :          return new GetElement();
+		case GetElementValue :     return new GetElementValue();
 		case GetDynamicTable :     return new GetDynamicTable();
 		case ScrollTo :            return new ScrollTo();
 		case PageSource :          return new PageSource();
