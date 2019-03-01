@@ -65,13 +65,13 @@ public class HttpSessionHandler extends SessionHandler implements HttpHandler
 		String method = exchange.getRequestMethod();
 		if (method.equalsIgnoreCase("POST"))
 		{
-			String body = IOUtils.toString(exchange.getRequestBody(), UTF_8);
 			List<String> contTypeList = exchange.getRequestHeaders().get("Content-type");
 			List<String> transFNs = exchange.getRequestHeaders().get("Transfer-filename");
 			if (contTypeList != null && !contTypeList.isEmpty() && "application/octet-stream".equals(contTypeList.get(0)) 
 					&& transFNs != null && !transFNs.isEmpty())
-				return new FileUploadRequest(transFNs.get(0), body);
+				return new FileUploadRequest(transFNs.get(0), IOUtils.toByteArray(exchange.getRequestBody()));
 			
+			String body = IOUtils.toString(exchange.getRequestBody(), UTF_8);
 			return new ExecutionRequest(body);
 		}
 		else if (method.equalsIgnoreCase("GET"))
