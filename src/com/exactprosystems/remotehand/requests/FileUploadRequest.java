@@ -12,10 +12,10 @@ package com.exactprosystems.remotehand.requests;
 
 public class FileUploadRequest implements RhRequest
 {
-	private final String fileName,
-			contents;
+	private final String fileName;
+	private final byte[] contents;
 	
-	public FileUploadRequest(String fileName, String contents)
+	public FileUploadRequest(String fileName, byte[] contents)
 	{
 		this.fileName = fileName;
 		this.contents = contents;
@@ -27,7 +27,7 @@ public class FileUploadRequest implements RhRequest
 		return fileName;
 	}
 	
-	public String getContents()
+	public byte[] getContents()
 	{
 		return contents;
 	}

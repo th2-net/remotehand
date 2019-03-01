@@ -14,11 +14,10 @@ import static com.exactprosystems.remotehand.RhUtils.logError;
 import static com.exactprosystems.remotehand.RhUtils.logInfo;
 import static java.lang.String.format;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,31 +103,15 @@ public abstract class SessionHandler
 			}
 		}
 		
-		BufferedWriter writer = null;
 		try
 		{
-			String contents = request.getContents();
-			writer = new BufferedWriter(new FileWriter(f, false));
-			writer.write(contents);
+			byte[] contents = request.getContents();
+			FileUtils.writeByteArrayToFile(f, contents, false);
 			sendSuccessMessage(exchange, "OK");
 		}
 		catch (Exception e)
 		{
 			logger.error("Could not write file.", e);
-		}
-		finally
-		{
-			if (writer != null)
-			{
-				try
-				{
-					writer.close();
-				}
-				catch (IOException e)
-				{
-					logger.error("Error while closing file writer", e);
-				}
-			}
 		}
 	}
 	

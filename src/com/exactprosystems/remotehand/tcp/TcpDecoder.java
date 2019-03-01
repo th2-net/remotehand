@@ -58,10 +58,22 @@ public class TcpDecoder extends ByteToMessageDecoder
 	}
 	
 	
-	private String readString(ByteBuf in, int length) throws UnsupportedEncodingException
+	private byte[] readBytes(ByteBuf in, int length) throws UnsupportedEncodingException
 	{
 		byte[] bytes = new byte[length];
 		in.readBytes(bytes);
+		return bytes;
+	}
+	
+	private byte[] readBytes(ByteBuf in) throws UnsupportedEncodingException
+	{
+		int length = in.readInt();
+		return readBytes(in, length);
+	}
+	
+	private String readString(ByteBuf in, int length) throws UnsupportedEncodingException
+	{
+		byte[] bytes = readBytes(in, length);
 		return new String(bytes, CharsetUtil.UTF_8);
 	}
 	
@@ -70,6 +82,7 @@ public class TcpDecoder extends ByteToMessageDecoder
 		int length = in.readInt();
 		return readString(in, length);
 	}
+	
 	
 	private RhRequest readRhRequest(ByteBuf in, TcpRequestType type) throws Exception
 	{
@@ -80,8 +93,8 @@ public class TcpDecoder extends ByteToMessageDecoder
 			return new ExecutionRequest(script);
 		case STATUS : return new ExecutionStatusRequest();
 		case FILE :
-			String fileName = readString(in),
-					contents = readString(in);
+			String fileName = readString(in);
+			byte[] contents = readBytes(in);
 			return new FileUploadRequest(fileName, contents);
 		case DOWNLOAD : 
 			String fileType = readString(in),
