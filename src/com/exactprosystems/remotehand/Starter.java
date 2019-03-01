@@ -20,6 +20,7 @@ import java.util.jar.Manifest;
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.sessions.SessionWatcher;
+import com.exactprosystems.remotehand.tcp.TcpClientMode;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -71,6 +72,7 @@ public class Starter
 
 
 		Option enableServerMode = OptionBuilder.isRequired(false).withDescription("Work in HTTP Server mode").create("httpserver"),
+				enableTcpClientMode = OptionBuilder.isRequired(false).withDescription("Work in TCP/IP client mode").create("tcpclient"),
 				inputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify input path name.").create("input"),
 				outputName = OptionBuilder.withArgName("file").hasArg().withDescription("Specify output path name.").create("output"),
 				dynamicInputName = OptionBuilder.withArgName("file").hasArg().withDescription("Dynamically added input file with further commands").create("dynamicinput"),
@@ -81,6 +83,7 @@ public class Starter
 
 		Options options = new Options();
 		options.addOption(enableServerMode);
+		options.addOption(enableTcpClientMode);
 		options.addOption(inputName);
 		options.addOption(outputName);
 		options.addOption(dynamicInputName);
@@ -105,7 +108,8 @@ public class Starter
 			closeApp();
 		}
 
-		Boolean serverMode = line.hasOption(enableServerMode.getOpt());
+		boolean httpServerMode = line.hasOption(enableServerMode.getOpt()),
+				tcpClientMode = line.hasOption(enableTcpClientMode.getOpt());
 		String input = line.getOptionValue(inputName.getOpt());
 		String output = line.getOptionValue(outputName.getOpt());
 		String dynInput = line.getOptionValue(dynamicInputName.getOpt());
@@ -115,17 +119,42 @@ public class Starter
 			manager.createConfiguration(line);
 		}
 
-		if (!serverMode && (input == null || output == null))
+		if (!httpServerMode && !tcpClientMode && (input == null || output == null))
 		{
 			printHelp(options);
 			closeApp();
 		}
 
+		//In any mode RemoteHand handles requests from ClearTH.
+		//Requests flow should start with "logon" request, for which RemoteHand will assign a sessionID and return it to ClearTH for further reference.
 
-		if (serverMode)
+		if (httpServerMode)
 		{
-			// starting HTTP Server
+			//In HTTP server mode RemoteHand waits for requests from ClearTH. 
+			//Once logon request is received, RemoteHand adds HttpSessionHandler to HTTP server, binding it to URL equal to sessionID.
+			//ClearTH sends further requests to that URL directly.
+			//This way multiple simultaneous sessions are handled by HTTP server nature.
+			
 			if (!HTTPServerMode.init(manager.createLogonHandler()))
+				logger.info("Application stopped with error");
+			startSessionWatcher();
+		}
+		else if (tcpClientMode)
+		{
+			//In TCP client mode RemoteHand connects to ClearTH, telling that it is ready to serve.
+			//ClearTH sends logon request before sending commands to execute.
+			//Once logon request is received, RemoteHand adds TcpSessionHandler to session pool. 
+			//Further requests from ClearTH must contain sessionID. Requests must have the following structure:
+			
+			//int requestType
+			//int totalSize
+			//int sessionIdLength
+			//String sessionId
+			//...other values depending on request type...
+			
+			//This way multiple simultaneous sessions can be handled by directing particular request to corresponding TcpSessionHandler.
+			
+			if (!TcpClientMode.init(version, manager))
 				logger.info("Application stopped with error");
 			startSessionWatcher();
 		}

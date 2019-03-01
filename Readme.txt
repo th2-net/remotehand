@@ -28,7 +28,15 @@ It makes RemoteHand wait for new script to arrive in specified file. After execu
 To start RemoteHand in 2nd mode, use the following command:
 java -jar remotehand.jar -httpserver
 
-In this mode RemoteHand will wait for script from HTTP request and send its output as HTTP response. In this mode ClearTH triggers RemoteHand to operate.
+In this mode RemoteHand will wait for script from HTTP request and send its output as HTTP response. 
+RemoteHand will use "Port" setting from config.ini to start HTTP server on.
+This mode is usual for ClearTH to trigger RemoteHand to operate.
+
+Alternatively, you can make RemoteHand connect to ClearTH to serve further requests:
+java -jar remotehand.jar -tcpclient
+
+In this mode RemoteHand connects to ClearTH via TCP/IP. ClearTH after that can trigger Remotehand to operate using connected socket.
+RemoteHand will use "Host" and "Port" settings from config.ini to connect to.
 
 
 CONFIGURATION

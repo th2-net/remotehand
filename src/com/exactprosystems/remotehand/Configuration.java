@@ -33,14 +33,17 @@ public class Configuration
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
-	public final String DEF_FILE_STORAGE = "generated/";
+	public final String DEF_FILE_STORAGE = "generated/",
+			DEF_HOST = "localhost";
 
-	public final String PARAM_PORT = "Port",
+	public final String PARAM_HOST = "Host",
+			PARAM_PORT = "Port",
 			PARAM_DELIMITER = "Delimiter",
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire",
 			PARAM_FILE_STORAGE = "DefaultFileStorage";
 	
+	private volatile String host;
 	private volatile int port;
 	private volatile char scriptDelimiter;
 	private volatile char scriptTextQualifier;
@@ -81,7 +84,15 @@ public class Configuration
 				logger.warn(String.format("An error occurred while closing file '%s'.", configFileName), e);
 			}
 		}
-
+		
+		
+		host = properties.getProperty(PARAM_HOST);
+		if (StringUtils.isBlank(host))
+		{
+			host = DEF_HOST;
+			logger.info(String.format("Property '%s' is empty. Using default value = <%s>", PARAM_HOST, host));
+		}
+		
 		try
 		{
 			port = Integer.parseInt(properties.getProperty(PARAM_PORT));
@@ -166,6 +177,11 @@ public class Configuration
 	public char getTextQualifier()
 	{
 		return scriptTextQualifier;
+	}
+	
+	public String getHost()
+	{
+		return host;
 	}
 
 	public int getPort()
