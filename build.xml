@@ -66,6 +66,7 @@
 						lib/jackson-databind-2.4.2.jar
 						lib/javacsv.jar
 						lib/log4j-1.2.16.jar
+						lib/netty-all-4.1.33.Final.jar
 						lib/okhttp-3.11.0.jar
 						lib/okio-1.14.0.jar
 						lib/selenium-java-3.141.59.jar
