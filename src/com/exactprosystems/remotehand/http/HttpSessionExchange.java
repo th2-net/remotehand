@@ -43,9 +43,9 @@ public class HttpSessionExchange implements SessionExchange
 	@Override
 	public void sendFile(int code, File f, String type, String name) throws IOException
 	{
-		exchange.sendResponseHeaders(200, f.length());
 		exchange.getResponseHeaders().set("Content-Type", type);
 		exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename="+name);
+		exchange.sendResponseHeaders(200, f.length());
 		try (OutputStream os = exchange.getResponseBody())
 		{
 			Files.copy(f.toPath(), os);
