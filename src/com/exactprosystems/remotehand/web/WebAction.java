@@ -39,6 +39,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.interactions.Locatable;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 
@@ -106,7 +107,14 @@ public abstract class WebAction extends Action
 	{
 		try
 		{
-			new WebDriverWait(webDriver, seconds).until(driver -> driver.findElements(webLocator).size() > 0);
+			new WebDriverWait(webDriver, seconds).until(new ExpectedCondition<Boolean>()
+			{
+				@Override
+				public Boolean apply(WebDriver webDriver)
+				{
+					return webDriver.findElements(webLocator).size() > 0;
+				}
+			});
 			logInfo("Appeared locator: '%s'", webLocator);
 		}
 		catch (TimeoutException ex)
