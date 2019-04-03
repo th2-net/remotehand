@@ -10,49 +10,39 @@
 
 package com.exactprosystems.remotehand.web;
 
-import java.awt.*;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.actions.GetScreenshot;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
-
+import com.jhlabs.image.PosterizeFilter;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 import static java.lang.String.format;
-
-import java.awt.image.BufferedImage;
 
 public abstract class WebAction extends Action
 {
 	protected static final String PARAM_WAIT = "wait", PARAM_NOTFOUNDFAIL = "notfoundfail";
 	
-	protected static final float DEFAULT_COMPRESSION_QUALITY = 0.3f;
+	protected static final String SCREENSHOT_EXTENSION = ".png";
 	protected static final SimpleDateFormat SCREENSHOT_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 	
 	protected String[] mandatoryParams;
@@ -241,7 +231,7 @@ public abstract class WebAction extends Action
 			logWarn("Cannot scroll %s.", webLocator);
 	}
 	
-	protected String takeScreenshot(String name, float compressionQuality) throws ScriptExecuteException
+	protected String takeScreenshot(String name) throws ScriptExecuteException
 	{
 		WebDriver webDriver = context.getWebDriver();
 		if (!(webDriver instanceof TakesScreenshot))
@@ -252,18 +242,17 @@ public abstract class WebAction extends Action
 		createScreenshotsDirIfNeeded(storageDirPath);
 		try
 		{
-			File tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE),
-					compressedFile = File.createTempFile("compressedScreenshot", ".jpg");
-			compressAndSaveImage(tmpFile, compressedFile, compressionQuality);
+			File tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+			// Use "posterization" method to reduce screenshot file's size
+			BufferedImage sourceImage = ImageIO.read(tmpFile),
+					filteredImage = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+			PosterizeFilter posterizeFilter = new PosterizeFilter();
+			posterizeFilter.setNumLevels(10);
+			posterizeFilter.filter(sourceImage, filteredImage);
+			ImageIO.write(filteredImage, "png", tmpFile);
 			
-			// Save file with the least length
-			boolean isCompressedFile = compressedFile.length() < tmpFile.length();
-			String fileName = createScreenshotFileName(name, isCompressedFile ? ".jpg" : ".png");
-			saveScreenshot(isCompressedFile ? compressedFile : tmpFile, storageDirPath.resolve(fileName));
-			// Remove created temporary files at once
-			tmpFile.delete();
-			compressedFile.delete();
-			
+			String fileName = createScreenshotFileName(name);
+			saveScreenshot(tmpFile, storageDirPath.resolve(fileName));
 			return fileName;
 		}
 		catch (WebDriverException wde)
@@ -272,7 +261,7 @@ public abstract class WebAction extends Action
 		}
 		catch (IOException e)
 		{
-			throw new ScriptExecuteException("Couldn't compress and save screenshot", e);
+			throw new ScriptExecuteException("Couldn't apply 'posterization' effect for made screenshot", e);
 		}
 		catch (RuntimeException e)
 		{
@@ -297,9 +286,9 @@ public abstract class WebAction extends Action
 		}
 	}
 	
-	private String createScreenshotFileName(String name, String extension)
+	private String createScreenshotFileName(String name)
 	{
-		return (name != null ? name : "screenshot") + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + extension;
+		return (name != null ? name : "screenshot") + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + SCREENSHOT_EXTENSION;
 	}
 	
 	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
@@ -320,49 +309,12 @@ public abstract class WebAction extends Action
 	{
 		try
 		{
-			return takeScreenshot(null, DEFAULT_COMPRESSION_QUALITY);
+			return takeScreenshot(null);
 		}
 		catch (ScriptExecuteException e)
 		{
 			logError("Unable to create screenshot.", e);
 			return null;
-		}
-	}
-	
-	private void compressAndSaveImage(File sourceFile, File targetFile, float compressionQuality) throws IOException
-	{
-		boolean isSourceJpeg = FilenameUtils.getExtension(sourceFile.getName()).matches("^jpe?g$");
-		if (!isSourceJpeg)
-		{
-			// Convert to JPEG because compression could be made only with such image type
-			BufferedImage pngImage = ImageIO.read(sourceFile),
-					jpegImage = new BufferedImage(pngImage.getWidth(), pngImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-			jpegImage.createGraphics().drawImage(pngImage, 0, 0, Color.WHITE, null);
-			ImageIO.write(jpegImage, "jpg", targetFile);
-		}
-		
-		// Make image compression to specified level
-		ImageWriter imgWriter = null;
-		try
-		{
-			BufferedImage sourceImg = ImageIO.read(isSourceJpeg ? sourceFile : targetFile);
-			Iterator<ImageWriter> imgWriters = ImageIO.getImageWritersByFormatName("jpg");
-			if (imgWriters.hasNext())
-				imgWriter = imgWriters.next();
-			else
-				throw new IOException("Image writer for 'jpg' format hasn't been found.");
-			imgWriter.setOutput(ImageIO.createImageOutputStream(new FileOutputStream(targetFile)));
-			
-			ImageWriteParam writeParam = imgWriter.getDefaultWriteParam();
-			writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-			writeParam.setCompressionQuality(compressionQuality);
-			
-			imgWriter.write(null, new IIOImage(sourceImg, null, null), writeParam);
-		}
-		finally
-		{
-			if (imgWriter != null)
-				imgWriter.dispose();
 		}
 	}
 	
