@@ -18,6 +18,8 @@ import java.util.Map;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +96,7 @@ public class SendKeys extends WebAction
 			String text = params.get(PARAM_TEXT);
 			text = replaceConversions(text);
 
-			sendText(input, text);
+			sendText(webDriver, input, text);
 			logInfo("Sent text: %s to: %s.", text, webLocator);
 
 
@@ -127,7 +129,7 @@ public class SendKeys extends WebAction
 
 			if (needRun)
 			{
-				sendText(input, text2);
+				sendText(webDriver, input, text2);
 				logInfo("Sent text2 to: %s.", webLocator);
 			}
 		}
@@ -138,24 +140,32 @@ public class SendKeys extends WebAction
 		}
 		return null;
 	}
-
-	protected void sendText(WebElement input, String text)
+	
+	protected void sendText(WebDriver webDriver, WebElement input, String text)
 	{
-		List<String> strings = processInputText(text);
-		for (String s : strings)
-			if (!s.startsWith(KEY_SIGN))
-				input.sendKeys(s);
+		for (String str : processInputText(text))
+		{
+			if (!str.startsWith(KEY_SIGN))
+			{
+				// Send string by every character to avoid bug about missed/confused chars
+				for (int i = 0; i < str.length(); i++)
+				{
+					input.sendKeys(Character.toString(str.charAt(i)));
+					new WebDriverWait(webDriver, 5).until(ExpectedConditions.attributeContains(input, "value", str.substring(0, i)));
+				}
+			}
 			else
 			{
-				CharSequence k = getKeysByLabel(s.substring(1));
+				CharSequence k = getKeysByLabel(str.substring(1));
 				if (k != null)
 					input.sendKeys(k);
 			}
+		}
 	}
 	
 	protected static List<String> processInputText(String text)
 	{
-		List<String> strings = new ArrayList<String>();
+		List<String> strings = new ArrayList<>();
 		boolean afterKey = false;
 		for (String s : text.split("(?=#)"))
 		{
