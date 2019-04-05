@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
 public class Click extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(Click.class);
+	
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", BUTTON = "button",
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
-	
 	
 	@Override
 	public boolean isNeedLocator()
@@ -41,19 +41,19 @@ public class Click extends WebAction
 	{
 		return true;
 	}
-
+	
 	@Override
 	public boolean isCanSwitchPage()
 	{
 		return true;
 	}
-
+	
 	@Override
 	protected Logger getLogger()
 	{
 		return logger;
 	}
-
+	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
@@ -81,15 +81,14 @@ public class Click extends WebAction
 			{
 				logError("xOffset or yOffset is not integer value");
 			}
-			actions = actions.moveToElement(element,xOffset,yOffset);
+			actions = actions.moveToElement(element, xOffset, yOffset);
 		}
 		else
-		{
 			actions = actions.moveToElement(element);
-		}
+		logInfo("Moved to element: %s", webLocator);
 		
-		
-		try {
+		try
+		{
 			if (button.equals(LEFT))
 				actions.click().perform();
 			else if (button.equals(RIGHT))
@@ -106,42 +105,34 @@ public class Click extends WebAction
 			}
 			
 			logInfo("Clicked %s button on: '%s'.", button, webLocator);
-				
-		} catch (ElementNotVisibleException e) {
-			logError("Element is not visible" ,e);
-
+		}
+		catch (ElementNotVisibleException e)
+		{
+			logError("Element is not visible. Executing click by JavaScript command" ,e);
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 			js.executeScript("arguments[0].click();", element);
-
 		}
-
-		
-
 		return null;
 	}
-
+	
 	@Override
-	protected boolean waitForElement(WebDriver driver, int waitDuration, By locator) throws ScriptExecuteException {
-
-		try {
+	protected boolean waitForElement(WebDriver driver, int waitDuration, By locator) throws ScriptExecuteException
+	{
+		try
+		{
 			new WebDriverWait(driver, waitDuration).until(ExpectedConditions.elementToBeClickable(locator));
-
 			logInfo("Appeared locator: '%s'.", locator);
 		}
-		catch (TimeoutException ex)  {
+		catch (TimeoutException ex)
+		{
 			List<WebElement> elements = driver.findElements(locator);
-			if (elements.size() > 0) {
-				logWarn("Element is not clickable, but try to click on it.");
-			} else {
-				if (isElementMandatory())
-					throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");
-				else
-					return false;
-			}
+			if (elements.size() > 0)
+				logWarn("Element is not clickable, but will try to click on it anyway");
+			else if (isElementMandatory())
+				throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");
+			else
+				return false;
 		}
-
 		return true;
-
 	}
-
 }

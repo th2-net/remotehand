@@ -32,16 +32,17 @@ import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 public class SendKeys extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(SendKeys.class);
+	
 	private static final String PARAM_TEXT = "text",
-			PARAM_TEXT2 = PARAM_TEXT+"2",
-			PARAM_WAIT2 = PARAM_WAIT+"2",
-			PARAM_LOCATOR2 = WebScriptCompiler.WEB_LOCATOR+"2",
-			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER+"2",
+			PARAM_TEXT2 = PARAM_TEXT + "2",
+			PARAM_WAIT2 = PARAM_WAIT + "2",
+			PARAM_LOCATOR2 = WebScriptCompiler.WEB_LOCATOR + "2",
+			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER + "2",
 			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled",
 			HASH = "#hash";
-
+	
 	public SendKeys()
 	{
 		super.mandatoryParams = new String[]{PARAM_TEXT};
@@ -58,28 +59,23 @@ public class SendKeys extends WebAction
 	{
 		return true;
 	}
-
+	
 	@Override
 	public boolean isCanSwitchPage()
 	{
 		return true;
 	}
-
+	
 	@Override
 	protected Logger getLogger()
 	{
 		return logger;
 	}
-
+	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement input;
-		if (webLocator != null)
-			input = findElement(webDriver, webLocator);
-		else
-			input = webDriver.switchTo().activeElement();
-		
+		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
 		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
 		try
 		{
@@ -92,20 +88,21 @@ public class SendKeys extends WebAction
 				input.clear();
 				logInfo("Text field has been cleared.");
 			}
-
+			
 			String text = params.get(PARAM_TEXT);
 			text = replaceConversions(text);
-
+			
+			logInfo("Sending text to matcher1: %s", webLocator);
 			sendText(webDriver, input, text);
 			logInfo("Sent text: %s to: %s.", text, webLocator);
-
-
+			
+			
 			if (!params.containsKey(PARAM_TEXT2) || params.get(PARAM_TEXT2) == null)
 				return null;
-
+			
 			String text2 = params.get(PARAM_TEXT2);
 			text2 = replaceConversions(text2);
-
+			
 			boolean needRun = true;
 			if ((params.containsKey(PARAM_WAIT2)) && (!params.get(PARAM_WAIT2).isEmpty()))
 			{
@@ -126,11 +123,12 @@ public class SendKeys extends WebAction
 				else
 					Wait.webWait(webDriver, wait2);
 			}
-
+			
 			if (needRun)
 			{
+				logInfo("Sending text to matcher2: %s", webLocator);
 				sendText(webDriver, input, text2);
-				logInfo("Sent text2 to: %s.", webLocator);
+				logInfo("Sent text2 to: %s", webLocator);
 			}
 		}
 		finally
@@ -148,10 +146,11 @@ public class SendKeys extends WebAction
 			if (!str.startsWith(KEY_SIGN))
 			{
 				// Send string by every character to avoid bug about missed/confused chars
+				WebDriverWait wait = new WebDriverWait(webDriver, 5);
 				for (int i = 0; i < str.length(); i++)
 				{
 					input.sendKeys(Character.toString(str.charAt(i)));
-					new WebDriverWait(webDriver, 5).until(ExpectedConditions.attributeContains(input, "value", str.substring(0, i)));
+					wait.until(ExpectedConditions.attributeContains(input, "value", str.substring(0, i)));
 				}
 			}
 			else
@@ -201,7 +200,7 @@ public class SendKeys extends WebAction
 		String firstKey = s.substring(1, plusIndex != -1 ? plusIndex : s.length()).toLowerCase();
 		return KEYS.containsKey(firstKey);
 	}
-
+	
 	public static CharSequence getKeysByLabel(String label)
 	{
 		if (label.contains("+"))
@@ -229,21 +228,22 @@ public class SendKeys extends WebAction
 	protected void enable(WebDriver driver, WebElement input)
 	{
 		logInfo("Try to enable element");
-		((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('disabled')", input);
+		((JavascriptExecutor)driver).executeScript("arguments[0].removeAttribute('disabled')", input);
 		logInfo("Now element is " + (input.isEnabled() ? "enabled" : "still disabled"));
 	}
 	
 	protected void disable(WebDriver driver, WebElement input)
 	{
 		logInfo("Try to disable element");
-		((JavascriptExecutor) driver).executeScript("arguments[0].setAttribute('disabled', '')", input);
+		((JavascriptExecutor)driver).executeScript("arguments[0].setAttribute('disabled', '')", input);
 		logInfo("Now element is " + (input.isEnabled() ? "still enabled" : "disabled"));
 	}
 
-	protected static String replaceConversions(String src) {
+	protected static String replaceConversions(String src)
+	{
 		return src.replace("(","#openbracket#").replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath());
 	}
-
+	
 	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
 		put("up", Keys.UP);
 		put("down", Keys.DOWN);
