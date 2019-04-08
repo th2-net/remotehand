@@ -18,8 +18,7 @@ import java.util.Map;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +75,7 @@ public class SendKeys extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
-		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
+		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params), isChromeDriver = webDriver instanceof ChromeDriver;
 		try
 		{
 			if (shouldBeEnabled)
@@ -92,8 +91,8 @@ public class SendKeys extends WebAction
 			String text = params.get(PARAM_TEXT);
 			text = replaceConversions(text);
 			
-			logInfo("Sending text to matcher1: %s", webLocator);
-			sendText(webDriver, input, text);
+			logInfo("Sending text1 to: %s", webLocator);
+			sendText(input, text, isChromeDriver);
 			logInfo("Sent text: %s to: %s.", text, webLocator);
 			
 			
@@ -126,8 +125,8 @@ public class SendKeys extends WebAction
 			
 			if (needRun)
 			{
-				logInfo("Sending text to matcher2: %s", webLocator);
-				sendText(webDriver, input, text2);
+				logInfo("Sending text2 to: %s", webLocator);
+				sendText(input, text2, isChromeDriver);
 				logInfo("Sent text2 to: %s", webLocator);
 			}
 		}
@@ -139,18 +138,21 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	protected void sendText(WebDriver webDriver, WebElement input, String text)
+	protected void sendText(WebElement input, String text, boolean checkInput)
 	{
 		for (String str : processInputText(text))
 		{
 			if (!str.startsWith(KEY_SIGN))
 			{
-				// Send string by every character to avoid bug about missed/confused chars
-				WebDriverWait wait = new WebDriverWait(webDriver, 5);
-				for (int i = 0; i < str.length(); i++)
+				int previousInputLength = input.getAttribute("value").length();
+				input.sendKeys(str);
+				
+				if (checkInput && !input.getAttribute("value").substring(previousInputLength).equals(str))
 				{
-					input.sendKeys(Character.toString(str.charAt(i)));
-					wait.until(ExpectedConditions.attributeContains(input, "value", str.substring(0, i)));
+					// If field not filled as expected for current moment, restart operation at all
+					logInfo("Missed input detected. Trying to resend keys newly..");
+					input.clear();
+					sendText(input, text, true);
 				}
 			}
 			else
