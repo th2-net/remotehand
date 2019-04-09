@@ -144,7 +144,7 @@ public class SendKeys extends WebAction
 		{
 			if (!str.startsWith(KEY_SIGN))
 			{
-				int previousInputLength = input.getAttribute("value").length();
+				int previousInputLength = input.getAttribute("value").replace(input.getAttribute("placeholder"), "").length();
 				input.sendKeys(str);
 				
 				if (checkInput && !input.getAttribute("value").substring(previousInputLength).equals(str))
