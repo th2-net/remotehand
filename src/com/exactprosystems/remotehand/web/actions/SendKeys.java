@@ -140,14 +140,15 @@ public class SendKeys extends WebAction
 	
 	protected void sendText(WebElement input, String text, boolean checkInput)
 	{
+		String inputAtStart = input.getAttribute("value");
 		for (String str : processInputText(text))
 		{
 			if (!str.startsWith(KEY_SIGN))
 			{
-				int previousInputLength = input.getAttribute("value").replace(input.getAttribute("placeholder"), "").length();
+				int inputPrevLength = input.getAttribute("value").replaceFirst(inputAtStart, "").length();
 				input.sendKeys(str);
 				
-				if (checkInput && !input.getAttribute("value").substring(previousInputLength).equals(str))
+				if (checkInput && !input.getAttribute("value").replaceFirst(inputAtStart, "").substring(inputPrevLength).equals(str))
 				{
 					// If field not filled as expected for current moment, restart operation at all
 					logInfo("Missed input detected. Trying to resend keys newly..");
