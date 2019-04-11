@@ -140,13 +140,19 @@ public class SendKeys extends WebAction
 	
 	protected void sendText(WebElement input, String text, boolean checkInput)
 	{
+		logInfo("Text at start: " + input.getAttribute("value"));
+		logInfo("Placeholder at start: " + input.getAttribute("placeholder"));
 		String inputAtStart = input.getAttribute("value");
 		for (String str : processInputText(text))
 		{
 			if (!str.startsWith(KEY_SIGN))
 			{
+				logInfo("Text before sendKeys: " + input.getAttribute("value"));
+				logInfo("Placeholder before sendKeys: " + input.getAttribute("placeholder"));
 				int inputPrevLength = input.getAttribute("value").replaceFirst(inputAtStart, "").length();
 				input.sendKeys(str);
+				logInfo("Text after sendKeys: " + input.getAttribute("value"));
+				logInfo("Placeholder after sendKeys: " + input.getAttribute("placeholder"));
 				
 				if (checkInput && !input.getAttribute("value").replaceFirst(inputAtStart, "").substring(inputPrevLength).equals(str))
 				{
