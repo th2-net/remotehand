@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
@@ -140,21 +141,15 @@ public class SendKeys extends WebAction
 	
 	protected void sendText(WebElement input, String text, boolean checkInput)
 	{
-		logInfo("Text at start: " + input.getAttribute("value"));
-		logInfo("Placeholder at start: " + input.getAttribute("placeholder"));
 		String inputAtStart = input.getAttribute("value");
 		for (String str : processInputText(text))
 		{
 			if (!str.startsWith(KEY_SIGN))
 			{
-				logInfo("Text before sendKeys: " + input.getAttribute("value"));
-				logInfo("Placeholder before sendKeys: " + input.getAttribute("placeholder"));
-				int inputPrevLength = input.getAttribute("value").replaceFirst(inputAtStart, "").length();
+				int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
 				input.sendKeys(str);
-				logInfo("Text after sendKeys: " + input.getAttribute("value"));
-				logInfo("Placeholder after sendKeys: " + input.getAttribute("placeholder"));
 				
-				if (checkInput && !input.getAttribute("value").replaceFirst(inputAtStart, "").substring(inputPrevLength).equals(str))
+				if (checkInput && !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
 				{
 					// If field not filled as expected for current moment, restart operation at all
 					logInfo("Missed input detected. Trying to resend keys newly..");
