@@ -34,6 +34,7 @@ public class WebConfiguration extends Configuration{
 
 	public static final Browser DEF_BROWSER = Browser.FIREFOX;
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
+	public static final String DEF_EDGEDRIVER_PATH = "MicrosoftWebDriver.exe";
 	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
 	public static final String DEF_FIREFOXDRIVER_PATH = "geckodriver.exe";
 	public static final String DEF_PROXY = "";
@@ -42,6 +43,7 @@ public class WebConfiguration extends Configuration{
 	
 	public static final String PARAM_BROWSER = "Browser";
 	public static final String PARAM_IEDRIVERPATH = "IEDriverPath";
+	public static final String PARAM_EDGEDRIVERPATH = "EdgeDriverPath";
 	public static final String PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
 	public static final String PARAM_FIREFOXDRIVERPATH = "FirefoxDriverPath";
 	public static final String PARAM_HTTPPROXY = "HttpProxy";
@@ -64,7 +66,7 @@ public class WebConfiguration extends Configuration{
 	private static final Level DEF_LOG_LEVEL = Level.OFF;
 
 	private volatile Browser browserToUse;
-	private final String ieDriverFileName, chromeDriverFileName, firefoxDriverFileName, httpProxySetting, sslProxySetting, 
+	private final String ieDriverFileName, edgeDriverFileName, chromeDriverFileName, firefoxDriverFileName, httpProxySetting, sslProxySetting,
 		ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary, defaultLocator;
 	
 	private final Level browserLoggingLevel;
@@ -89,6 +91,7 @@ public class WebConfiguration extends Configuration{
 		profilePath = loadProperty(properties, PARAM_PROFILE, "temporary profile");
 		
 		ieDriverFileName = loadProperty(properties, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
+		edgeDriverFileName = loadProperty(properties, PARAM_EDGEDRIVERPATH, DEF_EDGEDRIVER_PATH);
 		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
 		firefoxDriverFileName = loadProperty(properties, PARAM_FIREFOXDRIVERPATH, DEF_FIREFOXDRIVER_PATH);
 		binary = loadProperty(properties, PARAM_BINARY, "");
@@ -210,7 +213,12 @@ public class WebConfiguration extends Configuration{
 	{
 		return ieDriverFileName;
 	}
-
+	
+	public String getEdgeDriverFileName()
+	{
+		return edgeDriverFileName;
+	}
+	
 	public String getChromeDriverFileName()
 	{
 		return chromeDriverFileName;

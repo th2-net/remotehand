@@ -12,9 +12,10 @@ package com.exactprosystems.remotehand.web;
 
 public enum Browser
 {
-	FIREFOX("Firefox"),
 	IE("IE"),
+	EDGE("Edge"),
 	CHROME("Chrome"),
+	FIREFOX("Firefox"),
 	INVALID("");
 
 	private String label;

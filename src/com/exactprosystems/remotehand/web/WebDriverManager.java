@@ -22,6 +22,8 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
@@ -97,6 +99,7 @@ public class WebDriverManager
 		switch (configuration.getBrowserToUse())
 		{
 			case IE :       return createIeDriver(configuration, dc);
+			case EDGE:      return createEdgeDriver(configuration, dc);
 			case CHROME :   return createChromeDriver(configuration, dc, downloadDir);
 			default :       return createFirefoxDriver(configuration, dc);
 		}
@@ -111,11 +114,30 @@ public class WebDriverManager
 		try
 		{
 			System.setProperty("webdriver.ie.driver", cfg.getIeDriverFileName());
-			return (dc != null) ? new InternetExplorerDriver(new InternetExplorerOptions(dc)) : new InternetExplorerDriver();
+			return dc != null ? new InternetExplorerDriver(new InternetExplorerOptions(dc)) : new InternetExplorerDriver();
 		}
 		catch (Exception e)
 		{
 			throw new RhConfigurationException("Unable to create Internet Explorer driver: " + e.getMessage(), e);
+		}
+	}
+	
+	private EdgeDriver createEdgeDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	{
+		try
+		{
+			System.setProperty("webdriver.edge.driver", cfg.getEdgeDriverFileName());
+			EdgeOptions options = new EdgeOptions();
+			if (dc != null)
+			{
+				for (Entry<String, Object> capability : dc.asMap().entrySet())
+					options.setCapability(capability.getKey(), capability.getValue());
+			}
+			return new EdgeDriver(options);
+		}
+		catch (Exception e)
+		{
+			throw new RhConfigurationException("Unable to create Microsoft Edge driver: " + e.getMessage(), e);
 		}
 	}
 	
@@ -157,7 +179,7 @@ public class WebDriverManager
 		try
 		{
 			System.setProperty("webdriver.gecko.driver", cfg.getFirefoxDriverFileName());
-			return (dc != null) ? new FirefoxDriver(new FirefoxOptions(dc)) : new FirefoxDriver();
+			return dc != null ? new FirefoxDriver(new FirefoxOptions(dc)) : new FirefoxDriver();
 		}
 		catch (Exception e)
 		{
