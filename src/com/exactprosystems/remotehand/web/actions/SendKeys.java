@@ -20,6 +20,7 @@ import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Locatable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,7 +155,10 @@ public class SendKeys extends WebAction
 					// If field not filled as expected for current moment, restart operation at all
 					logInfo("Missed input detected. Trying to resend keys newly..");
 					input.clear();
+					if (!input.isDisplayed())
+						((Locatable)input).getCoordinates().inViewPort();
 					sendText(input, text, true);
+					return;
 				}
 			}
 			else
