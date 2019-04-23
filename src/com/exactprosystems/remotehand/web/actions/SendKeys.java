@@ -10,25 +10,23 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Locatable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class SendKeys extends WebAction
 {
@@ -77,7 +75,7 @@ public class SendKeys extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
-		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params), isChromeDriver = webDriver instanceof ChromeDriver;
+		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
 		try
 		{
 			if (shouldBeEnabled)
@@ -94,7 +92,7 @@ public class SendKeys extends WebAction
 			text = replaceConversions(text);
 			
 			logInfo("Sending text1 to: %s", webLocator);
-			sendText(input, text, isChromeDriver);
+			sendText(input, text, webDriver, webLocator);
 			logInfo("Sent text: %s to: %s.", text, webLocator);
 			
 			
@@ -128,7 +126,7 @@ public class SendKeys extends WebAction
 			if (needRun)
 			{
 				logInfo("Sending text2 to: %s", webLocator);
-				sendText(input, text2, isChromeDriver);
+				sendText(input, text2, webDriver, webLocator);
 				logInfo("Sent text2 to: %s", webLocator);
 			}
 		}
@@ -140,7 +138,7 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	protected void sendText(WebElement input, String text, boolean checkInput)
+	protected void sendText(WebElement input, String text, WebDriver driver, By locator) throws ScriptExecuteException
 	{
 		String inputAtStart = input.getAttribute("value");
 		for (String str : processInputText(text))
@@ -150,15 +148,20 @@ public class SendKeys extends WebAction
 				int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
 				input.sendKeys(str);
 				
-				if (checkInput && !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
+				if (driver instanceof ChromeDriver
+						&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
 				{
 					// If field not filled as expected for current moment, restart operation at all
 					logInfo("Missed input detected. Trying to resend keys newly..");
-					input.clear();
-					if (!input.isDisplayed())
-						((Locatable)input).getCoordinates().inViewPort();
-					sendText(input, text, true);
-					return;
+					
+					if (waitForElement(driver, 10, locator))
+					{
+						input.clear();
+						sendText(input, text, driver, locator);
+						return;
+					}
+					else
+						throw new ScriptExecuteException("Current locator specifies to not interactable element. Input couldn't be resend");
 				}
 			}
 			else
