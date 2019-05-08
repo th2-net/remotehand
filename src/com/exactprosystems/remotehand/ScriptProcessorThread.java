@@ -23,12 +23,12 @@ public class ScriptProcessorThread implements Runnable
 {
 	private static final Logger logger = LoggerFactory.getLogger(ScriptProcessorThread.class);
 
-	private boolean switchOn = true, 
+	private volatile boolean switchOn = true, 
 			busy = true, 
 			close = false;
 
-	private String script;
-	private RhScriptResult lastResult;
+	private volatile String script;
+	private volatile RhScriptResult lastResult;
 
 	private final String sessionId;
 	private final ActionsLauncher launcher;
@@ -109,6 +109,7 @@ public class ScriptProcessorThread implements Runnable
 
 	private void closeThread()
 	{
+		RhUtils.logInfo(logger, sessionId, "Closing thread");
 		this.rhmanager.close(sessionContext);
 		switchOn = false;
 	}
