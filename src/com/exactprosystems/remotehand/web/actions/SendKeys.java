@@ -145,7 +145,7 @@ public class SendKeys extends WebAction
 	protected void sendText(WebElement input, String text, WebDriver driver, By locator) throws ScriptExecuteException
 	{
 		String inputAtStart = input.getAttribute("value");
-		List<String> strings = text == null || text.isEmpty() ? Collections.emptyList() : processInputText(text);
+		List<String> strings = text == null || text.isEmpty() ? Collections.<String>emptyList() : processInputText(text);
 		for (String str : strings)
 		{
 			if (!str.startsWith(KEY_SIGN))
