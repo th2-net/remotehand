@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,9 @@ public class SendKeys extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
+		if (webLocator == null) {
+			logInfo("Active element: %s" , input != null ? input.getTagName() : "null");
+		}
 		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
 		try
 		{
@@ -141,10 +145,16 @@ public class SendKeys extends WebAction
 	protected void sendText(WebElement input, String text, WebDriver driver, By locator) throws ScriptExecuteException
 	{
 		String inputAtStart = input.getAttribute("value");
-		for (String str : processInputText(text))
+		List<String> strings = text == null || text.isEmpty() ? Collections.emptyList() : processInputText(text);
+		for (String str : strings)
 		{
 			if (!str.startsWith(KEY_SIGN))
 			{
+				if (inputAtStart == null || input.getAttribute("value") == null) {
+					logWarn("Input field does not contain value attribute. Sending text as is.");
+					input.sendKeys(str);
+					continue;
+				}
 				int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
 				input.sendKeys(str);
 				
