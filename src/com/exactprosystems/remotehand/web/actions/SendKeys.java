@@ -148,43 +148,42 @@ public class SendKeys extends WebAction
 		List<String> strings = text == null || text.isEmpty() ? Collections.<String>emptyList() : processInputText(text);
 		for (String str : strings)
 		{
-			if (!str.startsWith(KEY_SIGN))
-			{
-				if (inputAtStart == null || input.getAttribute("value") == null) {
-					logWarn("Input field does not contain value attribute. Sending text as is.");
-					input.sendKeys(str);
-					continue;
-				}
-				int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
-				input.sendKeys(str);
-				
-				if (driver instanceof ChromeDriver
-						&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
-				{
-					if (retries >= 3)
-					{
-						logWarn("Missed input detected, but too many retries were already done.");
-						return;
-					}
-					
-					// If field not filled as expected for current moment, restart operation at all
-					logInfo("Missed input detected. Trying to resend keys.");
-					
-					if (waitForElement(driver, 10, locator))
-					{
-						input.clear();
-						sendText(input, text, driver, locator, retries+1);
-						return;
-					}
-					else
-						throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
-				}
-			}
-			else
+			if (str.startsWith(KEY_SIGN))
 			{
 				CharSequence k = getKeysByLabel(str.substring(1));
 				if (k != null)
 					input.sendKeys(k);
+				continue;
+			}
+			
+			if (inputAtStart == null || input.getAttribute("value") == null) {
+					logWarn("Input field does not contain value attribute. Sending text as is.");
+					input.sendKeys(str);
+				continue;
+			}
+			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
+			input.sendKeys(str);
+			
+			if (driver instanceof ChromeDriver
+					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
+			{
+				if (retries >= 3)
+				{
+					logWarn("Missed input detected, but too many retries were already done.");
+					return;
+				}
+				
+				// If field not filled as expected for current moment, restart operation at all
+				logInfo("Missed input detected. Trying to resend keys.");
+				
+				if (waitForElement(driver, 10, locator))
+				{
+					input.clear();
+					sendText(input, text, driver, locator, retries+1);
+					return;
+				}
+				else
+					throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
 			}
 		}
 	}
