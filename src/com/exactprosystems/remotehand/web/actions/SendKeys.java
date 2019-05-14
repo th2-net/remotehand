@@ -96,7 +96,7 @@ public class SendKeys extends WebAction
 			text = replaceConversions(text);
 			
 			logInfo("Sending text1 to: %s", webLocator);
-			sendText(input, text, webDriver, webLocator);
+			sendText(input, text, webDriver, webLocator, 0);
 			logInfo("Sent text: %s to: %s.", text, webLocator);
 			
 			
@@ -130,7 +130,7 @@ public class SendKeys extends WebAction
 			if (needRun)
 			{
 				logInfo("Sending text2 to: %s", webLocator);
-				sendText(input, text2, webDriver, webLocator);
+				sendText(input, text2, webDriver, webLocator, 0);
 				logInfo("Sent text2 to: %s", webLocator);
 			}
 		}
@@ -142,7 +142,7 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	protected void sendText(WebElement input, String text, WebDriver driver, By locator) throws ScriptExecuteException
+	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries) throws ScriptExecuteException
 	{
 		String inputAtStart = input.getAttribute("value");
 		List<String> strings = text == null || text.isEmpty() ? Collections.<String>emptyList() : processInputText(text);
@@ -161,17 +161,23 @@ public class SendKeys extends WebAction
 				if (driver instanceof ChromeDriver
 						&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
 				{
+					if (retries >= 3)
+					{
+						logWarn("Missed input detected, but too many retries were already done.");
+						return;
+					}
+					
 					// If field not filled as expected for current moment, restart operation at all
-					logInfo("Missed input detected. Trying to resend keys newly..");
+					logInfo("Missed input detected. Trying to resend keys.");
 					
 					if (waitForElement(driver, 10, locator))
 					{
 						input.clear();
-						sendText(input, text, driver, locator);
+						sendText(input, text, driver, locator, retries+1);
 						return;
 					}
 					else
-						throw new ScriptExecuteException("Current locator specifies to not interactable element. Input couldn't be resend");
+						throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
 				}
 			}
 			else
