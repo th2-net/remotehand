@@ -47,7 +47,7 @@ public class GetElement extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = findElement(webDriver, webLocator);
-		String elementHTML = getElementHtml(element);
+		String elementHTML = element.getAttribute("outerHTML");
 
 		logInfo("Obtained element: %s.", elementHTML);
 
@@ -61,10 +61,5 @@ public class GetElement extends WebAction
 		}
 
 		return id + elementHTML;
-	}
-	
-	protected String getElementHtml(WebElement element)
-	{
-		return element.getAttribute("outerHTML");
 	}
 }
