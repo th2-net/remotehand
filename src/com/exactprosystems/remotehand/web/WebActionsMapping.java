@@ -29,7 +29,7 @@ public class WebActionsMapping
 		PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox, GetFromCanvasTable, MTableGetValue,
 		MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot,
 		SwitchWindow, UploadFile, CloseWindow, Select, DownloadFile, GetCurrentURL, SetZoom, DurationStart, GetDuration,
-		GetElementScreenshot, WaitForChanges;
+		GetElementScreenshot, WaitForChanges, GetElementInnerHtml;
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -73,14 +73,15 @@ public class WebActionsMapping
 		case SwitchWindow:         return new SwitchWindow();
 		case UploadFile:           return new UploadFile();
 		case CloseWindow:          return new CloseWindow();
-		case Select:			 			   return new Select();
-		case DownloadFile:	 		   return new DownloadFile();
-		case GetCurrentURL: 		   return new GetCurrentURL();
-		case SetZoom: 	   			   return new SetZoom();
-		case DurationStart:				 return new DurationStart();
-		case GetDuration:					 return new GetDuration();
+		case Select:               return new Select();
+		case DownloadFile:         return new DownloadFile();
+		case GetCurrentURL:        return new GetCurrentURL();
+		case SetZoom:              return new SetZoom();
+		case DurationStart:        return new DurationStart();
+		case GetDuration:          return new GetDuration();
 		case GetElementScreenshot: return new GetElementScreenshot();
 		case WaitForChanges:       return new WaitForChanges();
+		case GetElementInnerHtml:  return new GetElementInnerHtml();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
