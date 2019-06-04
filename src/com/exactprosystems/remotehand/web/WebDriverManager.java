@@ -30,6 +30,8 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -98,10 +100,20 @@ public class WebDriverManager
 		DesiredCapabilities dc = createDesiredCapabilities(configuration);
 		switch (configuration.getBrowserToUse())
 		{
-			case IE :       return createIeDriver(configuration, dc);
-			case EDGE:      return createEdgeDriver(configuration, dc);
-			case CHROME :   return createChromeDriver(configuration, dc, downloadDir);
-			default :       return createFirefoxDriver(configuration, dc);
+			case IE:
+				return createIeDriver(configuration, dc);
+			case EDGE:
+				return createEdgeDriver(configuration, dc);
+			case CHROME:
+				return createChromeDriver(configuration, dc, downloadDir, false);
+			case CHROME_HEADLESS:
+				return createChromeDriver(configuration, dc, downloadDir, true);
+			case FIREFOX_HEADLESS:
+				return createFirefoxDriver(configuration, dc, true);
+			case PHANTOM_JS:
+				return createPhantomJsDriver(configuration, dc);
+			default:
+				return createFirefoxDriver(configuration, dc, false);
 		}
 	}
 
@@ -141,12 +153,17 @@ public class WebDriverManager
 		}
 	}
 	
-	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir) throws RhConfigurationException
+	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir, boolean headlessMode) throws RhConfigurationException
 	{
 		try
 		{			
 			System.setProperty("webdriver.chrome.driver", cfg.getChromeDriverFileName());
 			ChromeOptions options = new ChromeOptions();
+			if (headlessMode)
+			{
+				options.setHeadless(true);
+				options.addArguments("window-size=1920x1080");
+			}
 			options.addArguments("--no-sandbox");
 			Map<String, String> prefs = new HashMap<>(2);
 			prefs.put("profile.default_content_settings.popups", "0");
@@ -174,16 +191,44 @@ public class WebDriverManager
 		}
 	}
 	
-	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc, boolean headlessMode) throws RhConfigurationException
 	{
 		try
 		{
 			System.setProperty("webdriver.gecko.driver", cfg.getFirefoxDriverFileName());
-			return dc != null ? new FirefoxDriver(new FirefoxOptions(dc)) : new FirefoxDriver();
+			FirefoxOptions options = new FirefoxOptions();
+			if (headlessMode)
+			{
+				options.setHeadless(true);
+				options.addArguments("--width=1920");
+				options.addArguments("--height=1080");
+			}
+			
+			if (dc != null)
+			{
+				for (Entry<String, Object> capability : dc.asMap().entrySet())
+					options.setCapability(capability.getKey(), capability.getValue());
+			}
+			return new FirefoxDriver(options);
 		}
 		catch (Exception e)
 		{
 			throw new RhConfigurationException("Unable to create FireFox driver: " + e.getMessage(), e);
+		}
+	}
+	
+	private PhantomJSDriver createPhantomJsDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
+	{
+		try
+		{
+			if (dc == null)
+				dc = new DesiredCapabilities();
+			dc.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, cfg.getPhantomJsPath());
+			return new PhantomJSDriver(dc);
+		}
+		catch (Exception e)
+		{
+			throw new RhConfigurationException("Unable to create PhantomJS driver: " + e.getMessage(), e);
 		}
 	}
 	

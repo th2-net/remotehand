@@ -15,7 +15,10 @@ public enum Browser
 	IE("IE"),
 	EDGE("Edge"),
 	CHROME("Chrome"),
+	CHROME_HEADLESS("Chrome-Headless"),
 	FIREFOX("Firefox"),
+	FIREFOX_HEADLESS("Firefox-Headless"),
+	PHANTOM_JS("PhantomJS"),
 	INVALID("");
 
 	private String label;
