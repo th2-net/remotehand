@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand.web.webelements;
 
 import java.util.Map;
 
+import com.exactprosystems.remotehand.SpecialKeys;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -37,7 +38,7 @@ public class XPath extends WebLocator
 			return null;
 		
 		if (matcher.contains(NON_BREAKING_SPACE))
-			return matcher.replace(NON_BREAKING_SPACE, "\u00A0");
+			return matcher.replace(NON_BREAKING_SPACE, SpecialKeys.NON_BREAKING_SPACE);
 		else 
 			return matcher;
 	}

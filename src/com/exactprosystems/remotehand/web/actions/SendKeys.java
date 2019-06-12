@@ -10,10 +10,7 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.RhUtils;
-import com.exactprosystems.remotehand.ScriptCompileException;
-import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
@@ -304,7 +301,7 @@ public class SendKeys extends WebAction
 		put("f10", Keys.F10);
 		put("f11", Keys.F11);
 		put("f12", Keys.F12);
-		put("nbsp", Keys.chord(Keys.ALT, Keys.NUMPAD0, Keys.NUMPAD1, Keys.NUMPAD6, Keys.NUMPAD0));
+		put("nbsp", SpecialKeys.NON_BREAKING_SPACE);
 		put("num0", Keys.NUMPAD0);
 		put("num1", Keys.NUMPAD1);
 		put("num2", Keys.NUMPAD2);
