@@ -79,7 +79,7 @@ public class Click extends WebAction
 			}
 			catch (Exception e)
 			{
-				logError("xOffset or yOffset is not integer value");
+				logError("xoffset or yoffset is not integer value");
 			}
 			actions = actions.moveToElement(element, xOffset, yOffset);
 		}
