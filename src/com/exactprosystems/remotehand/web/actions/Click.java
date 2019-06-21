@@ -10,9 +10,13 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 
@@ -28,7 +32,13 @@ public class Click extends WebAction
 	private static final Logger logger = LoggerFactory.getLogger(Click.class);
 	
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", BUTTON = "button",
-			X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
+			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
+	
+	private static final Map<String, CharSequence> MODIFIER_KEYS = new HashMap<String, CharSequence>() {{
+		put(SendKeys.SHIFT, Keys.SHIFT);
+		put(SendKeys.CTRL, Keys.CONTROL);
+		put(SendKeys.ALT, Keys.ALT);
+	}};
 	
 	@Override
 	public boolean isNeedLocator()
@@ -87,6 +97,7 @@ public class Click extends WebAction
 			actions = actions.moveToElement(element);
 		logInfo("Moved to element: %s", webLocator);
 		
+		Set<CharSequence> mods = applyModifiers(actions, params.get(MODIFIERS));
 		try
 		{
 			if (button.equals(LEFT))
@@ -112,6 +123,10 @@ public class Click extends WebAction
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 			js.executeScript("arguments[0].click();", element);
 		}
+		finally
+		{
+			resetModifiers(actions, mods);
+		}
 		return null;
 	}
 	
@@ -134,5 +149,33 @@ public class Click extends WebAction
 				return false;
 		}
 		return true;
+	}
+	
+	
+	private Set<CharSequence> applyModifiers(Actions actions, String modifiers)
+	{
+		if (StringUtils.isEmpty(modifiers))
+			return null;
+		
+		Set<CharSequence> result = new LinkedHashSet<>();
+		String[] keys = modifiers.split(",");
+		for (String k : keys)
+		{
+			CharSequence c = MODIFIER_KEYS.get(k.trim());
+			if (c == null || result.contains(c))
+				continue;
+			actions.keyDown(c);
+			result.add(c);
+		}
+		return result;
+	}
+	
+	private void resetModifiers(Actions actions, Set<CharSequence> modifiers)
+	{
+		if (modifiers == null || modifiers.isEmpty())
+			return;
+		
+		for (CharSequence c : modifiers)
+			actions.keyUp(c);
 	}
 }

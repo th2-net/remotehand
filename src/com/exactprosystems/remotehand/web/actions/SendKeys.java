@@ -39,6 +39,9 @@ public class SendKeys extends WebAction
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled",
 			HASH = "#hash";
+	public static final String SHIFT = "shift",
+			CTRL = "ctrl",
+			ALT = "alt";
 	
 	public SendKeys()
 	{
@@ -280,9 +283,9 @@ public class SendKeys extends WebAction
 		put("openbracket", Keys.chord(Keys.SHIFT, "9"));
 		put("tab", Keys.TAB);
 		put("enter", Keys.ENTER);
-		put("shift", Keys.SHIFT);
-		put("ctrl", Keys.CONTROL);
-		put("alt", Keys.ALT);
+		put(SHIFT, Keys.SHIFT);
+		put(CTRL, Keys.CONTROL);
+		put(ALT, Keys.ALT);
 		put("esc", Keys.ESCAPE);
 		put("end", Keys.END);
 		put("home", Keys.HOME);
