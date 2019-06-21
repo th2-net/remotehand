@@ -97,13 +97,14 @@ public class Click extends WebAction
 			actions = actions.moveToElement(element);
 		logInfo("Moved to element: %s", webLocator);
 		
-		Set<CharSequence> mods = applyModifiers(actions, params.get(MODIFIERS));
 		try
 		{
+			//Building sequence of actions to perform
+			Set<CharSequence> mods = applyModifiers(actions, params.get(MODIFIERS));
 			if (button.equals(LEFT))
-				actions.click().perform();
+				actions.click();
 			else if (button.equals(RIGHT))
-				actions.contextClick().perform();
+				actions.contextClick();
 			else if (button.equals(MIDDLE))
 			{
 				logError("Middle click is not implemented.");
@@ -114,6 +115,10 @@ public class Click extends WebAction
 				logError("Button may be only left, right or middle.");
 				return null;
 			}
+			resetModifiers(actions, mods);
+			
+			//Performing built sequence of actions
+			actions.perform();
 			
 			logInfo("Clicked %s button on: '%s'.", button, webLocator);
 		}
@@ -122,10 +127,6 @@ public class Click extends WebAction
 			logError("Element is not visible. Executing click by JavaScript command" ,e);
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 			js.executeScript("arguments[0].click();", element);
-		}
-		finally
-		{
-			resetModifiers(actions, mods);
 		}
 		return null;
 	}
