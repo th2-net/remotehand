@@ -16,6 +16,7 @@ import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +143,24 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
+	protected void sendKeys(String s, WebElement input, WebDriver driver)
+	{
+		Actions a = new Actions(driver);
+		a.moveToElement(input);
+		a.click();
+		a.sendKeys(s);
+		a.build().perform();
+	}
+	
+	protected void sendKeys(CharSequence s, WebElement input, WebDriver driver)
+	{
+		Actions a = new Actions(driver);
+		a.moveToElement(input);
+		a.click();
+		a.sendKeys(s);
+		a.build().perform();
+	}
+	
 	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries) throws ScriptExecuteException
 	{
 		String inputAtStart = input.getAttribute("value");
@@ -152,17 +171,17 @@ public class SendKeys extends WebAction
 			{
 				CharSequence k = getKeysByLabel(str.substring(1));
 				if (k != null)
-					input.sendKeys(k);
+					sendKeys(k, input, driver);
 				continue;
 			}
 			
 			if (inputAtStart == null || input.getAttribute("value") == null) {
 					logWarn("Input field does not contain value attribute. Sending text as is.");
-					input.sendKeys(str);
+					sendKeys(str, input, driver);
 				continue;
 			}
 			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
-			input.sendKeys(str);
+			sendKeys(str, input, driver);
 			
 			if (driver instanceof ChromeDriver
 					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
