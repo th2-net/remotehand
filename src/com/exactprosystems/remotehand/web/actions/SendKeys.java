@@ -39,7 +39,8 @@ public class SendKeys extends WebAction
 			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled",
-			HASH = "#hash";
+			HASH = "#hash",
+			DELETE_ALL = "#ctrl+a##delete#";
 	public static final String SHIFT = "shift",
 			CTRL = "ctrl",
 			ALT = "alt";
@@ -87,14 +88,21 @@ public class SendKeys extends WebAction
 				enable(webDriver, input);
 			
 			String beforeClear = params.get(CLEAR_BEFORE);
-			if (beforeClear != null && RhUtils.YES.contains(beforeClear.toLowerCase()))
+			boolean clear = beforeClear != null && RhUtils.YES.contains(beforeClear.toLowerCase());
+			
+			String text = params.get(PARAM_TEXT);
+			text = replaceConversions(text);
+			if (text.startsWith(DELETE_ALL))
+			{
+				text.replaceFirst(DELETE_ALL, "");
+				clear = true;
+			}
+			
+			if (clear)
 			{
 				input.clear();
 				logInfo("Text field has been cleared.");
 			}
-			
-			String text = params.get(PARAM_TEXT);
-			text = replaceConversions(text);
 			
 			logInfo("Sending text1 to: %s", webLocator);
 			sendText(input, text, webDriver, webLocator, 0);
