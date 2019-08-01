@@ -92,11 +92,11 @@ public class SendKeys extends WebAction
 			
 			String text = params.get(PARAM_TEXT);
 			text = replaceConversions(text);
-			if (text.startsWith(DELETE_ALL))
-			{
-				text.replaceFirst(DELETE_ALL, "");
-				clear = true;
-			}
+//			if (text.toLowerCase().startsWith(DELETE_ALL))
+//			{
+//				text = text.substring(DELETE_ALL.length());
+//				clear = true;
+//			}
 			
 			if (clear)
 			{
@@ -151,68 +151,69 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	protected void sendKeys(String s, WebElement input, WebDriver driver)
-	{
-		Actions a = new Actions(driver);
-		a.moveToElement(input);
-		a.click();
-		a.sendKeys(s);
-		a.build().perform();
-	}
-	
-	protected void sendKeys(CharSequence s, WebElement input, WebDriver driver)
-	{
-		Actions a = new Actions(driver);
-		a.moveToElement(input);
-		a.click();
-		a.sendKeys(s);
-		a.build().perform();
-	}
 	
 	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries) throws ScriptExecuteException
 	{
 		String inputAtStart = input.getAttribute("value");
 		List<String> strings = text == null || text.isEmpty() ? Collections.<String>emptyList() : processInputText(text);
+		
+		Actions a = new Actions(driver);
+		a.moveToElement(input);
+		a.click();
+		
+		
 		for (String str : strings)
 		{
 			if (str.startsWith(KEY_SIGN))
 			{
+				logger.trace("Sending key {}", str);
 				CharSequence k = getKeysByLabel(str.substring(1));
-				if (k != null)
-					sendKeys(k, input, driver);
+				if (k != null) {
+					if (logger.isTraceEnabled()) {
+						StringBuilder sb0 = new StringBuilder();
+						for (int i = 0, len = k.length(); i < len; ++i) {
+							sb0.append("\\u").append(Integer.toHexString(k.charAt(i))).append(" ");
+						}
+						logger.trace("Put to {} text {}", locator, sb0);
+					}
+					a.sendKeys(k);
+				}
+					
 				continue;
 			}
 			
 			if (inputAtStart == null || input.getAttribute("value") == null) {
 					logWarn("Input field does not contain value attribute. Sending text as is.");
-					sendKeys(str, input, driver);
+				a.sendKeys(str);
 				continue;
 			}
-			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
-			sendKeys(str, input, driver);
 			
-			if (driver instanceof ChromeDriver
-					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
-			{
-				if (retries >= 3)
-				{
-					logWarn("Missed input detected, but too many retries were already done.");
-					return;
-				}
-				
-				// If field not filled as expected for current moment, restart operation at all
-				logInfo("Missed input detected. Trying to resend keys.");
-				
-				if (waitForElement(driver, 10, locator))
-				{
-					input.clear();
-					sendText(input, text, driver, locator, retries+1);
-					return;
-				}
-				else
-					throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
-			}
+//			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
+			a.sendKeys(str);
+			
+//			if (driver instanceof ChromeDriver
+//					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
+//			{
+//				if (retries >= 3)
+//				{
+//					logWarn("Missed input detected, but too many retries were already done.");
+//					return;
+//				}
+//				
+//				// If field not filled as expected for current moment, restart operation at all
+//				logInfo("Missed input detected. Trying to resend keys.");
+//				
+//				if (waitForElement(driver, 10, locator))
+//				{
+//					input.clear();
+//					sendText(input, text, driver, locator, retries+1);
+//					return;
+//				}
+//				else
+//					throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
+//			}
 		}
+		a.build().perform();
 	}
 	
 	protected static List<String> processInputText(String text)
