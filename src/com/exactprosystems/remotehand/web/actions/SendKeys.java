@@ -87,18 +87,11 @@ public class SendKeys extends WebAction
 			if (shouldBeEnabled)
 				enable(webDriver, input);
 			
-			String beforeClear = params.get(CLEAR_BEFORE);
-			boolean clear = beforeClear != null && RhUtils.YES.contains(beforeClear.toLowerCase());
-			
 			String text = params.get(PARAM_TEXT);
 			text = replaceConversions(text);
-//			if (text.toLowerCase().startsWith(DELETE_ALL))
-//			{
-//				text = text.substring(DELETE_ALL.length());
-//				clear = true;
-//			}
 			
-			if (clear)
+			String beforeClear = params.get(CLEAR_BEFORE);
+			if (beforeClear != null && RhUtils.YES.contains(beforeClear.toLowerCase()))
 			{
 				input.clear();
 				logInfo("Text field has been cleared.");
@@ -160,7 +153,7 @@ public class SendKeys extends WebAction
 		Actions a = new Actions(driver);
 		a.moveToElement(input);
 		a.click();
-		
+		a.build().perform();
 		
 		for (String str : strings)
 		{
@@ -177,6 +170,7 @@ public class SendKeys extends WebAction
 						logger.trace("Put to {} text {}", locator, sb0);
 					}
 					a.sendKeys(k);
+					a.build().perform();
 				}
 					
 				continue;
@@ -185,35 +179,35 @@ public class SendKeys extends WebAction
 			if (inputAtStart == null || input.getAttribute("value") == null) {
 					logWarn("Input field does not contain value attribute. Sending text as is.");
 				a.sendKeys(str);
-				continue;
+				a.build().perform();
 			}
 			
-//			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
+			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
 			a.sendKeys(str);
+			a.build().perform();
 			
-//			if (driver instanceof ChromeDriver
-//					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
-//			{
-//				if (retries >= 3)
-//				{
-//					logWarn("Missed input detected, but too many retries were already done.");
-//					return;
-//				}
-//				
-//				// If field not filled as expected for current moment, restart operation at all
-//				logInfo("Missed input detected. Trying to resend keys.");
-//				
-//				if (waitForElement(driver, 10, locator))
-//				{
-//					input.clear();
-//					sendText(input, text, driver, locator, retries+1);
-//					return;
-//				}
-//				else
-//					throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
-//			}
+			if (driver instanceof ChromeDriver
+					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
+			{
+				if (retries >= 3)
+				{
+					logWarn("Missed input detected, but too many retries were already done.");
+					return;
+				}
+				
+				// If field not filled as expected for current moment, restart operation at all
+				logInfo("Missed input detected. Trying to resend keys.");
+				
+				if (waitForElement(driver, 10, locator))
+				{
+					input.clear();
+					sendText(input, text, driver, locator, retries+1);
+					return;
+				}
+				else
+					throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
+			}
 		}
-		a.build().perform();
 	}
 	
 	protected static List<String> processInputText(String text)
