@@ -176,10 +176,12 @@ public class SendKeys extends WebAction
 				continue;
 			}
 			
-			if (inputAtStart == null || input.getAttribute("value") == null) {
-					logWarn("Input field does not contain value attribute. Sending text as is.");
+			if (inputAtStart == null || input.getAttribute("value") == null)
+			{
+				logWarn("Input field does not contain value attribute. Sending text as is.");
 				a.sendKeys(str);
 				a.build().perform();
+				continue;
 			}
 			
 			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
