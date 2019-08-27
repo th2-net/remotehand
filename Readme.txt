@@ -35,7 +35,7 @@ This mode is usual for ClearTH to trigger RemoteHand to operate.
 Alternatively, you can make RemoteHand connect to ClearTH to serve further requests:
 java -jar remotehand.jar -tcpclient
 
-In this mode RemoteHand connects to ClearTH via TCP/IP. ClearTH after that can trigger Remotehand to operate using connected socket.
+In this mode RemoteHand connects to ClearTH via TCP/IP. ClearTH after that can trigger RemoteHand to operate using connected socket.
 RemoteHand will use "Host" and "Port" settings from config.ini to connect to.
 
 
@@ -347,7 +347,7 @@ Check for changes is performed (i.e. new screenshot is taken) every <checkmillis
 NOTES
 *****
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
-The exception can be supressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
+The exception can be suppressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
 In case of FindElement, no exception is thrown because the action handles this case.
 
 All actions support optional parameter #execute. If this parameter is set to false (n, no, f, 0, -), action will not be executed.
