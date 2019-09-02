@@ -119,10 +119,8 @@ public class WebDriverManager
 	public WebDriver getWebDriver(WebSessionContext context) throws RhConfigurationException
 	{
 		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
-		WebDriver driver = null;
-		if (!webDriverPool.isEmpty())
-			driver = webDriverPool.poll();
 
+		WebDriver driver = webDriverPool.poll();
 		if (!isDriverAlive(driver))
 			driver = createDriver(configuration);
 

@@ -33,7 +33,7 @@ public class Configuration
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
-	public final int DEF_DRIVER_POOL_SIZE = 5;
+	public final int DEF_DRIVER_POOL_SIZE = 1;
 	public final String DEF_FILE_STORAGE = "generated/",
 			DEF_HOST = "localhost";
 
