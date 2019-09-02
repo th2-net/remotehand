@@ -56,7 +56,7 @@ public class WebActionsLauncher extends ActionsLauncher
 				scriptResult.addToTextOutput(actionResult);
 		}
 	}
-	
+
 	private void checkWebDriver(WebSessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
 		WebDriver webDriver = context.getWebDriver();
@@ -74,17 +74,17 @@ public class WebActionsLauncher extends ActionsLauncher
 				throw new ScriptExecuteException("Error while checking browser state: " + e.getMessage(), e);
 		}
 	}
-	
+
 	private void closeOldDriver(WebDriver driver, WebSessionContext context)
 	{
 		WebDriverManager manager = context.getWebDriverManager();
 		manager.closeWebDriver(driver, context.getSessionId());
 	}
-	
+
 	private void updateWebDriver(WebSessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
 		logger.info("Trying to create new driver...");
 		WebDriverManager driverManager = context.getWebDriverManager();
-		context.setWebDriver(driverManager.createWebDriver(context.getSessionId(), context.getDownloadDir()));
+		context.setWebDriver(driverManager.getWebDriver(context));
 	}
 }

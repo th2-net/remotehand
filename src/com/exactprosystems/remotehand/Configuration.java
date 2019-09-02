@@ -33,6 +33,7 @@ public class Configuration
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
+	public final int DEF_DRIVER_POOL_SIZE = 5;
 	public final String DEF_FILE_STORAGE = "generated/",
 			DEF_HOST = "localhost";
 
@@ -41,13 +42,15 @@ public class Configuration
 			PARAM_DELIMITER = "Delimiter",
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire",
-			PARAM_FILE_STORAGE = "DefaultFileStorage";
-	
+			PARAM_FILE_STORAGE = "DefaultFileStorage",
+			PARAM_DRIVER_POOL_SIZE = "WebDriverPoolSize";
+
 	private volatile String host;
 	private volatile int port;
 	private volatile char scriptDelimiter;
 	private volatile char scriptTextQualifier;
 	private volatile int sessionExpire;
+	private volatile int driverPoolSize;
 	private volatile File fileStorage;
 	
 	protected Configuration(CommandLine commandLine)
@@ -146,6 +149,17 @@ public class Configuration
 			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
 			fileStorage = new File(DEF_FILE_STORAGE);
 		}
+
+		try
+		{
+			driverPoolSize = Integer.parseInt(properties.getProperty(PARAM_DRIVER_POOL_SIZE));
+		}
+		catch (Exception ex)
+		{
+			logger.warn("Error while reading property '{}'. Using default value = <{}>", PARAM_DRIVER_POOL_SIZE,
+			            DEF_DRIVER_POOL_SIZE);
+			driverPoolSize = DEF_DRIVER_POOL_SIZE;
+		}
 	}
 	
 	protected Properties getDefaultProperties()
@@ -198,4 +212,8 @@ public class Configuration
 		return fileStorage;
 	}
 
+	public int getDriverPoolSize()
+	{
+		return driverPoolSize;
+	}
 }

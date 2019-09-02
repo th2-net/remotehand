@@ -39,7 +39,9 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		return new WebConfiguration(commandLine);
+		WebConfiguration webConfiguration = new WebConfiguration(commandLine);
+		webDriverManager.initDriverPool();
+		return webConfiguration;
 	}
 
 
@@ -55,7 +57,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		File downloadDir = WebUtils.createDownloadDirectory();
 		webSessionContext.setDownloadDir(downloadDir);
 		webSessionContext.setWebDriverManager(webDriverManager);
-		webSessionContext.setWebDriver(webDriverManager.createWebDriver(sessionId, downloadDir));
+		webSessionContext.setWebDriver(webDriverManager.getWebDriver(webSessionContext));
 		return webSessionContext;
 	}
 

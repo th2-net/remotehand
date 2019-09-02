@@ -10,16 +10,12 @@
 
 package com.exactprosystems.remotehand.web;
 
-import static java.lang.Thread.currentThread;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.RhConfigurationException;
+import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -37,9 +33,15 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.RhConfigurationException;
-import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static java.lang.Thread.currentThread;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -49,7 +51,36 @@ public class WebDriverManager
 	private static final Logger log = LoggerFactory.getLogger(WebDriverManager.class);
 	
 	private final Map<String, DriverLoggerThread> loggers = new ConcurrentHashMap<>();
-	
+	private final Queue<WebDriver> webDriverPool = new ConcurrentLinkedQueue<>();
+
+	public boolean isDriverAlive(WebDriver driver)
+	{
+		if (driver == null)
+			return false;
+
+		try {
+			return driver.getWindowHandles().size() > 0;
+		} catch (WebDriverException e) {
+			log.warn("Error received as result of checking browser state", e);
+			return false;
+		}
+	}
+
+	public void initDriverPool()
+	{
+		WebConfiguration config = (WebConfiguration) Configuration.getInstance();
+		int i = config.getDriverPoolSize();
+		try
+		{
+			if (i > 0)
+				for (int j = 0; j < i; j++)
+					webDriverPool.add(createDriver(config));
+		}
+		catch (RhConfigurationException e)
+		{
+			log.warn("Unable init driver pool", e);
+		}
+	}
 
 	private DesiredCapabilities createDesiredCapabilities(WebConfiguration cfg)
 	{
@@ -84,18 +115,30 @@ public class WebDriverManager
 		preferences.enable(LogType.CLIENT, cfg.getClientLoggingLevel());
 		return preferences;
 	}
-	
-	
-	public WebDriver createWebDriver(String sessionId, File downloadDir) throws RhConfigurationException
+
+	public WebDriver getWebDriver(WebSessionContext context) throws RhConfigurationException
 	{
 		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
-		WebDriver driver = createDriver(configuration, downloadDir);
+		WebDriver driver = null;
+		if (!webDriverPool.isEmpty())
+			driver = webDriverPool.poll();
+
+		if (!isDriverAlive(driver))
+			driver = createDriver(configuration);
+
+		if (configuration.getBrowserToUse() == Browser.CHROME ||
+		    configuration.getBrowserToUse() == Browser.CHROME_HEADLESS)
+		{
+			setChromeDownloadsDir((ChromeOptions) ((ChromeDriver) driver).getCapabilities(),
+			                      context.getDownloadDir());
+		}
 		if (configuration.isDriverLoggingEnabled())
-			initLogger(driver, sessionId);
+			initLogger(driver, context.getSessionId());
+
 		return driver;
 	}
 
-	private WebDriver createDriver(WebConfiguration configuration, File downloadDir) throws RhConfigurationException
+	private WebDriver createDriver(WebConfiguration configuration) throws RhConfigurationException
 	{
 		DesiredCapabilities dc = createDesiredCapabilities(configuration);
 		switch (configuration.getBrowserToUse())
@@ -105,9 +148,8 @@ public class WebDriverManager
 			case EDGE:
 				return createEdgeDriver(configuration, dc);
 			case CHROME:
-				return createChromeDriver(configuration, dc, downloadDir, false);
 			case CHROME_HEADLESS:
-				return createChromeDriver(configuration, dc, downloadDir, true);
+				return createChromeDriver(configuration, dc, true);
 			case FIREFOX_HEADLESS:
 				return createFirefoxDriver(configuration, dc, true);
 			case PHANTOM_JS:
@@ -153,7 +195,7 @@ public class WebDriverManager
 		}
 	}
 	
-	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir, boolean headlessMode) throws RhConfigurationException
+	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, boolean headlessMode) throws RhConfigurationException
 	{
 		try
 		{			
@@ -165,11 +207,6 @@ public class WebDriverManager
 				options.addArguments("window-size=1920x1080");
 			}
 			options.addArguments("--no-sandbox");
-			Map<String, String> prefs = new HashMap<>(2);
-			prefs.put("profile.default_content_settings.popups", "0");
-			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
-			options.setExperimentalOption("prefs", prefs);
-
 			String binaryParam = cfg.getBinary();
 			if (binaryParam != null && !binaryParam.isEmpty())
 			{
@@ -190,7 +227,24 @@ public class WebDriverManager
 			throw new RhConfigurationException("Unable to create Chrome driver: " + e.getMessage(), e);
 		}
 	}
-	
+
+	private void setChromeDownloadsDir(ChromeOptions options, File downloadDir)
+	{
+		Object prefsObj = options.getExperimentalOption("prefs");
+		if (prefsObj != null)
+		{
+			Map<String, String> prefs = (Map<String, String>)prefsObj;
+			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
+		}
+		else
+		{
+			Map<String, String> prefs = new HashMap<>(2);
+			prefs.put("profile.default_content_settings.popups", "0");
+			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
+			options.setExperimentalOption("prefs", prefs);
+		}
+	}
+
 	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc, boolean headlessMode) throws RhConfigurationException
 	{
 		try
