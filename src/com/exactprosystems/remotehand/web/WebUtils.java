@@ -26,5 +26,13 @@ public class WebUtils {
 		newFileDir.mkdirs();
 		return newFileDir;
 	}
+
+	public static void deleteDownloadDirectory(File downloadDir)
+	{
+		File[] tmp;
+		if (downloadDir != null && (tmp = downloadDir.listFiles()) != null && tmp.length == 0) {
+			downloadDir.delete();
+		}
+	}
 	
 }

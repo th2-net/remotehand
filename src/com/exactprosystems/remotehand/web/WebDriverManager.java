@@ -51,7 +51,7 @@ public class WebDriverManager
 	private static final Logger log = LoggerFactory.getLogger(WebDriverManager.class);
 	
 	private final Map<String, DriverLoggerThread> loggers = new ConcurrentHashMap<>();
-	private final Queue<WebDriver> webDriverPool = new ConcurrentLinkedQueue<>();
+	private final Queue<DriverStorage> webDriverPool = new ConcurrentLinkedQueue<>();
 
 	public boolean isDriverAlive(WebDriver driver)
 	{
@@ -74,7 +74,7 @@ public class WebDriverManager
 		{
 			if (i > 0)
 				for (int j = 0; j < i; j++)
-					webDriverPool.add(createDriver(config));
+					webDriverPool.add(createDriverStorage(config));
 		}
 		catch (RhConfigurationException e)
 		{
@@ -120,41 +120,51 @@ public class WebDriverManager
 	{
 		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
 
-		WebDriver driver = webDriverPool.poll();
-		if (!isDriverAlive(driver))
-			driver = createDriver(configuration);
-
-		if (configuration.getBrowserToUse() == Browser.CHROME ||
-		    configuration.getBrowserToUse() == Browser.CHROME_HEADLESS)
+		WebDriver driver;
+		DriverStorage driverStorage = webDriverPool.poll();
+		if (driverStorage == null || !isDriverAlive(driverStorage.getDriver()))
 		{
-			setChromeDownloadsDir((ChromeOptions) ((ChromeDriver) driver).getCapabilities(),
-			                      context.getDownloadDir());
+			driverStorage = createDriverStorage(configuration);
 		}
+		driver = driverStorage.getDriver();
+		context.setDownloadDir(driverStorage.getDownloadDir());
+
 		if (configuration.isDriverLoggingEnabled())
 			initLogger(driver, context.getSessionId());
 
 		return driver;
 	}
 
-	private WebDriver createDriver(WebConfiguration configuration) throws RhConfigurationException
+	private DriverStorage createDriverStorage(WebConfiguration configuration) throws RhConfigurationException
 	{
 		DesiredCapabilities dc = createDesiredCapabilities(configuration);
+		WebDriver driver;
+		File downloadDir = WebUtils.createDownloadDirectory();
 		switch (configuration.getBrowserToUse())
 		{
 			case IE:
-				return createIeDriver(configuration, dc);
+				driver = createIeDriver(configuration, dc);
+				break;
 			case EDGE:
-				return createEdgeDriver(configuration, dc);
+				driver = createEdgeDriver(configuration, dc);
+				break;
 			case CHROME:
+				driver = createChromeDriver(configuration, dc, downloadDir, false);
+				break;
 			case CHROME_HEADLESS:
-				return createChromeDriver(configuration, dc, true);
+				driver = createChromeDriver(configuration, dc, downloadDir,true);
+				break;
 			case FIREFOX_HEADLESS:
-				return createFirefoxDriver(configuration, dc, true);
+				driver = createFirefoxDriver(configuration, dc, true);
+				break;
 			case PHANTOM_JS:
-				return createPhantomJsDriver(configuration, dc);
+				driver = createPhantomJsDriver(configuration, dc);
+				break;
 			default:
-				return createFirefoxDriver(configuration, dc, false);
+				driver = createFirefoxDriver(configuration, dc, false);
 		}
+
+		return new DriverStorage(driver, downloadDir);
 	}
 
 	// Notes about driver initialization:
@@ -193,7 +203,7 @@ public class WebDriverManager
 		}
 	}
 	
-	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, boolean headlessMode) throws RhConfigurationException
+	private ChromeDriver createChromeDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir, boolean headlessMode) throws RhConfigurationException
 	{
 		try
 		{			
@@ -213,6 +223,13 @@ public class WebDriverManager
 					options.setBinary(binaryParam);
 			}
 
+			Map<String, String> prefs = new HashMap<>(2);
+			prefs.put("profile.default_content_settings.popups", "0");
+			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
+			options.setExperimentalOption("prefs", prefs);
+
+			options.setExperimentalOption("prefs", prefs);
+
 			if (dc != null)
 			{
 				for (Entry<String, Object> capability : dc.asMap().entrySet())
@@ -223,23 +240,6 @@ public class WebDriverManager
 		catch (Exception e)
 		{
 			throw new RhConfigurationException("Unable to create Chrome driver: " + e.getMessage(), e);
-		}
-	}
-
-	private void setChromeDownloadsDir(ChromeOptions options, File downloadDir)
-	{
-		Object prefsObj = options.getExperimentalOption("prefs");
-		if (prefsObj != null)
-		{
-			Map<String, String> prefs = (Map<String, String>)prefsObj;
-			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
-		}
-		else
-		{
-			Map<String, String> prefs = new HashMap<>(2);
-			prefs.put("profile.default_content_settings.popups", "0");
-			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
-			options.setExperimentalOption("prefs", prefs);
 		}
 	}
 
@@ -320,6 +320,37 @@ public class WebDriverManager
 			{
 				currentThread().interrupt();
 			}
+		}
+	}
+
+	public void clearDriverPool()
+	{
+		DriverStorage driverStorage;
+		while ((driverStorage = webDriverPool.poll()) != null)
+		{
+			WebUtils.deleteDownloadDirectory(driverStorage.getDownloadDir());
+		}
+	}
+
+	public static class DriverStorage
+	{
+		private final WebDriver driver;
+		private final File downloadDir;
+
+		public DriverStorage(WebDriver driver, File downloadDir)
+		{
+			this.driver = driver;
+			this.downloadDir = downloadDir;
+		}
+
+		public WebDriver getDriver()
+		{
+			return driver;
+		}
+
+		public File getDownloadDir()
+		{
+			return downloadDir;
 		}
 	}
 }

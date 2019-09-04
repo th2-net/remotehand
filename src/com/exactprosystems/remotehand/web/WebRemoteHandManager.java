@@ -14,12 +14,9 @@ import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.openqa.selenium.WebDriver;
-
-import java.io.File;
 
 /**
  * Created by alexey.karpukhin on 2/2/16.
@@ -54,8 +51,6 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
 		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
-		File downloadDir = WebUtils.createDownloadDirectory();
-		webSessionContext.setDownloadDir(downloadDir);
 		webSessionContext.setWebDriverManager(webDriverManager);
 		webSessionContext.setWebDriver(webDriverManager.getWebDriver(webSessionContext));
 		return webSessionContext;
@@ -75,15 +70,16 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		WebDriver webDriver = webSessionContext.getWebDriver();
 		if (webDriver != null)
 			webDriverManager.closeWebDriver(webDriver, webSessionContext.getSessionId());
-		File downloadDir = webSessionContext.getDownloadDir();
-		File[] tmp;
-		if (downloadDir != null && (tmp = downloadDir.listFiles()) != null && tmp.length == 0) {
-			downloadDir.delete();
-		}
+		WebUtils.deleteDownloadDirectory(webSessionContext.getDownloadDir());
 	}
 
 	@Override
 	public LogonHandler createLogonHandler() {
 		return new HttpLogonHandler(this);
+	}
+
+	public WebDriverManager getWebDriverManager()
+	{
+		return webDriverManager;
 	}
 }

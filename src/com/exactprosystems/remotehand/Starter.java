@@ -10,6 +10,19 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.http.HTTPServerMode;
+import com.exactprosystems.remotehand.sessions.SessionContext;
+import com.exactprosystems.remotehand.sessions.SessionWatcher;
+import com.exactprosystems.remotehand.tcp.TcpClientMode;
+import com.exactprosystems.remotehand.web.WebDriverManager;
+import com.exactprosystems.remotehand.web.WebRemoteHandManager;
+import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -17,31 +30,9 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
-import com.exactprosystems.remotehand.sessions.SessionContext;
-import com.exactprosystems.remotehand.sessions.SessionWatcher;
-import com.exactprosystems.remotehand.tcp.TcpClientMode;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-
-import com.exactprosystems.remotehand.http.HTTPServerMode;
-
-import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class Starter
 {
 	private static final Logger logger = LoggerFactory.getLogger(Starter.class);
-
 	private static final String DEFAULT_VERSION = "local_build";
 	
 	public static final String CLEANUP_SCRIPT_FILE = "cleanup.csv";
@@ -50,6 +41,8 @@ public class Starter
 	@SuppressWarnings("static-access")
 	public static void main(String[] args, IRemoteHandManager manager)
 	{
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(((WebRemoteHandManager)manager).getWebDriverManager()));
+
 		Manifest mf = null;
 		String version = null;
 		try
@@ -336,5 +329,26 @@ public class Starter
 			sb.append(line).append("\r\n");
 		}
 		return sb.toString();
+	}
+
+	private static class ShutdownHook extends Thread
+	{
+		private static final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
+
+		private final WebDriverManager manager;
+
+		public ShutdownHook(WebDriverManager manager)
+		{
+			this.manager = manager;
+			setName("ShutdownHook");
+		}
+
+		@Override
+		public void run()
+		{
+			logger.info("Driver pool clearing...");
+			manager.clearDriverPool();
+		}
+
 	}
 }
