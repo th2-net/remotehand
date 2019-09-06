@@ -155,13 +155,13 @@ public class WebDriverManager
 				driver = createChromeDriver(configuration, dc, downloadDir,true);
 				break;
 			case FIREFOX_HEADLESS:
-				driver = createFirefoxDriver(configuration, dc, true);
+				driver = createFirefoxDriver(configuration, dc, downloadDir, true);
 				break;
 			case PHANTOM_JS:
 				driver = createPhantomJsDriver(configuration, dc);
 				break;
 			default:
-				driver = createFirefoxDriver(configuration, dc, false);
+				driver = createFirefoxDriver(configuration, dc, downloadDir, false);
 		}
 
 		return new DriverStorage(driver, downloadDir);
@@ -243,7 +243,7 @@ public class WebDriverManager
 		}
 	}
 
-	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc, boolean headlessMode) throws RhConfigurationException
+	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir, boolean headlessMode) throws RhConfigurationException
 	{
 		try
 		{
@@ -255,6 +255,13 @@ public class WebDriverManager
 				options.addArguments("--width=1920");
 				options.addArguments("--height=1080");
 			}
+
+			//Use for the default download directory the last folder specified for a download
+			options.addPreference("browser.download.folderList", 2);
+			//Set the last directory used for saving a file from the "What should (browser) do with this file?" dialog.
+			options.addPreference("browser.download.dir", downloadDir.getAbsolutePath());
+			//This is true by default.
+			options.addPreference("browser.download.useDownloadDir", true);
 			
 			if (dc != null)
 			{
@@ -295,15 +302,8 @@ public class WebDriverManager
 	
 	public void closeWebDriver(WebDriver driver, String sessionId)
 	{
-		stopLogger(sessionId);	
-		try
-		{
-			driver.quit();
-		}
-		catch (Exception e)
-		{
-			log.error("Error while closing driver.", e);
-		}
+		stopLogger(sessionId);
+		closeDriver(driver);
 	}
 
 	private void stopLogger(String sessionId)
@@ -329,6 +329,19 @@ public class WebDriverManager
 		while ((driverStorage = webDriverPool.poll()) != null)
 		{
 			WebUtils.deleteDownloadDirectory(driverStorage.getDownloadDir());
+			closeDriver(driverStorage.getDriver());
+		}
+	}
+
+	private void closeDriver(WebDriver driver)
+	{
+		try
+		{
+			driver.quit();
+		}
+		catch (Exception e)
+		{
+			log.error("Error while closing driver.", e);
 		}
 	}
 
