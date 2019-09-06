@@ -140,28 +140,36 @@ public class WebDriverManager
 		DesiredCapabilities dc = createDesiredCapabilities(configuration);
 		WebDriver driver;
 		File downloadDir = WebUtils.createDownloadDirectory();
-		switch (configuration.getBrowserToUse())
+		try
 		{
-			case IE:
-				driver = createIeDriver(configuration, dc);
-				break;
-			case EDGE:
-				driver = createEdgeDriver(configuration, dc);
-				break;
-			case CHROME:
-				driver = createChromeDriver(configuration, dc, downloadDir, false);
-				break;
-			case CHROME_HEADLESS:
-				driver = createChromeDriver(configuration, dc, downloadDir,true);
-				break;
-			case FIREFOX_HEADLESS:
-				driver = createFirefoxDriver(configuration, dc, downloadDir, true);
-				break;
-			case PHANTOM_JS:
-				driver = createPhantomJsDriver(configuration, dc);
-				break;
-			default:
-				driver = createFirefoxDriver(configuration, dc, downloadDir, false);
+			switch (configuration.getBrowserToUse())
+			{
+				case IE:
+					driver = createIeDriver(configuration, dc);
+					break;
+				case EDGE:
+					driver = createEdgeDriver(configuration, dc);
+					break;
+				case CHROME:
+					driver = createChromeDriver(configuration, dc, downloadDir, false);
+					break;
+				case CHROME_HEADLESS:
+					driver = createChromeDriver(configuration, dc, downloadDir,true);
+					break;
+				case FIREFOX_HEADLESS:
+					driver = createFirefoxDriver(configuration, dc, downloadDir, true);
+					break;
+				case PHANTOM_JS:
+					driver = createPhantomJsDriver(configuration, dc);
+					break;
+				default:
+					driver = createFirefoxDriver(configuration, dc, downloadDir, false);
+			}
+		}
+		catch (RhConfigurationException e)
+		{
+			WebUtils.deleteDownloadDirectory(downloadDir);
+			throw e;
 		}
 
 		return new DriverStorage(driver, downloadDir);
