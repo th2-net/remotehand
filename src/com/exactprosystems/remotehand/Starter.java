@@ -41,7 +41,8 @@ public class Starter
 	@SuppressWarnings("static-access")
 	public static void main(String[] args, IRemoteHandManager manager)
 	{
-		Runtime.getRuntime().addShutdownHook(new ShutdownHook(((WebRemoteHandManager)manager).getWebDriverManager()));
+		WebDriverManager webDriverManager = ((WebRemoteHandManager) manager).getWebDriverManager();
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(webDriverManager));
 
 		Manifest mf = null;
 		String version = null;
@@ -130,6 +131,8 @@ public class Starter
 			
 			if (!HTTPServerMode.init(manager.createLogonHandler()))
 				logger.info("Application stopped with error");
+			else
+				webDriverManager.initDriverPool();
 			startSessionWatcher();
 		}
 		else if (tcpClientMode)
@@ -146,9 +149,11 @@ public class Starter
 			//...other values depending on request type...
 			
 			//This way multiple simultaneous sessions can be handled by directing particular request to corresponding TcpSessionHandler.
-			
+
 			if (!TcpClientMode.init(version, manager))
 				logger.info("Application stopped with error");
+			else
+				webDriverManager.initDriverPool();
 			startSessionWatcher();
 		}
 		else
@@ -173,6 +178,8 @@ public class Starter
 				logger.error("Unable to initialize application.", e);
 				closeApp();
 			}
+
+			webDriverManager.initDriverPool();
 
 			processAllScriptsFromDirectory(input, output, inputParams, launcher, compiler, sessionContext);
 			if (dynInput != null)
@@ -251,8 +258,7 @@ public class Starter
 				@Override
 				public boolean accept(File file)
 				{
-					boolean isMatrix = file.isFile() && file.getName().endsWith(".csv");
-					return isMatrix;
+					return file.isFile() && file.getName().endsWith(".csv");
 				}
 			});
 		}

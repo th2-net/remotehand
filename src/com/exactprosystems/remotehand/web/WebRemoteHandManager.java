@@ -36,11 +36,8 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		WebConfiguration webConfiguration = new WebConfiguration(commandLine);
-		webDriverManager.initDriverPool();
-		return webConfiguration;
+		return new WebConfiguration(commandLine);
 	}
-
 
 	@Override
 	public ActionsLauncher createActionsLauncher(ScriptProcessorThread thread) {
