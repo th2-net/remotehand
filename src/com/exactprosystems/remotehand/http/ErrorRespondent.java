@@ -16,6 +16,7 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 
 import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.COMPILE_ERROR;
 import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.EXECUTION_ERROR;
+import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.RH_ERROR;
 
 public class ErrorRespondent
 {
@@ -32,7 +33,9 @@ public class ErrorRespondent
 	{
 		RhScriptResult result = new RhScriptResult();
 		if (ex instanceof ScriptCompileException)
+		{
 			result.setCode(COMPILE_ERROR.getCode());
+		}
 		else if (ex instanceof ScriptExecuteException)
 		{
 			ScriptExecuteException see = (ScriptExecuteException) ex; 
@@ -41,7 +44,9 @@ public class ErrorRespondent
 				result.addScreenshotId(see.getScreenshotId());
 		}
 		else
-			throw ex instanceof RuntimeException? (RuntimeException) ex : new RuntimeException(ex);
+		{
+			result.setCode(RH_ERROR.getCode());
+		}
 		result.setErrorMessage(ex.getMessage());
 		return result;
 	}
