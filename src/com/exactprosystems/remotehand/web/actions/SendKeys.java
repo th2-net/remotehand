@@ -14,6 +14,7 @@ import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -32,19 +33,21 @@ public class SendKeys extends WebAction
 	private static final Logger logger = LoggerFactory.getLogger(SendKeys.class);
 	
 	private static final String PARAM_TEXT = "text",
-			PARAM_TEXT2 = PARAM_TEXT + "2",
-			PARAM_WAIT2 = PARAM_WAIT + "2",
-			PARAM_LOCATOR2 = WebScriptCompiler.WEB_LOCATOR + "2",
-			PARAM_MATCHER2 = WebScriptCompiler.WEB_MATCHER + "2",
+			PARAM_TEXT2 = String.format("%s2", PARAM_TEXT),
+			PARAM_WAIT2 = String.format("%s2", PARAM_WAIT),
+			PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR),
+			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
 			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled",
-			HASH = "#hash",
-			DELETE_ALL = "#ctrl+a##delete#";
+			HASH = "#hash";
+
+	private static final int MAX_RETRIES = 3;
+
 	public static final String SHIFT = "shift",
 			CTRL = "ctrl",
 			ALT = "alt";
-	
+
 	public SendKeys()
 	{
 		super.mandatoryParams = new String[]{PARAM_TEXT};
@@ -78,58 +81,28 @@ public class SendKeys extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
-		if (webLocator == null) {
+		if (webLocator == null)
 			logInfo("Active element: %s" , input != null ? input.getTagName() : "null");
-		}
-		boolean shouldBeEnabled = shouldBeEnabledAtFirst(input, params);
+
+		boolean shouldBeEnabled = needEnable(input, params);
 		try
 		{
 			if (shouldBeEnabled)
 				enable(webDriver, input);
-			
-			String text = params.get(PARAM_TEXT);
-			text = replaceConversions(text);
-			
-			String beforeClear = params.get(CLEAR_BEFORE);
-			if (beforeClear != null && RhUtils.YES.contains(beforeClear.toLowerCase()))
+
+			if (input != null && RhUtils.getBooleanOrDefault(params, CLEAR_BEFORE, false))
 			{
 				input.clear();
 				logInfo("Text field has been cleared.");
 			}
-			
-			logInfo("Sending text1 to: %s", webLocator);
+
+			String text = replaceConversions(params.get(PARAM_TEXT));
+			logInfo("Sending text1 (%s) to locator: %s", text, webLocator);
 			sendText(input, text, webDriver, webLocator, 0);
-			logInfo("Sent text: %s to: %s.", text, webLocator);
-			
-			
-			if (!params.containsKey(PARAM_TEXT2) || params.get(PARAM_TEXT2) == null)
-				return null;
-			
-			String text2 = params.get(PARAM_TEXT2);
-			text2 = replaceConversions(text2);
-			
-			boolean needRun = true;
-			if ((params.containsKey(PARAM_WAIT2)) && (!params.get(PARAM_WAIT2).isEmpty()))
-			{
-				int wait2 = getIntegerParam(params, PARAM_WAIT2);
-				if ((params.containsKey(PARAM_LOCATOR2)) && (params.containsKey(PARAM_MATCHER2)))
-				{
-					try
-					{
-						By locator2 = WebLocatorsMapping.getInstance().getByName(params.get(PARAM_LOCATOR2)).getWebLocator(webDriver, params.get(PARAM_MATCHER2));
-						if (!waitForElement(webDriver, wait2, locator2))
-							needRun = false;
-					}
-					catch (ScriptCompileException e)
-					{
-						throw new ScriptExecuteException("Error while resolving locator2", e);
-					}
-				}
-				else
-					Wait.webWait(webDriver, wait2);
-			}
-			
-			if (needRun)
+			logInfo("Text '%s' was sent to locator: %s.", text, webLocator);
+
+			String text2 = replaceConversions(params.get(PARAM_TEXT2));
+			if (StringUtils.isNotEmpty(text2) && needRun(webDriver, params))
 			{
 				logInfo("Sending text2 to: %s", webLocator);
 				sendText(input, text2, webDriver, webLocator, 0);
@@ -144,76 +117,87 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	
 	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries) throws ScriptExecuteException
 	{
-		String inputAtStart = input.getAttribute("value");
-		List<String> strings = text == null || text.isEmpty() ? Collections.<String>emptyList() : processInputText(text);
+		List<String> strings = processInputText(text);
 		
-		Actions a = new Actions(driver);
-		a.moveToElement(input);
-		a.click();
-		a.build().perform();
+		Actions actions = new Actions(driver);
+		doClick(actions, input);
 		
 		for (String str : strings)
 		{
 			if (str.startsWith(KEY_SIGN))
 			{
-				logger.trace("Sending key {}", str);
-				CharSequence k = getKeysByLabel(str.substring(1));
-				if (k != null) {
-					if (logger.isTraceEnabled()) {
-						StringBuilder sb0 = new StringBuilder();
-						for (int i = 0, len = k.length(); i < len; ++i) {
-							sb0.append("\\u").append(Integer.toHexString(k.charAt(i))).append(" ");
-						}
-						logger.trace("Put to {} text {}", locator, sb0);
-					}
-					a.sendKeys(k);
-					a.build().perform();
-				}
-					
+				sendSpecialKey(actions, str, locator);
 				continue;
 			}
-			
-			if (inputAtStart == null || input.getAttribute("value") == null)
+
+			String inputAtStart = input.getAttribute("value");
+			doSendKeys(actions, str);
+			if (inputAtStart == null)
 			{
 				logWarn("Input field does not contain value attribute. Sending text as is.");
-				a.sendKeys(str);
-				a.build().perform();
 				continue;
 			}
-			
-			int inputPrevLength = input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").length();
-			a.sendKeys(str);
-			a.build().perform();
-			
-			if (driver instanceof ChromeDriver
-					&& !input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").substring(inputPrevLength).equals(str))
+
+			if (!(driver instanceof ChromeDriver))
+				continue;
+			if (!input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").equals(str))
 			{
-				if (retries >= 3)
+				if (retries >= MAX_RETRIES)
 				{
 					logWarn("Missed input detected, but too many retries were already done.");
+					logWarn("Unable to send text '{}' to locator '{}'", text, locator);
 					return;
 				}
-				
+
 				// If field not filled as expected for current moment, restart operation at all
 				logInfo("Missed input detected. Trying to resend keys.");
-				
-				if (waitForElement(driver, 10, locator))
-				{
-					input.clear();
-					sendText(input, text, driver, locator, retries+1);
-					return;
-				}
-				else
-					throw new ScriptExecuteException("Current locator specifies not interactable element. Input couldn't be resend");
+				if (!waitForElement(driver, 10, locator))
+					throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
+				input.clear();
+				sendText(input, text, driver, locator, retries + 1);
 			}
+		}
+	}
+
+	protected void doClick(Actions a, WebElement element)
+	{
+		a.moveToElement(element);
+		a.click();
+		a.build().perform();
+	}
+
+	protected void doSendKeys(Actions a, CharSequence keys)
+	{
+		a.sendKeys(keys);
+		a.build().perform();
+	}
+
+	protected void sendSpecialKey(Actions a, String specKey, By locator)
+	{
+		logger.trace("Sending key {}", specKey);
+		CharSequence key = getKeysByLabel(specKey.substring(1));
+		if (StringUtils.isNotEmpty(key))
+		{
+			if (logger.isTraceEnabled())
+			{
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0, len = key.length(); i < len; i++)
+				{
+					sb.append("\\u").append(Integer.toHexString(key.charAt(i))).append(" ");
+				}
+				logger.trace("Put to {} text {}", locator, sb);
+			}
+			doSendKeys(a, key);
 		}
 	}
 	
 	protected static List<String> processInputText(String text)
 	{
+		if (StringUtils.isEmpty(text))
+			return Collections.emptyList();
+
 		List<String> strings = new ArrayList<>();
 		boolean afterKey = false;
 		for (String s : text.split("(?=#)"))
@@ -225,27 +209,29 @@ public class SendKeys extends WebAction
 					strings.add(s);
 					afterKey = true;
 				}
-				else 
+				else
 				{
 					if (afterKey)
 						afterKey = false;
-					else 
+					else
 						strings.add(HASH);
 					
 					if (s.length() > 1)
 						strings.add(s.substring(1));
 				}
 			}
-			else 
+			else
+			{
 				strings.add(s);
+			}
 		}
 		return strings;
 	}
-	
+
 	protected static boolean isSpecialKey(String s)
 	{
-		if (s.length() == 0)
-			return false;		
+		if (StringUtils.isEmpty(s))
+			return false;
 		int plusIndex = s.indexOf('+');
 		String firstKey = s.substring(1, plusIndex != -1 ? plusIndex : s.length()).toLowerCase();
 		return KEYS.containsKey(firstKey);
@@ -253,33 +239,59 @@ public class SendKeys extends WebAction
 	
 	public static CharSequence getKeysByLabel(String label)
 	{
-		if (label.contains("+"))
-		{
-			String[] src = label.split("\\+");
-			int size = src.length;
-			CharSequence[] res = new CharSequence[size];
-			for (int i = 0; i < size; i++)
-			{
-				CharSequence c = KEYS.get(src[i].toLowerCase());
-				res[i] = c == null ? src[i] : c;
-			}
-			return Keys.chord(res);
-		}
-		else
+		if (!label.contains("+"))
 			return KEYS.get(label.toLowerCase());
+
+		String[] src = label.split("\\+");
+		int size = src.length;
+		CharSequence[] res = new CharSequence[size];
+		for (int i = 0; i < size; i++)
+		{
+			CharSequence c = KEYS.get(src[i].toLowerCase());
+			res[i] = c == null ? src[i] : c;
+		}
+		return Keys.chord(res);
 	}
 	
-	protected boolean shouldBeEnabledAtFirst(WebElement element, Map<String, String> params)
+	protected boolean needEnable(WebElement element, Map<String, String> params)
 	{
-		String canBeDisabled = params.get(CAN_BE_DISABLED);
-		return canBeDisabled != null && !element.isEnabled() && RhUtils.YES.contains(canBeDisabled.toLowerCase());
+		if (element.isEnabled())
+			return false;
+		return RhUtils.getBooleanOrDefault(params, CAN_BE_DISABLED, false);
+	}
+
+	protected boolean needRun(WebDriver webDriver, Map<String, String> params) throws ScriptExecuteException
+	{
+		if (StringUtils.isEmpty(params.get(PARAM_WAIT2)))
+			return false;
+
+		int wait2 = getIntegerParam(params, PARAM_WAIT2);
+		String locator2Name = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
+		if (StringUtils.isEmpty(locator2Name) || StringUtils.isEmpty(matcher2))
+		{
+			Wait.webWait(webDriver, wait2);
+		}
+		else
+		{
+			try
+			{
+				By locator2 = WebLocatorsMapping.getInstance().getByName(locator2Name).getWebLocator(webDriver, matcher2);
+				if (!waitForElement(webDriver, wait2, locator2))
+					return false;
+			}
+			catch (ScriptCompileException e)
+			{
+				throw new ScriptExecuteException("Error while resolving locator2", e);
+			}
+		}
+		return true;
 	}
 	
 	protected void enable(WebDriver driver, WebElement input)
 	{
-		logInfo("Try to enable element");
+		logInfo("Trying to enable element");
 		((JavascriptExecutor)driver).executeScript("arguments[0].removeAttribute('disabled')", input);
-		logInfo("Now element is " + (input.isEnabled() ? "enabled" : "still disabled"));
+		logInfo("Element is " + (input.isEnabled() ? "enabled" : "still disabled"));
 	}
 	
 	protected void disable(WebDriver driver, WebElement input)
@@ -291,10 +303,13 @@ public class SendKeys extends WebAction
 
 	protected static String replaceConversions(String src)
 	{
-		return src.replace("(","#openbracket#").replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath());
+		if (StringUtils.isEmpty(src))
+			return "";
+		return src.replace("(","#openbracket#")
+				.replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath());
 	}
 	
-	public static Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
+	public static final Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
 		put("up", Keys.UP);
 		put("down", Keys.DOWN);
 		put("left", Keys.LEFT);
