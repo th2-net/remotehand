@@ -25,6 +25,7 @@ public class WebSessionContext extends SessionContext
 	private WebDriver webDriver;
 	private WebElementsDictionary dictionary;
 	private File downloadDir;
+	private String shutdownScript;
 
 	public WebSessionContext(String sessionId)
 	{
@@ -61,11 +62,23 @@ public class WebSessionContext extends SessionContext
 		this.dictionary = dictionary;
 	}
 
-	public File getDownloadDir() {
+	public File getDownloadDir()
+	{
 		return downloadDir;
 	}
 
-	public void setDownloadDir(File donwloadDir) {
+	public void setDownloadDir(File donwloadDir)
+	{
 		this.downloadDir = donwloadDir;
+	}
+
+	public String getShutdownScript()
+	{
+		return shutdownScript;
+	}
+
+	public void setShutdownScript(String shutdownScript)
+	{
+		this.shutdownScript = shutdownScript;
 	}
 }
