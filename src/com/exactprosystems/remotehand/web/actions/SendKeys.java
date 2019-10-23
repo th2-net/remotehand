@@ -121,6 +121,8 @@ public class SendKeys extends WebAction
 	{
 		List<String> strings = processInputText(text);
 		
+		if (retries > 0)
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", input);
 		Actions actions = new Actions(driver);
 		doClick(actions, input);
 		
