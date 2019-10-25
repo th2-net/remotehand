@@ -52,7 +52,7 @@ public class ScrollTo extends WebAction
 		if (element instanceof Locatable)
 		{
 			((Locatable)element).getCoordinates().inViewPort();
-			logInfo("Locate on: %s.", webLocator);
+			logInfo("Located on element: %s.", webLocator);
 		}
 		else
 			throw new ScriptExecuteException("Can't scroll to the following web element: '" + element.toString() + "'");

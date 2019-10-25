@@ -25,11 +25,46 @@ public class WebActionsMapping
 
 	private enum WebActionName
 	{
-		Click, Open, SendKeys, WaitForElement, WaitForNew, Wait, GetElement, GetElementValue, GetDynamicTable, ScrollTo,
-		PageSource, Refresh, ClearElement, Output, SelectFrame, FindElement, SetCheckbox, GetFromCanvasTable, MTableGetValue,
-		MTableGetRow, MTableGetTable, MTableGetRowCount, SendKeysToActive, PressKey, GetFormFields, GetScreenshot,
-		SwitchWindow, UploadFile, CloseWindow, Select, DownloadFile, GetCurrentURL, SetZoom, DurationStart, GetDuration,
-		GetElementScreenshot, WaitForChanges, GetElementInnerHtml;
+		Click,
+		Open,
+		SendKeys,
+		WaitForElement,
+		WaitForNew,
+		Wait,
+		GetElement,
+		GetElementValue,
+		GetDynamicTable,
+		ScrollTo,
+		ScrollDivTo,
+		PageSource,
+		Refresh,
+		ClearElement,
+		Output,
+		SelectFrame,
+		FindElement,
+		SetCheckbox,
+		GetFromCanvasTable,
+		MTableGetValue,
+		MTableGetRow,
+		MTableGetTable,
+		MTableGetRowCount,
+		SendKeysToActive,
+		PressKey,
+		GetFormFields,
+		GetScreenshot,
+		SwitchWindow,
+		UploadFile,
+		CloseWindow,
+		Select,
+		DownloadFile,
+		GetCurrentURL,
+		SetZoom,
+		DurationStart,
+		GetDuration,
+		GetElementScreenshot,
+		WaitForChanges,
+		GetElementInnerHtml;
+		
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
 		{
@@ -55,6 +90,7 @@ public class WebActionsMapping
 		case GetElementValue :     return new GetElementValue();
 		case GetDynamicTable :     return new GetDynamicTable();
 		case ScrollTo :            return new ScrollTo();
+		case ScrollDivTo :         return new ScrollDivTo();
 		case PageSource :          return new PageSource();
 		case Refresh :             return new Refresh();
 		case ClearElement :        return new ClearElement();
