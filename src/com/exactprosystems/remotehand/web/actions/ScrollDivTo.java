@@ -13,6 +13,7 @@ import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -26,7 +27,7 @@ public class ScrollDivTo extends ScrollTo
 {
 	private static final Logger logger = LoggerFactory.getLogger(ScrollDivTo.class);
 
-	public static final String
+	public static final String PARAM_WAIT2 = String.format("%s2", PARAM_WAIT),
 			PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR),
 			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
 			PARAM_Y_OFFSET = "yoffset";
@@ -45,8 +46,11 @@ public class ScrollDivTo extends ScrollTo
 		WebElement elementToScrollTo;
 		try
 		{
+			boolean isWait2 = StringUtils.isNotEmpty(params.get(PARAM_WAIT2));
 			String locator2 = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
 			webLocator2 = WebLocatorsMapping.getInstance().getByName(locator2).getWebLocator(webDriver, matcher2);
+			if (isWait2 && !waitForElement(webDriver, getIntegerParam(params, PARAM_WAIT2), webLocator2))
+				return null;
 			elementToScrollTo = webDriver.findElement(webLocator2);
 		}
 		catch (ScriptCompileException e)

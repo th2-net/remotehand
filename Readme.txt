@@ -200,6 +200,16 @@ Optionally waits <wait> seconds for element specified by <matcher> and scrolls b
 Note that all of actions working with elements (Click, SendKeys, etc.) will scroll to the element automatically if it is invisible.
 
 
+SCROLLDIVTO
+========
+#action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#yoffset
+SendKeys,5,locator,matcher,5,locator2,matcher2,-100
+
+Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
+Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Previous element will scroll to 'offsetTop' of this element.
+Action can optionally move scroll by <yoffset> (positive or negative integer) pixels after scrolling to specified element.
+
+
 PAGESOURCE
 ==========
 #action
