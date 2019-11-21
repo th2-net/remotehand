@@ -36,6 +36,7 @@ public class WebActionsMapping
 		GetDynamicTable,
 		ScrollTo,
 		ScrollDivTo,
+		ScrollDivUntilElement,
 		PageSource,
 		Refresh,
 		ClearElement,
@@ -91,6 +92,7 @@ public class WebActionsMapping
 		case GetDynamicTable :     return new GetDynamicTable();
 		case ScrollTo :            return new ScrollTo();
 		case ScrollDivTo :         return new ScrollDivTo();
+		case ScrollDivUntilElement:return new ScrollDivUntilElement();
 		case PageSource :          return new PageSource();
 		case Refresh :             return new Refresh();
 		case ClearElement :        return new ClearElement();

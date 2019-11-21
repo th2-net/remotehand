@@ -206,8 +206,20 @@ SCROLLDIVTO
 SendKeys,5,locator,matcher,5,locator2,matcher2,-100
 
 Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
-Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Previous element will scroll to 'offsetTop' of this element.
+Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Element with scroll-bar will be scrolled to 'offsetTop' of this element.
 Action can optionally move scroll by <yoffset> (positive or negative integer) pixels after scrolling to specified element.
+
+
+SCROLLDIVUNTILELEMENT
+========
+#action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#searchdir,#searchoffset,#doscrollto,#yoffset
+SendKeys,5,locator,matcher,5,locator2,matcher2,both,300,y,-100
+
+Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
+Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Previous element will scroll until this element will appear.
+Search can be performed in different directions, user can control it with <searchdir> variable. Possible values: 'up', 'down' and 'both'.
+<searchoffset> is number of pixels to scroll on each searching iteration (100 by default).
+If logical variable <doscrollto> is TRUE then action will perform same functional, as SCROLLDIVTO: element with scroll-bar will be scrolled to 'offsetTop' of this element with <yoffset> offset.
 
 
 PAGESOURCE
