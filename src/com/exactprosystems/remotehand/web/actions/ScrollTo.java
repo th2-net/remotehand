@@ -48,15 +48,11 @@ public class ScrollTo extends WebAction
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		WebElement element = webDriver.findElement(webLocator);
-
-		if (element instanceof Locatable)
-		{
-			((Locatable)element).getCoordinates().inViewPort();
-			logInfo("Located on element: %s.", webLocator);
-		}
-		else
-			throw new ScriptExecuteException("Can't scroll to the following web element: '" + element.toString() + "'");
-
+		if (!(element instanceof Locatable))
+			throw new ScriptExecuteException(String.format("Can't scroll to the following web element: '%s'", element));
+		
+		((Locatable)element).getCoordinates().inViewPort();
+		logInfo("Located on element: '%s'", webLocator);
 		return null;
 	}
 

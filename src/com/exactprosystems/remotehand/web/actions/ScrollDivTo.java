@@ -13,7 +13,6 @@ import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +31,11 @@ public class ScrollDivTo extends ScrollTo
 			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
 			PARAM_Y_OFFSET = "yoffset";
 
+	protected static final int DEFAULT_Y_OFFSET = 0;
+
+	protected JavascriptExecutor jsExecutor;
+	protected WebElement divWithScrollbar;
+
 	@Override
 	protected Logger getLogger()
 	{
@@ -41,29 +45,58 @@ public class ScrollDivTo extends ScrollTo
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		WebElement divWithScrollbar = webDriver.findElement(webLocator);
-		By webLocator2;
-		WebElement elementToScrollTo;
+		this.jsExecutor = (JavascriptExecutor) webDriver;
+		this.divWithScrollbar = webDriver.findElement(webLocator);
+
+		By webLocator2 = getWebLocator2(webDriver, params);
+		if (webLocator2 == null)
+			throw new ScriptExecuteException("Element to scroll to didn't appear");
+
+		return doScrollTo(webDriver, webLocator, webLocator2, params);
+	}
+
+	protected By getWebLocator2(WebDriver webDriver, Map<String, String> params) throws ScriptExecuteException
+	{
+		int wait2 = Integer.parseInt(params.getOrDefault(PARAM_WAIT2, "0"));
+		String locator2 = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
 		try
 		{
-			boolean isWait2 = StringUtils.isNotEmpty(params.get(PARAM_WAIT2));
-			String locator2 = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
-			webLocator2 = WebLocatorsMapping.getInstance().getByName(locator2).getWebLocator(webDriver, matcher2);
-			if (isWait2 && !waitForElement(webDriver, getIntegerParam(params, PARAM_WAIT2), webLocator2))
+			By webLocator2 = WebLocatorsMapping.getInstance().getByName(locator2).getWebLocator(webDriver, matcher2);
+			if (!waitForElement(webDriver, wait2, webLocator2, false))
 				return null;
-			elementToScrollTo = webDriver.findElement(webLocator2);
+			return webLocator2;
 		}
 		catch (ScriptCompileException e)
 		{
 			throw new ScriptExecuteException("Error while resolving locator2", e);
 		}
+	}
 
-		int yOffset = Integer.parseInt(params.getOrDefault(PARAM_Y_OFFSET, "0"));
-		JavascriptExecutor jsExecutor = (JavascriptExecutor) webDriver;
-		jsExecutor.executeScript("arguments[0].scrollTop=arguments[1].offsetTop", divWithScrollbar, elementToScrollTo);
-		jsExecutor.executeScript("arguments[0].scrollTop+=(arguments[2]))", divWithScrollbar, yOffset);
+	protected String doScrollTo(WebDriver webDriver, By webLocator, By webLocator2, Map<String, String> params)
+	{
+		WebElement elementToScrollTo = webDriver.findElement(webLocator2);
+
+		int yOffset = getIntegerParam(params, PARAM_Y_OFFSET, DEFAULT_Y_OFFSET);
+		scrollDivToElement(divWithScrollbar, elementToScrollTo);
+		scrollDivByOffset(divWithScrollbar, yOffset);
 		logInfo("Element '%s' located on element '%s' with y-offset %s", webLocator, webLocator2, yOffset);
 
 		return null;
+	}
+	
+	protected void scrollDivToElement(WebElement divWithScrollbar, WebElement elementToScrollTo)
+	{
+		executeJsScript("arguments[0].scrollTop=arguments[1].offsetTop", divWithScrollbar, elementToScrollTo);
+	}
+	
+	protected void scrollDivByOffset(WebElement divWithScrollbar, int yOffset)
+	{
+		if (yOffset != 0)
+			executeJsScript("arguments[0].scrollTop+=(arguments[1])", divWithScrollbar, yOffset);
+	}
+	
+	protected Object executeJsScript(String script, Object... args)
+	{
+		return jsExecutor.executeScript(script, args);
 	}
 }
