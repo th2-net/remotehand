@@ -30,7 +30,8 @@ public class SetCheckbox extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(SetCheckbox.class);
 	
-	public static final String PARAM_CHECKED = "checked";
+	public static final String PARAM_CHECKED = "checked",
+			STATE_CHECKED = "checked", STATE_UNCHECKED = "unchecked";
 
 	@Override
 	public boolean isNeedLocator()
@@ -55,17 +56,19 @@ public class SetCheckbox extends WebAction
 	{
 		WebElement checkbox = findElement(webDriver, webLocator);
 		boolean shouldBeChecked = !RhUtils.NO.contains(params.get(PARAM_CHECKED));
-		switchCheckbox(checkbox, shouldBeChecked);	
+		switchCheckbox(checkbox, shouldBeChecked);
 		return null;
 	}
 	
-	private void switchCheckbox(WebElement checkbox, boolean newState) throws ScriptExecuteException
+	private void switchCheckbox(WebElement checkbox, boolean shouldBeChecked) throws ScriptExecuteException
 	{
-		String newStateStr = newState ? "selected" : "cleared";
-		boolean oldState = checkbox.isSelected();
-		if (newState == oldState)
+		String newState = shouldBeChecked ? STATE_CHECKED : STATE_UNCHECKED;
+
+		boolean checkedNow = isCheckboxChecked(checkbox);
+
+		if (shouldBeChecked == checkedNow)
 		{
-			logInfo("Checkbox has been already " + newStateStr);
+			logInfo("Checkbox is already in required state: %s", newState);
 			return;
 		}
 		
@@ -75,20 +78,29 @@ public class SetCheckbox extends WebAction
 		}
 		catch (WebDriverException e)
 		{
-				if (e.getMessage().contains("Element is not clickable") 
-						&& checkbox.isSelected() != newState) // Case from LCH frontend
-				{
-					WebElement parent = checkbox.findElement(By.xpath(".."));
-					logInfo("Try to click on parent " + parent);
-					parent.click();
-					if (checkbox.isSelected() != newState)
-						throw new ScriptExecuteException("Cannot change state of checkbox " + checkbox);				
-				}
-				else
-				{
-					throw e;
-				}
+			if (e.getMessage().contains("Element is not clickable") && checkbox.isSelected() != shouldBeChecked) // Case from LCH frontend
+			{
+				WebElement parent = checkbox.findElement(By.xpath(".."));
+				logInfo("Trying to click on parent element: %s", parent);
+				parent.click();
+				if (checkbox.isSelected() != shouldBeChecked)
+					throw new ScriptExecuteException(String.format("Cannot change state of checkbox '%s'", checkbox), e);
+			}
+			else
+			{
+				throw e;
+			}
 		}
-		logInfo("Checkbox has been successfully " + newStateStr);
+		logInfo("Checkbox has been successfully updated, new state: %s", newState);
+	}
+
+	protected boolean isCheckboxChecked(WebElement checkbox)
+	{
+		String type = checkbox.getAttribute("type");
+		String clazz = checkbox.getAttribute("class");
+		if ("checkbox".equalsIgnoreCase(type) || clazz == null)
+			return checkbox.isSelected();
+		else
+			return clazz.contains(STATE_CHECKED) && !clazz.contains(STATE_UNCHECKED);
 	}
 }
