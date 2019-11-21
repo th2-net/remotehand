@@ -58,4 +58,10 @@ public class GetScreenshot extends WebAction
 	{
 		return log;
 	}
+	
+	@Override
+	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
+	{
+		return see;
+	}
 }

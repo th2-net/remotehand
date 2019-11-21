@@ -14,7 +14,6 @@ import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.web.actions.GetScreenshot;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
 import com.jhlabs.image.PosterizeFilter;
 import org.apache.commons.io.FileUtils;
@@ -31,19 +30,18 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
-import static java.lang.String.format;
 
 public abstract class WebAction extends Action
 {
 	protected static final String PARAM_WAIT = "wait", PARAM_NOTFOUNDFAIL = "notfoundfail";
 	
 	protected static final String SCREENSHOT_EXTENSION = ".png";
-	protected static final SimpleDateFormat SCREENSHOT_TIMESTAMP_FORMAT = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+	protected static final DateTimeFormatter SCREENSHOT_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 	
 	protected String[] mandatoryParams;
 
@@ -66,9 +64,22 @@ public abstract class WebAction extends Action
 		{
 			return Integer.parseInt(params.get(paramName));
 		}
-		catch (NumberFormatException ex)
+		catch (NumberFormatException e)
 		{
-			throw new ScriptExecuteException("Error while parsing parameter '" + paramName + "' = '" + params.get(paramName) + "' as number");
+			throw new ScriptExecuteException(String.format("Error while parsing parameter '%s' = '%s' as number",
+					paramName, params.get(paramName)), e);
+		}
+	}
+
+	public static int getIntegerParam(Map<String, String> params, String paramName, int defaultValue)
+	{
+		try
+		{
+			return Integer.parseInt(params.get(paramName));
+		}
+		catch (NumberFormatException e)
+		{
+			return defaultValue;
 		}
 	}
 	
@@ -93,26 +104,26 @@ public abstract class WebAction extends Action
 		return !params.containsKey(PARAM_NOTFOUNDFAIL) || RhUtils.YES.contains(params.get(PARAM_NOTFOUNDFAIL));
 	}
 	
-	protected boolean waitForElement(WebDriver webDriver, int seconds, final By webLocator) throws ScriptExecuteException
+	protected boolean waitForElement(WebDriver webDriver, int seconds, By webLocator) throws ScriptExecuteException
+	{
+		return waitForElement(webDriver, seconds, webLocator, isElementMandatory());
+	}
+	
+	protected boolean waitForElement(WebDriver webDriver, int seconds, By webLocator, boolean isElementMandatory)
+			throws ScriptExecuteException
 	{
 		try
 		{
-			new WebDriverWait(webDriver, seconds).until(new ExpectedCondition<Boolean>()
-			{
-				@Override
-				public Boolean apply(WebDriver webDriver)
-				{
-					return webDriver.findElements(webLocator).size() > 0;
-				}
-			});
+			new WebDriverWait(webDriver, seconds).until((ExpectedCondition<Boolean>) webDriver1 ->
+					webDriver1 != null && webDriver1.findElements(webLocator).size() > 0);
 			logInfo("Appeared locator: '%s'", webLocator);
 		}
 		catch (TimeoutException ex)
 		{
-			if (isElementMandatory())
-				throw new ScriptExecuteException("Timed out after " + seconds + " seconds waiting for '" + webLocator.toString() + "'");
-			else
-				return false;
+			if (isElementMandatory)
+				throw new ScriptExecuteException(String.format("Timed out after %s seconds waiting for '%s'",
+						seconds, webLocator), ex);
+			return false;
 		}
 		return true;
 	}
@@ -136,7 +147,7 @@ public abstract class WebAction extends Action
 			if((start = value.indexOf("@{")) < 0)
 				continue;
 
-			int end = value.lastIndexOf("}");
+			int end = value.lastIndexOf('}');
 			String name = value.substring(start + 2, end);
 			String contextValue = (String) context.getContextData().get(name);
 
@@ -161,9 +172,9 @@ public abstract class WebAction extends Action
 			boolean needRun = true;
 			if (isCanWait())
 			{
-				if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
-					if (!waitForElement(webDriver, getIntegerParam(params, PARAM_WAIT), locator))
-						needRun = false;
+				int waitSecs = getIntegerParam(params, PARAM_WAIT, 0);
+				if (waitSecs != 0 && !waitForElement(webDriver, waitSecs, locator))
+					needRun = false;
 			}
 
 			if (isCanSwitchPage())
@@ -178,16 +189,14 @@ public abstract class WebAction extends Action
 		catch (WebDriverException e)
 		{
 			ScriptExecuteException see = new ScriptExecuteException(e.getMessage(), e);
-			if (!isBrowserNotReachable(e))
-				see = addScreenshot(see);
-			throw see;
+			if (isBrowserNotReachable(e))
+				throw see;
+			throw addScreenshot(see);
 		}
 	}
 	
-	private ScriptExecuteException addScreenshot(ScriptExecuteException see)
+	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
 	{
-		if (this instanceof GetScreenshot)
-			return see;
 		see.setScreenshotId(takeScreenshotIfError());
 		return see;
 	}
@@ -267,7 +276,7 @@ public abstract class WebAction extends Action
 		{
 			String msg = "Unexpected error while trying to create screenshot";
 			logError(msg, e);
-			throw new ScriptExecuteException(msg);
+			throw new ScriptExecuteException(msg, e);
 		}
 	}
 	
@@ -288,7 +297,7 @@ public abstract class WebAction extends Action
 	
 	private String createScreenshotFileName(String name)
 	{
-		return (name != null ? name : "screenshot") + SCREENSHOT_TIMESTAMP_FORMAT.format(new Date()) + SCREENSHOT_EXTENSION;
+		return (name != null ? name : "screenshot") + SCREENSHOT_TIMESTAMP_FORMAT.format(LocalDateTime.now()) + SCREENSHOT_EXTENSION;
 	}
 	
 	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
@@ -300,8 +309,8 @@ public abstract class WebAction extends Action
 		}
 		catch (IOException e)
 		{
-			throw new ScriptExecuteException(format("Unable to copy screenshot file '%s' to the storage directory '%s'.",
-					tmpFile, WebConfiguration.SCREENSHOTS_DIR_NAME));
+			throw new ScriptExecuteException(String.format("Unable to copy screenshot file '%s' to the storage directory '%s'.",
+					tmpFile, WebConfiguration.SCREENSHOTS_DIR_NAME), e);
 		}
 	}
 	
@@ -379,7 +388,7 @@ public abstract class WebAction extends Action
 		{
 			String msg = "Unexpected error while trying to create screenshot of element";
 			logError(msg, e);
-			throw new ScriptExecuteException(msg);
+			throw new ScriptExecuteException(msg, e);
 		}
 	}
 	
@@ -392,12 +401,12 @@ public abstract class WebAction extends Action
 	
 	protected void logError(String msg)
 	{
-		getLogger().error(sessionIdForLogs + msg);
+		getLogger().error("{}{}", sessionIdForLogs, msg);
 	}
 	
 	protected void logError(String msg, Throwable e)
 	{
-		getLogger().error(sessionIdForLogs + msg, e);
+		getLogger().error(String.format("%s%s", sessionIdForLogs, msg), e);
 	}
 	
 	protected void logWarn(String msg)
@@ -407,20 +416,20 @@ public abstract class WebAction extends Action
 	
 	protected void logWarn(String msgTemplate, Object... args)
 	{
-		getLogger().warn(sessionIdForLogs + format(msgTemplate, args));
+		getLogger().warn("{}{}", sessionIdForLogs, String.format(msgTemplate, args));
 	}
 	
 	protected void logInfo(String msg)
 	{
 		Logger logger = getLogger();
 		if (logger.isInfoEnabled())
-			logger.info(sessionIdForLogs + msg);
+			logger.info("{}{}", sessionIdForLogs, msg);
 	}
 	
 	protected void logInfo(String msgTemplate, Object... args)
 	{
 		Logger logger = getLogger();
 		if (logger.isInfoEnabled())
-			logger.info(sessionIdForLogs + format(msgTemplate, args));
+			logger.info("{}{}", sessionIdForLogs, String.format(msgTemplate, args));
 	}
 }
