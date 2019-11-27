@@ -11,6 +11,7 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.Action;
+import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
@@ -177,7 +178,7 @@ public abstract class WebAction extends Action
 					needRun = false;
 			}
 
-			if (isCanSwitchPage())
+			if (isCanSwitchPage() && isNeedDisableLeavePageAlert())
 				disableLeavePageAlert(webDriver);
 
 			return (needRun) ? run(webDriver, locator, params) : null;
@@ -204,6 +205,11 @@ public abstract class WebAction extends Action
 	public String[] getMandatoryParams() throws ScriptCompileException
 	{
 		return mandatoryParams;
+	}
+	
+	public boolean isNeedDisableLeavePageAlert()
+	{
+		return ((WebConfiguration) Configuration.getInstance()).isDisableLeavePageAlert();
 	}
 
 	public void disableLeavePageAlert(WebDriver webDriver)

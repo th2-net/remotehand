@@ -79,6 +79,7 @@ public class WebConfiguration extends Configuration{
 	private final Properties formParserProperties;
 	private boolean isProxySettingsSet;
 	private volatile File downloadsDir;
+	private boolean disableLeavePageAlert;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
@@ -114,7 +115,7 @@ public class WebConfiguration extends Configuration{
 		formParserProperties = loadFormParserConfig(FORM_PARSER_CONFIG_FILE);
 		
 		this.downloadsDir = new File(loadProperty(properties, "DownloadsDir", "downloads/"));
-		
+		disableLeavePageAlert = Boolean.parseBoolean(loadProperty(properties, "DisableLeavePageAlert", "true"));
 	}
 
 	@Override
@@ -318,5 +319,10 @@ public class WebConfiguration extends Configuration{
 				|| clientLoggingLevel != Level.OFF
 				|| driverLoggingLevel != Level.OFF
 				|| performanceLoggingLevel != Level.OFF;
+	}
+
+	public boolean isDisableLeavePageAlert()
+	{
+		return disableLeavePageAlert;
 	}
 }
