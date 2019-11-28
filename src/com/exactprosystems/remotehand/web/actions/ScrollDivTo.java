@@ -59,11 +59,13 @@ public class ScrollDivTo extends ScrollTo
 	{
 		int wait2 = Integer.parseInt(params.getOrDefault(PARAM_WAIT2, "0"));
 		String locator2 = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
+		logInfo("Waiting for element by: '%s'", locator2);
 		try
 		{
 			By webLocator2 = WebLocatorsMapping.getInstance().getByName(locator2).getWebLocator(webDriver, matcher2);
 			if (!waitForElement(webDriver, wait2, webLocator2, false))
 				return null;
+			logInfo("Appeared locator: '%s'", webLocator2);
 			return webLocator2;
 		}
 		catch (ScriptCompileException e)
