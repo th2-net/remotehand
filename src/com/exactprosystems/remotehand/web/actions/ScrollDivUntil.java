@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 
-public class ScrollDivUntilElement extends ScrollDivTo
+public class ScrollDivUntil extends ScrollDivTo
 {
-	private static final Logger logger = LoggerFactory.getLogger(ScrollDivUntilElement.class);
+	private static final Logger logger = LoggerFactory.getLogger(ScrollDivUntil.class);
 
 	public static final String PARAM_SCROLL_DIR = "searchdir",
 			PARAM_SEARCH_OFFSET = "searchoffset",

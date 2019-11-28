@@ -210,7 +210,7 @@ Then optionally waits <wait2> seconds for element specified by <matcher2>, this 
 Action can optionally move scroll by <yoffset> (positive or negative integer) pixels after scrolling to specified element.
 
 
-SCROLLDIVUNTILELEMENT
+SCROLLDIVUNTIL
 ========
 #action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#searchdir,#searchoffset,#doscrollto,#yoffset
 SendKeys,5,locator,matcher,5,locator2,matcher2,both,300,y,-100
