@@ -298,6 +298,14 @@ UploadFile,5,locator,matcher,absolutepath
 Uploads file by locator, using absolute path to the file or path relative to RemoteHand directory.
 
 
+DOWNLOAD
+========
+You are able to download files from GUI with this action. First of all you need to make a snapshot of a download directory.
+To do this call the action with #actiontype = snapshot. Then call the action with #actiontype = download.
+If there are some new files in the download directory action output will contain local path or http link of the downloaded file.
+The output depends on #localpath parameter('false' by default results in http link in the output).
+
+
 SWITCHWINDOW
 ============
 #action,#window

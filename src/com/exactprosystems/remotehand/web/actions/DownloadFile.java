@@ -13,6 +13,7 @@ package com.exactprosystems.remotehand.web.actions;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebConfiguration;
@@ -39,8 +40,10 @@ import java.util.Map;
  */
 public class DownloadFile extends WebAction {
 	
-	public static final String FILES_KEY = "DownloadDirFiles";
-	public static final String FILE_NAME = "filename";
+	public static final String
+			FILES_KEY = "DownloadDirFiles",
+			FILE_NAME = "filename",
+			LOCAL_PATH = "localpath";
 
 	private static final Logger logger = LoggerFactory.getLogger(DownloadFile.class);
 
@@ -95,6 +98,9 @@ public class DownloadFile extends WebAction {
 			}
 
 			file = renameFile(file, params);
+
+			if (getParams().containsKey(LOCAL_PATH) && RhUtils.YES.contains(getParams().get(LOCAL_PATH)))
+				return "FilePath=" + file.getAbsolutePath();
 
 			return "Downloaded_file=" + createUrl(file);
 		}
