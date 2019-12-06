@@ -33,6 +33,7 @@ public class WebActionsMapping
 		Wait,
 		GetElement,
 		GetElementValue,
+		GetElementAttribute,
 		GetDynamicTable,
 		ScrollTo,
 		ScrollDivTo,
@@ -89,6 +90,7 @@ public class WebActionsMapping
 		case Wait :	               return new Wait();
 		case GetElement :          return new GetElement();
 		case GetElementValue :     return new GetElementValue();
+		case GetElementAttribute : return new GetElementAttribute();
 		case GetDynamicTable :     return new GetDynamicTable();
 		case ScrollTo :            return new ScrollTo();
 		case ScrollDivTo :         return new ScrollDivTo();

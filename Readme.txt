@@ -179,7 +179,14 @@ GETELEMENTVALUE
 #action,#wait,#locator,#matcher
 GetElementValue,5,locator,matcher
 
-Allow to obtain element value. For example value of tag <input>
+Allow to obtain element value. For example value of tag <input>.
+
+GETELEMENTVALUE
+==========
+#action,#wait,#locator,#matcher,#attribute
+GetElementValue,5,locator,matcher,class
+
+Allow to obtain element's attribute value. For example, class of element.
 
 
 GETDYNAMICTABLE
