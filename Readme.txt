@@ -91,11 +91,11 @@ You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is
 
 SENDKEYS
 ========
-#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear
-SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes
+#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear,#CheckInput
+SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes,no
 
 "Clear" parameter can be true or yes when we want to clear element before sending.
-Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputing <text>. Element is found using <locator>.
+Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputting <text>. Element is found using <locator>.
 In some cases it is needed to wait for some element to appear after first input and then continue the input 
 (for example, need to wait for autocomplete box to appear). 
 In these cases optional parameters <wait2>, <locator2>, <matcher2> and <text2> come in handy: 
@@ -103,6 +103,7 @@ after inputing <text>, RemoteHand will wait <wait2> seconds for element specifie
 Element to wait is found using <locator2>. 
 Also, you can skip <locator2> and <matcher2> and RemoteHand will just wait <wait2> seconds before continuing the input with <text2>.
 If you want to fill disabled field use #CanBeDisabled=yes. Field will be enabled and disabled back after text input.
+If you want to send keys without checking sending result value use #CheckInput=no ('yes' by default).
 
 You can tell RemoteHand to press the following special keys by specifying corresponding codes:
 1. Up arrow - #up#
@@ -210,7 +211,7 @@ Note that all of actions working with elements (Click, SendKeys, etc.) will scro
 SCROLLDIVTO
 ========
 #action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#yoffset
-SendKeys,5,locator,matcher,5,locator2,matcher2,-100
+ScrollDivTo,5,locator,matcher,5,locator2,matcher2,-100
 
 Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
 Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Element with scroll-bar will be scrolled to 'offsetTop' of this element.
@@ -220,7 +221,7 @@ Action can optionally move scroll by <yoffset> (positive or negative integer) pi
 SCROLLDIVUNTIL
 ========
 #action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#searchdir,#searchoffset,#doscrollto,#yoffset
-SendKeys,5,locator,matcher,5,locator2,matcher2,both,300,y,-100
+ScrollDivUntil,5,locator,matcher,5,locator2,matcher2,both,300,y,-100
 
 Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
 Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Previous element will scroll until this element will appear.

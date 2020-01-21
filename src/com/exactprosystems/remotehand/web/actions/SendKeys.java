@@ -37,6 +37,7 @@ public class SendKeys extends WebAction
 			PARAM_WAIT2 = String.format("%s2", PARAM_WAIT),
 			PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR),
 			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
+			PARAM_CHECKINPUT = "checkinput",
 			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled",
@@ -83,6 +84,8 @@ public class SendKeys extends WebAction
 		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
 		if (webLocator == null)
 			logInfo("Active element: %s" , input != null ? input.getTagName() : "null");
+		if (input == null)
+			throw new ScriptExecuteException("Unable to send keys: input element is null");
 
 		boolean shouldBeEnabled = needEnable(input, params);
 		try
@@ -90,22 +93,23 @@ public class SendKeys extends WebAction
 			if (shouldBeEnabled)
 				enable(webDriver, input);
 
-			if (input != null && RhUtils.getBooleanOrDefault(params, CLEAR_BEFORE, false))
+			if (RhUtils.getBooleanOrDefault(params, CLEAR_BEFORE, false))
 			{
 				input.clear();
 				logInfo("Text field has been cleared.");
 			}
 
+			boolean checkInput = RhUtils.getBooleanOrDefault(params, PARAM_CHECKINPUT, true);
 			String text = replaceConversions(params.get(PARAM_TEXT));
 			logInfo("Sending text1 (%s) to locator: %s", text, webLocator);
-			sendText(input, text, webDriver, webLocator, 0);
+			sendText(input, text, webDriver, webLocator, 0, checkInput);
 			logInfo("Text '%s' was sent to locator: %s.", text, webLocator);
 
 			String text2 = replaceConversions(params.get(PARAM_TEXT2));
 			if (StringUtils.isNotEmpty(text2) && needRun(webDriver, params))
 			{
 				logInfo("Sending text2 to: %s", webLocator);
-				sendText(input, text2, webDriver, webLocator, 0);
+				sendText(input, text2, webDriver, webLocator, 0, checkInput);
 				logInfo("Sent text2 to: %s", webLocator);
 			}
 		}
@@ -117,7 +121,8 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries) throws ScriptExecuteException
+	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries, boolean checkInput)
+			throws ScriptExecuteException
 	{
 		List<String> strings = processInputText(text);
 		
@@ -147,7 +152,11 @@ public class SendKeys extends WebAction
 
 			if (!(driver instanceof ChromeDriver))
 				continue;
-			if (!input.getAttribute("value").replaceFirst(Pattern.quote(inputAtStart), "").equals(str))
+			String result = input.getAttribute("value");
+			boolean equals = result.equals(str);
+			if (!equals && result.startsWith(inputAtStart))
+				equals = result.replaceFirst(Pattern.quote(inputAtStart), "").equals(str);
+			if (!equals)
 			{
 				if (retries >= MAX_RETRIES)
 				{
@@ -161,7 +170,7 @@ public class SendKeys extends WebAction
 				if (!waitForElement(driver, 10, locator))
 					throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
 				input.clear();
-				sendText(input, text, driver, locator, retries + 1);
+				sendText(input, text, driver, locator, retries + 1, checkInput);
 			}
 		}
 	}
