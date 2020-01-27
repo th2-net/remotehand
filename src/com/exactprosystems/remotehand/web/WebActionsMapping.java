@@ -51,6 +51,7 @@ public class WebActionsMapping
 		MTableGetTable,
 		MTableGetRowCount,
 		SendKeysToActive,
+		KeyAction,
 		PressKey,
 		GetFormFields,
 		GetScreenshot,
@@ -107,7 +108,8 @@ public class WebActionsMapping
 		case MTableGetTable :      return new MTableGetTable();
 		case MTableGetRowCount :   return new MTableGetRowCount();
 		case SendKeysToActive:     return new SendKeysToActive();
-		case PressKey :            return new PressKey();
+		case KeyAction:
+		case PressKey:             return new KeyAction();
 		case GetFormFields:        return new GetFormFields();
 		case GetScreenshot:        return new GetScreenshot();
 		case SwitchWindow:         return new SwitchWindow();

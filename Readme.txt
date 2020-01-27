@@ -91,8 +91,8 @@ You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is
 
 SENDKEYS
 ========
-#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear,#CheckInput
-SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes,no
+#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear,#CheckInput,#NeedClick
+SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes,no,no
 
 "Clear" parameter can be true or yes when we want to clear element before sending.
 Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputting <text>. Element is found using <locator>.
@@ -104,6 +104,7 @@ Element to wait is found using <locator2>.
 Also, you can skip <locator2> and <matcher2> and RemoteHand will just wait <wait2> seconds before continuing the input with <text2>.
 If you want to fill disabled field use #CanBeDisabled=yes. Field will be enabled and disabled back after text input.
 If you want to send keys without checking sending result value use #CheckInput=no ('yes' by default).
+If you want to send keys without clicking on element first use #NeedClick=no ('yes' by default).
 
 You can tell RemoteHand to press the following special keys by specifying corresponding codes:
 1. Up arrow - #up#
@@ -134,6 +135,8 @@ text#down##return#
 
 The keys and special codes can be combined in order to press a combination of keys. The combination is specified in "#" chars with keys delimited by "+". For example, to simulate input of '(' char you can use the following:
 #shift+9#
+
+Special keys (Shift, Ctrl, Alt) can be hold during keys sending. To hold key you can place it in round brackets (ex. '(#shift#)a' will cause pressing key 'a' with shift holded).
 
 
 WAITFORELEMENT
@@ -282,12 +285,20 @@ FindElement,5,locator,matcher,controlID
 Optionally waits <wait> seconds for element specified by <matcher> and <locator>. If element is found, "<id>=found" is printed in output. Else "<id>=notfound" is printed.
 
 
+KEYACTION
+========
+#action,#key,#keyaction
+KeyAction,#shift#,down
+
+Allows to perform action over key specified for SendKeys action without reference to locator. Available values of #keyaction param: press (press key), down (hold key), up (release key).
+
+
 PRESSKEY
 ========
 #action,#key
 PressKey,#tab#
 
-Allows to send one of keys specified for SendKeys action without reference to locator.
+Allows to send one of keys specified for SendKeys action without reference to locator. Equals to KeyAction with #keyaction=press.
 
 
 SENDKEYSTOACTIVE

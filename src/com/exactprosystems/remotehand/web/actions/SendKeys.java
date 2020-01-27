@@ -26,11 +26,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SendKeys extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(SendKeys.class);
+
+	private static final Pattern HOLD_KEYS_PATTERN = Pattern.compile("\\(#(shift|ctrl|alt)#\\)");
 	
 	private static final String PARAM_TEXT = "text",
 			PARAM_TEXT2 = String.format("%s2", PARAM_TEXT),
@@ -38,6 +41,7 @@ public class SendKeys extends WebAction
 			PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR),
 			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
 			PARAM_CHECKINPUT = "checkinput",
+			PARAM_NEEDCLICK = "needclick",
 			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled",
@@ -45,9 +49,9 @@ public class SendKeys extends WebAction
 
 	private static final int MAX_RETRIES = 3;
 
-	public static final String SHIFT = "shift",
-			CTRL = "ctrl",
-			ALT = "alt";
+	public static final String SHIFT = "shift", CTRL = "ctrl", ALT = "alt";
+	
+	private boolean holdShift, holdCtrl, holdAlt;
 
 	public SendKeys()
 	{
@@ -100,16 +104,17 @@ public class SendKeys extends WebAction
 			}
 
 			boolean checkInput = RhUtils.getBooleanOrDefault(params, PARAM_CHECKINPUT, true);
-			String text = replaceConversions(params.get(PARAM_TEXT));
+			boolean needClick = RhUtils.getBooleanOrDefault(params, PARAM_NEEDCLICK, true);
+			String text = replaceConversions(checkHoldKeys(params.get(PARAM_TEXT)));
 			logInfo("Sending text1 (%s) to locator: %s", text, webLocator);
-			sendText(input, text, webDriver, webLocator, 0, checkInput);
+			sendText(input, text, webDriver, webLocator, 0, checkInput, needClick);
 			logInfo("Text '%s' was sent to locator: %s.", text, webLocator);
 
 			String text2 = replaceConversions(params.get(PARAM_TEXT2));
 			if (StringUtils.isNotEmpty(text2) && needRun(webDriver, params))
 			{
 				logInfo("Sending text2 to: %s", webLocator);
-				sendText(input, text2, webDriver, webLocator, 0, checkInput);
+				sendText(input, text2, webDriver, webLocator, 0, checkInput, needClick);
 				logInfo("Sent text2 to: %s", webLocator);
 			}
 		}
@@ -121,8 +126,8 @@ public class SendKeys extends WebAction
 		return null;
 	}
 	
-	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries, boolean checkInput)
-			throws ScriptExecuteException
+	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries,
+			boolean checkInput, boolean needClick) throws ScriptExecuteException
 	{
 		List<String> strings = processInputText(text);
 		
@@ -132,7 +137,9 @@ public class SendKeys extends WebAction
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", input);
 		}
 		Actions actions = new Actions(driver);
-		doClick(actions, input);
+		if (needClick)
+			doClick(actions, input);
+		doHoldKeys(driver);
 		
 		for (String str : strings)
 		{
@@ -170,9 +177,51 @@ public class SendKeys extends WebAction
 				if (!waitForElement(driver, 10, locator))
 					throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
 				input.clear();
-				sendText(input, text, driver, locator, retries + 1, checkInput);
+				sendText(input, text, driver, locator, retries + 1, checkInput, needClick);
 			}
 		}
+		doReleaseKeys(driver);
+	}
+	
+	protected String checkHoldKeys(String text)
+	{
+		if (StringUtils.isEmpty(text))
+			return text;
+		
+		Matcher holdMatcher = HOLD_KEYS_PATTERN.matcher(text);
+		while (holdMatcher.find())
+		{
+			boolean replace = false;
+			String match = holdMatcher.group();
+			String holdKey = holdMatcher.group(1);
+			switch (holdKey)
+			{
+				case SHIFT:
+					if (!holdShift)
+					{
+						logInfo("Shift key will be holded during keys sending");
+						holdShift = replace = true;
+					}
+					break;
+				case CTRL:
+					if (!holdCtrl)
+					{
+						logInfo("Ctrl key will be holded during keys sending");
+						holdCtrl = replace = true;
+					}
+					break;
+				case ALT:
+					if (!holdAlt)
+					{
+						logInfo("Alt key will be holded during keys sending");
+						holdAlt = replace = true;
+					}
+					break;
+			}
+			if (replace)
+				text = text.replace(match, "");
+		}
+		return text;
 	}
 
 	protected void doClick(Actions a, WebElement element)
@@ -180,6 +229,28 @@ public class SendKeys extends WebAction
 		a.moveToElement(element);
 		a.click();
 		a.build().perform();
+	}
+	
+	protected void doHoldKeys(WebDriver driver)
+	{
+		Actions a = new Actions(driver);
+		if (holdShift)
+			a.keyDown(Keys.SHIFT).perform();
+		if (holdCtrl)
+			a.keyDown(Keys.CONTROL).perform();
+		if (holdAlt)
+			a.keyDown(Keys.ALT).perform();
+	}
+
+	protected void doReleaseKeys(WebDriver driver)
+	{
+		Actions a = new Actions(driver);
+		if (holdShift)
+			a.keyUp(Keys.SHIFT).perform();
+		if (holdCtrl)
+			a.keyUp(Keys.CONTROL).perform();
+		if (holdAlt)
+			a.keyUp(Keys.ALT).perform();
 	}
 
 	protected void doSendKeys(Actions a, CharSequence keys)
