@@ -138,7 +138,11 @@ public class SendKeys extends WebAction
 		}
 		Actions actions = new Actions(driver);
 		if (needClick)
+		{
 			doClick(actions, input);
+			// find element again to avoid 'cannot focus element' error
+			input = locator != null ? findElement(driver, locator) : driver.switchTo().activeElement();
+		}
 		doHoldKeys(driver);
 		
 		for (String str : strings)
@@ -157,30 +161,35 @@ public class SendKeys extends WebAction
 				continue;
 			}
 
-			if (!(driver instanceof ChromeDriver))
-				continue;
-			String result = input.getAttribute("value");
-			boolean equals = result.equals(str);
-			if (!equals && result.startsWith(inputAtStart))
-				equals = result.replaceFirst(Pattern.quote(inputAtStart), "").equals(str);
-			if (!equals)
-			{
-				if (retries >= MAX_RETRIES)
-				{
-					logWarn("Missed input detected, but too many retries were already done.");
-					logWarn("Unable to send text '{}' to locator '{}'", text, locator);
-					return;
-				}
-
-				// If field not filled as expected for current moment, restart operation at all
-				logInfo("Missed input detected. Trying to resend keys.");
-				if (!waitForElement(driver, 10, locator))
-					throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
-				input.clear();
-				sendText(input, text, driver, locator, retries + 1, checkInput, needClick);
-			}
+			if (checkInput && driver instanceof ChromeDriver)
+				checkInput(input, text, driver, locator, retries, needClick, str, inputAtStart);
 		}
 		doReleaseKeys(driver);
+	}
+	
+	protected void checkInput(WebElement input, String text, WebDriver driver, By locator, int retries,
+			boolean needClick, String str, String inputAtStart) throws ScriptExecuteException
+	{
+		String result = input.getAttribute("value");
+		boolean equals = result.equals(str);
+		if (!equals && result.startsWith(inputAtStart))
+			equals = result.replaceFirst(Pattern.quote(inputAtStart), "").equals(str);
+		if (!equals)
+		{
+			if (retries >= MAX_RETRIES)
+			{
+				logWarn("Missed input detected, but too many retries were already done.");
+				logWarn("Unable to send text '{}' to locator '{}'", text, locator);
+				return;
+			}
+
+			// If field not filled as expected for current moment, restart operation at all
+			logInfo("Missed input detected. Trying to resend keys.");
+			if (!waitForElement(driver, 10, locator))
+				throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
+			input.clear();
+			sendText(input, text, driver, locator, retries + 1, true, needClick);
+		}
 	}
 	
 	protected String checkHoldKeys(String text)
