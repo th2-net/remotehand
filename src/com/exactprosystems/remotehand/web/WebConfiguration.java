@@ -80,6 +80,7 @@ public class WebConfiguration extends Configuration{
 	private boolean isProxySettingsSet;
 	private volatile File downloadsDir;
 	private boolean disableLeavePageAlert;
+	private boolean createDownloadSubDir;
 
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
@@ -116,6 +117,7 @@ public class WebConfiguration extends Configuration{
 		
 		this.downloadsDir = new File(loadProperty(properties, "DownloadsDir", "downloads/"));
 		disableLeavePageAlert = Boolean.parseBoolean(loadProperty(properties, "DisableLeavePageAlert", "true"));
+		createDownloadSubDir = Boolean.parseBoolean(loadProperty(properties, "CreateDownloadSubDir", "true"));
 	}
 
 	@Override
@@ -141,7 +143,7 @@ public class WebConfiguration extends Configuration{
 			property = defaultValue;
 		}
 		else 
-			logger.info(name + " = " + property);
+			logger.info("{} = {}", name, property);
 		return property;
 	}
 	
@@ -152,7 +154,7 @@ public class WebConfiguration extends Configuration{
 			logger.warn(format("Property '%s' is not set.", propertyName));
 		else 
 		{
-			logger.info(propertyName + " = " + setting);
+			logger.info("{} = {}", propertyName, setting);
 			if (!isProxySettingsSet)
 				isProxySettingsSet = true;
 		}
@@ -324,5 +326,10 @@ public class WebConfiguration extends Configuration{
 	public boolean isDisableLeavePageAlert()
 	{
 		return disableLeavePageAlert;
+	}
+	
+	public boolean isCreateDownloadSubDir()
+	{
+		return createDownloadSubDir;
 	}
 }

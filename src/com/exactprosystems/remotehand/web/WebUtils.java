@@ -22,6 +22,11 @@ public class WebUtils {
 	public static File createDownloadDirectory() {
 		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
 		File downloadsDir = configuration.getDownloadsDir();
+		if (!configuration.isCreateDownloadSubDir())
+		{
+			downloadsDir.mkdirs();
+			return downloadsDir;
+		}
 		File newFileDir = new File(downloadsDir, String.valueOf(System.currentTimeMillis()));
 		newFileDir.mkdirs();
 		return newFileDir;
@@ -30,9 +35,8 @@ public class WebUtils {
 	public static void deleteDownloadDirectory(File downloadDir)
 	{
 		File[] tmp;
-		if (downloadDir != null && (tmp = downloadDir.listFiles()) != null && tmp.length == 0) {
+		if (downloadDir != null && (tmp = downloadDir.listFiles()) != null && tmp.length == 0)
 			downloadDir.delete();
-		}
 	}
 	
 }
