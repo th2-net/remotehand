@@ -31,7 +31,7 @@ public class Click extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(Click.class);
 	
-	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", BUTTON = "button",
+	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
 	
 	private static final Map<String, CharSequence> MODIFIER_KEYS = new HashMap<String, CharSequence>() {{
@@ -110,9 +110,11 @@ public class Click extends WebAction
 				logError("Middle click is not implemented.");
 				return null;
 			}
+			else if (button.equals(DOUBLE))
+				actions.doubleClick();
 			else
 			{
-				logError("Button may be only left, right or middle.");
+				logError("Button may be only left, right, middle or double (for double click with left button).");
 				return null;
 			}
 			resetModifiers(actions, mods);

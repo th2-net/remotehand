@@ -77,6 +77,7 @@ Click,5,locator,matcher,mouse_button,10,10,"ctrl,shift"
 Optionally waits <wait> seconds for element specified by <matcher> and clicks on it with <button> ("left" by default). Element is found using <locator>.
 Optional <xoffset> and <yoffset> parameters define position from element top left corner to click on.
 Optional <modifiers> parameter is expected to be enumeration of modifier keys, e.g.: "ctrl,shift,alt"
+Possible values of <button>: left, right, middle, double.
 
 
 SETCHECKBOX
