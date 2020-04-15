@@ -66,7 +66,9 @@ public class WebActionsMapping
 		GetDuration,
 		GetElementScreenshot,
 		WaitForChanges,
-		GetElementInnerHtml;
+		GetElementInnerHtml,
+		AcceptAlert,
+		DismissAlert;
 		
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
@@ -124,6 +126,8 @@ public class WebActionsMapping
 		case GetElementScreenshot: return new GetElementScreenshot();
 		case WaitForChanges:       return new WaitForChanges();
 		case GetElementInnerHtml:  return new GetElementInnerHtml();
+		case AcceptAlert:          return new AcceptAlert();
+		case DismissAlert:         return new DismissAlert();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}

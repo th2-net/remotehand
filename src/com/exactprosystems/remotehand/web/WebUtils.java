@@ -11,6 +11,11 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.ScriptExecuteException;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 
@@ -39,4 +44,16 @@ public class WebUtils {
 			downloadDir.delete();
 	}
 	
+	public static Alert waitForAlert(WebDriver webDriver, int timeoutSec) throws ScriptExecuteException
+	{
+		try
+		{
+			WebDriverWait wait = new WebDriverWait(webDriver, timeoutSec);
+			return wait.until(ExpectedConditions.alertIsPresent());
+		}
+		catch (Exception e)
+		{
+			throw new ScriptExecuteException(e.getMessage(), e);
+		}
+	}
 }

@@ -394,6 +394,22 @@ Changes are found by comparing element screenshot with the one stored under <id>
 Check for changes is performed (i.e. new screenshot is taken) every <checkmillis> milliseconds.
 
 
+ACCEPTALERT
+===========
+#action,#wait
+AcceptAlert,5
+
+Waits <wait> seconds for alert and accept it.
+
+
+DISMISSALERT
+===========
+#action,#wait
+DismissAlert,5
+
+Waits <wait> seconds for alert and dismiss it.
+
+
 NOTES
 *****
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
