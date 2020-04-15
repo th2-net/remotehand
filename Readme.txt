@@ -399,7 +399,7 @@ ACCEPTALERT
 #action,#wait
 AcceptAlert,5
 
-Waits <wait> seconds for alert and accept it.
+Waits <wait> seconds for alert dialog to appear and accepts it, i.e. presses OK button.
 
 
 DISMISSALERT
@@ -407,7 +407,7 @@ DISMISSALERT
 #action,#wait
 DismissAlert,5
 
-Waits <wait> seconds for alert and dismiss it.
+Waits <wait> seconds for alert dialog to appeat and dismisses it, i.e. presses Cancel button.
 
 
 NOTES
