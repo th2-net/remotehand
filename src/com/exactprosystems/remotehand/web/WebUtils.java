@@ -13,11 +13,15 @@ package com.exactprosystems.remotehand.web;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+
+import static java.lang.String.format;
 
 /**
  * Created by alexey.karpukhin on 9/18/17.
@@ -51,9 +55,13 @@ public class WebUtils {
 			WebDriverWait wait = new WebDriverWait(webDriver, timeoutSec);
 			return wait.until(ExpectedConditions.alertIsPresent());
 		}
-		catch (Exception e)
+		catch (TimeoutException e)
 		{
-			throw new ScriptExecuteException(e.getMessage(), e);
+			throw new ScriptExecuteException(format("Timed out after %s seconds waiting for alert.", timeoutSec), e);
+		}
+		catch (WebDriverException e)
+		{
+			throw new ScriptExecuteException("Error while waiting for alert.", e);
 		}
 	}
 }

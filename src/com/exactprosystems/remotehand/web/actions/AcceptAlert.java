@@ -26,12 +26,10 @@ public class AcceptAlert extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(AcceptAlert.class);
 	
-	public static final String WAIT_PARAM = "wait";
-	
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		int wait = getIntegerParam(params, WAIT_PARAM);
+		int wait = getIntegerParam(params, PARAM_WAIT);
 		Alert alert = waitForAlert(webDriver, wait);
 		try
 		{
@@ -47,7 +45,7 @@ public class AcceptAlert extends WebAction
 	@Override
 	public String[] getMandatoryParams() throws ScriptCompileException
 	{
-		return new String[]{WAIT_PARAM};
+		return new String[]{PARAM_WAIT};
 	}
 
 	@Override

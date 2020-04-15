@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 import static com.exactprosystems.remotehand.web.WebUtils.waitForAlert;
-import static com.exactprosystems.remotehand.web.actions.AcceptAlert.WAIT_PARAM;
 
 public class DismissAlert extends WebAction
 {
@@ -30,7 +29,7 @@ public class DismissAlert extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		int wait = getIntegerParam(params, WAIT_PARAM);
+		int wait = getIntegerParam(params, PARAM_WAIT);
 		Alert alert = waitForAlert(webDriver, wait);
 		try
 		{
@@ -46,7 +45,7 @@ public class DismissAlert extends WebAction
 	@Override
 	public String[] getMandatoryParams() throws ScriptCompileException
 	{
-		return new String[]{WAIT_PARAM};
+		return new String[]{PARAM_WAIT};
 	}
 
 	@Override
