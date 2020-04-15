@@ -43,6 +43,9 @@ public class WebUtils {
 
 	public static void deleteDownloadDirectory(File downloadDir)
 	{
+		if (!((WebConfiguration) Configuration.getInstance()).isCreateDownloadSubDir())
+			return;
+		
 		File[] tmp;
 		if (downloadDir != null && (tmp = downloadDir.listFiles()) != null && tmp.length == 0)
 			downloadDir.delete();
