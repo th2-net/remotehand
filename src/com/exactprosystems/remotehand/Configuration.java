@@ -62,7 +62,7 @@ public class Configuration
 
 		properties = new Properties(getDefaultProperties());
 
-		String configFileName = commandLine.getOptionValue(Starter.CONFIG_PARAM, CONFIG_FILE_NAME);
+		String configFileName = commandLine.getOptionValue(RemoteHandStarter.CONFIG_PARAM, CONFIG_FILE_NAME);
 		logger.info(String.format("Using configuration file '%s'", configFileName));
 		
 		FileInputStream fs = null;

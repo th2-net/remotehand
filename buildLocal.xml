@@ -24,11 +24,4 @@
             <property name="svn.info.lastRev" value="${svn.info.lastRev}"/>
         </subant>
     </target>
-
-    <target name="UIAHRelease" depends="Get revision">
-        <subant target="UIAHRelease">
-            <fileset dir="." includes="build.xml"/>
-            <property name="svn.info.lastRev" value="${svn.info.lastRev}"/>
-        </subant>
-    </target>
 </project>
