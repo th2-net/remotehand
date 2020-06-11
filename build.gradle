@@ -1,0 +1,89 @@
+plugins {
+    id "java"
+}
+
+ext {
+    releaseDir = "${projectDir}/release"
+    extractDataDir = "${releaseDir}/${rootProject.name}"
+    build_version = 'local_build'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    maven {
+        name 'Artifactory'
+        url 'http://arti.exactpro.com/libs-release'
+    }
+    maven {
+        name 'Artifactory-local'
+        url 'http://arti.exactpro.com/libs-release-local'
+    }
+}
+
+dependencies {
+    compile (group: 'com.exactprosystems.clearth', name: 'clearth-rhdata', version: '1.0.10452') {
+        exclude group: 'com.exactprosystems.clearth', module: 'clearth-core'
+    }
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.6.4'
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    compile group: 'net.sourceforge.javacsv', name: 'javacsv', version: '2.0'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.7'
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
+    compile group: 'com.jhlabs', name: 'filters', version: '2.0.235'
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.33.Final'
+    compile(group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.141.59') {
+        exclude group: 'org.seleniumhq.selenium', module: 'selenium-opera-driver'
+        exclude group: 'org.seleniumhq.selenium', module: 'selenium-safari-driver'
+    }
+}
+
+jar {
+    archivesBaseName = 'remotehand'
+    manifest {
+        attributes 'Main-Class': 'com.exactprosystems.remotehand.RemoteHandStarter'
+        attributes "Class-Path": configurations.compile.collect { "lib/${it.getName()}" }.join(' ')
+        attributes('Created-By': System.getProperty('java.version') + ' (' + System.getProperty('java.vendor') + ')')
+        attributes('Specification-Title': '')
+        attributes('Specification-Vendor': 'Exactpro Systems LLC')
+        attributes('Implementation-Title': rootProject.name)
+        attributes('Implementation-Vendor': 'Exactpro Systems LLC')
+        attributes('Implementation-Vendor-Id': 'com.exactprosystems')
+        attributes('Implementation-Version': "1.0.0")
+    }
+}
+
+task copyJar(type: Copy, dependsOn: [jar, configurations.runtimeClasspath]) {
+    doFirst {
+        delete releaseDir
+    }
+    from jar
+    from ("${projectDir}") {
+        include "config.ini"
+        include "formParser.properties"
+        include "log4j.properties"
+        include "Readme.txt"
+    }
+    into ("lib/") {
+        from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
+    }
+    into extractDataDir
+}
+
+task releaseZip(type: Zip, group: 'build', dependsOn: copyJar) {
+    archiveAppendix = new Date().format('yyyyMMdd')
+    archiveVersion = build_version
+    destinationDirectory = file("${releaseDir}")
+    from extractDataDir
+    doLast {
+        delete extractDataDir
+    }
+}
+
+wrapper {
+    gradleVersion = '5.5'
+}

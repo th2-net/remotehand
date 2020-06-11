@@ -37,7 +37,6 @@ public class WebConfiguration extends Configuration{
 	public static final String DEF_EDGEDRIVER_PATH = "MicrosoftWebDriver.exe";
 	public static final String DEF_CHROMEDRIVER_PATH = "chromedriver.exe";
 	public static final String DEF_FIREFOXDRIVER_PATH = "geckodriver.exe";
-	public static final String DEF_PHANTOMJS_PATH = "phantomjs.exe";
 	public static final String DEF_PROXY = "";
 	public static final String DEF_LOCATOR = "xpath";
 	public static final String FORM_PARSER_CONFIG_FILE = "formParser.properties";
@@ -47,7 +46,6 @@ public class WebConfiguration extends Configuration{
 	public static final String PARAM_EDGEDRIVERPATH = "EdgeDriverPath";
 	public static final String PARAM_CHROMEDRIVERPATH = "ChromeDriverPath";
 	public static final String PARAM_FIREFOXDRIVERPATH = "FirefoxDriverPath";
-	public static final String PARAM_PHANTOMJSPATH = "PhantomJSPath";
 	public static final String PARAM_HTTPPROXY = "HttpProxy";
 	public static final String PARAM_SSLPROXY = "SslProxy";
 	public static final String PARAM_FTPPROXY = "FtpProxy";
@@ -68,7 +66,7 @@ public class WebConfiguration extends Configuration{
 	private static final Level DEF_LOG_LEVEL = Level.OFF;
 
 	private volatile Browser browserToUse;
-	private final String ieDriverFileName, edgeDriverFileName, chromeDriverFileName, firefoxDriverFileName, phantomJsFileName,
+	private final String ieDriverFileName, edgeDriverFileName, chromeDriverFileName, firefoxDriverFileName, 
 			httpProxySetting, sslProxySetting, ftpProxySetting, socksProxySetting, noProxySetting, profilePath, binary, defaultLocator;
 	
 	private final Level browserLoggingLevel;
@@ -98,7 +96,6 @@ public class WebConfiguration extends Configuration{
 		edgeDriverFileName = loadProperty(properties, PARAM_EDGEDRIVERPATH, DEF_EDGEDRIVER_PATH);
 		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
 		firefoxDriverFileName = loadProperty(properties, PARAM_FIREFOXDRIVERPATH, DEF_FIREFOXDRIVER_PATH);
-		phantomJsFileName = loadProperty(properties, PARAM_PHANTOMJSPATH, DEF_PHANTOMJS_PATH);
 		binary = loadProperty(properties, PARAM_BINARY, "");
 		defaultLocator = loadProperty(properties, PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
 		
@@ -235,11 +232,6 @@ public class WebConfiguration extends Configuration{
 		return firefoxDriverFileName;
 	}
 	
-	public String getPhantomJsPath()
-	{
-		return phantomJsFileName;
-	}
-
 	public boolean isProxySettingsSet()
 	{
 		return isProxySettingsSet;

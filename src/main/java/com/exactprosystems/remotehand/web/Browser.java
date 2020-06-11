@@ -18,7 +18,6 @@ public enum Browser
 	CHROME_HEADLESS("Chrome-Headless"),
 	FIREFOX("Firefox"),
 	FIREFOX_HEADLESS("Firefox-Headless"),
-	PHANTOM_JS("PhantomJS"),
 	INVALID("");
 
 	private String label;

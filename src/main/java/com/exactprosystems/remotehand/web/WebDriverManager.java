@@ -26,8 +26,6 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -159,9 +157,6 @@ public class WebDriverManager
 				case FIREFOX_HEADLESS:
 					driver = createFirefoxDriver(configuration, dc, downloadDir, true);
 					break;
-				case PHANTOM_JS:
-					driver = createPhantomJsDriver(configuration, dc);
-					break;
 				default:
 					driver = createFirefoxDriver(configuration, dc, downloadDir, false);
 			}
@@ -281,21 +276,6 @@ public class WebDriverManager
 		catch (Exception e)
 		{
 			throw new RhConfigurationException("Unable to create FireFox driver: " + e.getMessage(), e);
-		}
-	}
-	
-	private PhantomJSDriver createPhantomJsDriver(WebConfiguration cfg, DesiredCapabilities dc) throws RhConfigurationException
-	{
-		try
-		{
-			if (dc == null)
-				dc = new DesiredCapabilities();
-			dc.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, cfg.getPhantomJsPath());
-			return new PhantomJSDriver(dc);
-		}
-		catch (Exception e)
-		{
-			throw new RhConfigurationException("Unable to create PhantomJS driver: " + e.getMessage(), e);
 		}
 	}
 	
