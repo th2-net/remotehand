@@ -3,9 +3,9 @@ plugins {
 }
 
 ext {
-    releaseDir = "${projectDir}/release"
-    extractDataDir = "${releaseDir}/${rootProject.name}"
-    build_version = 'local_build'
+    if (!project.hasProperty('build_version')) {
+        build_version = 'local_build'
+    }
 }
 
 java {
@@ -46,7 +46,7 @@ jar {
     archivesBaseName = 'remotehand'
     manifest {
         attributes 'Main-Class': 'com.exactprosystems.remotehand.RemoteHandStarter'
-        attributes "Class-Path": configurations.compile.collect { "lib/${it.getName()}" }.join(' ')
+        attributes "Class-Path": configurations.runtimeClasspath.collect { "lib/${it.getName()}" }.join(' ')
         attributes('Created-By': System.getProperty('java.version') + ' (' + System.getProperty('java.vendor') + ')')
         attributes('Specification-Title': '')
         attributes('Specification-Vendor': 'Exactpro Systems LLC')
@@ -57,10 +57,9 @@ jar {
     }
 }
 
-task copyJar(type: Copy, dependsOn: [jar, configurations.runtimeClasspath]) {
-    doFirst {
-        delete releaseDir
-    }
+task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
+    archiveAppendix = new Date().format('yyyyMMdd')
+    archiveVersion = build_version
     from jar
     from ("${projectDir}") {
         include "config.ini"
@@ -70,17 +69,6 @@ task copyJar(type: Copy, dependsOn: [jar, configurations.runtimeClasspath]) {
     }
     into ("lib/") {
         from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
-    }
-    into extractDataDir
-}
-
-task releaseZip(type: Zip, group: 'build', dependsOn: copyJar) {
-    archiveAppendix = new Date().format('yyyyMMdd')
-    archiveVersion = build_version
-    destinationDirectory = file("${releaseDir}")
-    from extractDataDir
-    doLast {
-        delete extractDataDir
     }
 }
 
