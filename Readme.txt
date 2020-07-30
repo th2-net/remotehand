@@ -410,6 +410,16 @@ DismissAlert,5
 Waits <wait> seconds for alert dialog to appeat and dismisses it, i.e. presses Cancel button.
 
 
+CHECKIMAGEAVAILABILITY
+===========
+#action,#wait,#locator,#matcher
+CheckImageAvailability,5,locator,matcher
+
+This action checks that the specified image is available on page. 
+Optionally waits <wait> seconds for <img src="img_source"...> element specified by <matcher> and <locator>. 
+If element is found and the image is available, "true" is printed in output. Else "false" is printed.
+
+
 NOTES
 *****
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 

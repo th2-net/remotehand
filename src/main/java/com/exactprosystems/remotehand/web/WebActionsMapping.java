@@ -68,7 +68,8 @@ public class WebActionsMapping
 		WaitForChanges,
 		GetElementInnerHtml,
 		AcceptAlert,
-		DismissAlert;
+		DismissAlert,
+		CheckImageAvailability;
 		
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
@@ -128,6 +129,7 @@ public class WebActionsMapping
 		case GetElementInnerHtml:  return new GetElementInnerHtml();
 		case AcceptAlert:          return new AcceptAlert();
 		case DismissAlert:         return new DismissAlert();
+		case CheckImageAvailability: return new CheckImageAvailability();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
