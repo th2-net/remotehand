@@ -15,8 +15,8 @@ import com.exactprosystems.remotehand.http.HTTPServerMode;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.sessions.SessionWatcher;
 import com.exactprosystems.remotehand.tcp.TcpClientMode;
-import com.exactprosystems.remotehand.web.WebDriverManager;
 import com.exactprosystems.remotehand.web.WebRemoteHandManager;
+import com.exactprosystems.remotehand.windows.WindowsRemoteHandManager;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.PropertyConfigurator;
@@ -45,14 +45,13 @@ public class RemoteHandStarter
 			OUTPUT_NAME_PARAM = "outputName",
 			DYNAMIC_INPUT_NAME_PARAM = "dynamicInputName",
 			INPUT_NAME_PARAMS = "inputParamsName",
-			CONFIG_FILE_OPTIONS_PARAM = "configFileOption";
+			CONFIG_FILE_OPTIONS_PARAM = "configFileOption", 
+			WINDOWS_OPTIONS_PARAM = "windowsMode";
+	public static final String ENV_VARS_PARAM = "enableEnvVars";
 
 
 	public static void main(String[] args)
 	{
-		WebRemoteHandManager manager = new WebRemoteHandManager();
-		WebDriverManager webDriverManager = manager.getWebDriverManager();
-		Runtime.getRuntime().addShutdownHook(new ShutdownHook(webDriverManager));
 		String version = getVersion();
 
 		PropertyConfigurator.configureAndWatch("log4j.properties");
@@ -60,8 +59,18 @@ public class RemoteHandStarter
 		logger.info("Started RemoteHand "+version);
 
 		Map<String, Option> optionMap = createOptionMap();
-		Options options = createOptions(manager, optionMap);
+		Options options = createOptions(optionMap);
 		CommandLine line = getCommandLine(args, options);
+
+		IRemoteHandManager manager = null;
+		if (line.hasOption(optionMap.get(WINDOWS_OPTIONS_PARAM).getOpt())) {
+			manager = new WindowsRemoteHandManager();
+		} else {
+			manager = new WebRemoteHandManager();
+		}
+		
+		IDriverManager webDriverManager = manager.getWebDriverManager();
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(webDriverManager));
 
 		boolean httpServerMode = line.hasOption(optionMap.get(ENABLE_SERVER_MODE_PARAM).getOpt()),
 				tcpClientMode = line.hasOption(optionMap.get(ENABLE_TCP_CLIENT_MODE_PARAM).getOpt());
@@ -97,8 +106,8 @@ public class RemoteHandStarter
 	}
 
 	private static void startLocalMode(
-			WebRemoteHandManager manager,
-			WebDriverManager webDriverManager,
+			IRemoteHandManager manager,
+			IDriverManager webDriverManager,
 			Map<String, Option> optionMap,
 			CommandLine line, String input,
 			String output)
@@ -168,7 +177,7 @@ public class RemoteHandStarter
 		logger.info("Application stopped");
 	}
 
-	private static void startTcpClientMode(WebRemoteHandManager manager, WebDriverManager webDriverManager, String version)
+	private static void startTcpClientMode(IRemoteHandManager manager, IDriverManager webDriverManager, String version)
 	{
 		//In TCP client mode RemoteHand connects to ClearTH, telling that it is ready to serve.
 		//ClearTH sends logon request before sending commands to execute.
@@ -190,7 +199,7 @@ public class RemoteHandStarter
 		startSessionWatcher();
 	}
 
-	private static void startHttpServerMode(WebRemoteHandManager manager, WebDriverManager webDriverManager)
+	private static void startHttpServerMode(IRemoteHandManager manager, IDriverManager webDriverManager)
 	{
 		//In HTTP server mode RemoteHand waits for requests from ClearTH.
 		//Once logon request is received, RemoteHand adds HttpSessionHandler to HTTP server, binding it to URL equal to sessionID.
@@ -226,7 +235,7 @@ public class RemoteHandStarter
 		return dynInput;
 	}
 
-	private static SessionContext getSessionContext(WebRemoteHandManager manager)
+	private static SessionContext getSessionContext(IRemoteHandManager manager)
 	{
 		SessionContext sessionContext = null;
 
@@ -337,21 +346,28 @@ public class RemoteHandStarter
 				.create(CONFIG_PARAM);
 		optionMap.put(CONFIG_FILE_OPTIONS_PARAM, configFileOption);
 
+		Option windowsMode = OptionBuilder
+				.isRequired(false)
+				.withDescription("Windows mode. Works with windows app driver")
+				.create("windowsMode");
+		optionMap.put(WINDOWS_OPTIONS_PARAM, windowsMode);
+
+		Option envVarsMode = OptionBuilder
+				.isRequired(false)
+				.withDescription("Enables environment variables. Example: to option SessionExpire (in ini file) " + 
+						"option will be RH_SESSION_EXPIRE").create(ENV_VARS_PARAM);
+		optionMap.put(ENV_VARS_PARAM, envVarsMode);
+
 		return optionMap;
 	}
 
-	private static Options createOptions(IRemoteHandManager manager, Map<String, Option> optionMap)
+	private static Options createOptions(Map<String, Option> optionMap)
 	{
 		Options options = new Options();
 
 		for (Option option : optionMap.values())
 		{
 			options.addOption(option);
-		}
-
-		for (Option additional : manager.getAdditionalOptions())
-		{
-			options.addOption(additional);
 		}
 
 		return options;
@@ -463,9 +479,9 @@ public class RemoteHandStarter
 	{
 		private static final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
 
-		private final WebDriverManager manager;
+		private final IDriverManager manager;
 
-		public ShutdownHook(WebDriverManager manager)
+		public ShutdownHook(IDriverManager manager)
 		{
 			this.manager = manager;
 			setName("ShutdownHook");

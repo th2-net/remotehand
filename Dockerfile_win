@@ -1,0 +1,11 @@
+FROM gradle:6.4-jdk11 AS build
+COPY ./ .
+RUN gradle dockerPrepare
+
+FROM openjdk:12-alpine
+ENV RH_WIN_APP_DRIVER_HOST=localhost \
+    RH_WIN_APP_DRIVER_PORT=4123    
+
+WORKDIR /home
+COPY --from=build /home/gradle/build/docker /home/gradle/formParser.properties /home/gradle/log4j.properties /home/gradle/config.ini ./
+ENTRYPOINT ["/home/remotehand/bin/remotehand", "-enableEnvVars", "-httpserver", "-windowsMode"]

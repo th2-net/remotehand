@@ -14,13 +14,6 @@ import com.exactprosystems.remotehand.ScriptCompileException;
 
 public class WebLocatorsMapping
 {
-	private static WebLocatorsMapping mapping = new WebLocatorsMapping();
-
-	public static WebLocatorsMapping getInstance()
-	{
-		return mapping;
-	}
-
 	private enum WebLocatorName
 	{
 		cssSelector, 
@@ -38,7 +31,7 @@ public class WebLocatorsMapping
 		}
 	};
 
-	public WebLocator getByName(String locatorName) throws ScriptCompileException
+	public static WebLocator getByName(String locatorName) throws ScriptCompileException
 	{
 		if (locatorName.isEmpty())
 			return null;

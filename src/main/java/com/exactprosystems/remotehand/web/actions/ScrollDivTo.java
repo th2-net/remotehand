@@ -62,7 +62,7 @@ public class ScrollDivTo extends ScrollTo
 		logInfo("Waiting for element by %s: '%s'", locator2, matcher2);
 		try
 		{
-			By webLocator2 = WebLocatorsMapping.getInstance().getByName(locator2).getWebLocator(webDriver, matcher2);
+			By webLocator2 = WebLocatorsMapping.getByName(locator2).getWebLocator(webDriver, matcher2);
 			if (!waitForElement(webDriver, wait2, webLocator2, false))
 				return null;
 			return webLocator2;

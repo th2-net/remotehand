@@ -28,7 +28,7 @@ import com.exactprosystems.remotehand.web.actions.GetFormFields;
 /**
  * Created by alexey.karpukhin on 2/1/16.
  */
-public class WebConfiguration extends Configuration{
+public class WebConfiguration extends Configuration {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
 
@@ -83,38 +83,38 @@ public class WebConfiguration extends Configuration{
 	protected WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
 
-		browserToUse = Browser.valueByLabel(properties.getProperty(PARAM_BROWSER));
+		browserToUse = Browser.valueByLabel(this.loadProperty(PARAM_BROWSER, ""));
 		if (browserToUse == Browser.INVALID)
 		{
 			logger.warn(format("Property '%s' is not set or has invalid value. Using default value = '%s'", PARAM_BROWSER, DEF_BROWSER.getLabel()));
 			browserToUse = DEF_BROWSER;
 		}
 		
-		profilePath = loadProperty(properties, PARAM_PROFILE, "temporary profile");
+		profilePath = this.loadProperty(PARAM_PROFILE, "temporary profile");
 		
-		ieDriverFileName = loadProperty(properties, PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
-		edgeDriverFileName = loadProperty(properties, PARAM_EDGEDRIVERPATH, DEF_EDGEDRIVER_PATH);
-		chromeDriverFileName = loadProperty(properties, PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
-		firefoxDriverFileName = loadProperty(properties, PARAM_FIREFOXDRIVERPATH, DEF_FIREFOXDRIVER_PATH);
-		binary = loadProperty(properties, PARAM_BINARY, "");
-		defaultLocator = loadProperty(properties, PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
+		ieDriverFileName = this.loadProperty(PARAM_IEDRIVERPATH, DEF_IEDRIVER_PATH);
+		edgeDriverFileName = this.loadProperty(PARAM_EDGEDRIVERPATH, DEF_EDGEDRIVER_PATH);
+		chromeDriverFileName = this.loadProperty(PARAM_CHROMEDRIVERPATH, DEF_CHROMEDRIVER_PATH);
+		firefoxDriverFileName = this.loadProperty(PARAM_FIREFOXDRIVERPATH, DEF_FIREFOXDRIVER_PATH);
+		binary = this.loadProperty(PARAM_BINARY, "");
+		defaultLocator = this.loadProperty(PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
 		
-		browserLoggingLevel = loadLogLevel(properties, BROWSER_LOGGING_LEVEL);
-		clientLoggingLevel = loadLogLevel(properties, CLIENT_LOGGING_LEVEL);
-		driverLoggingLevel = loadLogLevel(properties, DRIVER_LOGGING_LEVEL);
-		performanceLoggingLevel = loadLogLevel(properties, PERFORMANCE_LOGGING_LEVEL);
+		browserLoggingLevel = loadLogLevel(BROWSER_LOGGING_LEVEL);
+		clientLoggingLevel = loadLogLevel(CLIENT_LOGGING_LEVEL);
+		driverLoggingLevel = loadLogLevel(DRIVER_LOGGING_LEVEL);
+		performanceLoggingLevel = loadLogLevel(PERFORMANCE_LOGGING_LEVEL);
 
-		httpProxySetting = loadProxySetting(properties, PARAM_HTTPPROXY);
-		sslProxySetting = loadProxySetting(properties, PARAM_SSLPROXY);
-		ftpProxySetting = loadProxySetting(properties, PARAM_FTPPROXY);
-		socksProxySetting = loadProxySetting(properties, PARAM_SOCKSPROXY);
-		noProxySetting = loadProxySetting(properties, PARAM_NOPROXY);
+		httpProxySetting = loadProxySetting(PARAM_HTTPPROXY);
+		sslProxySetting = loadProxySetting(PARAM_SSLPROXY);
+		ftpProxySetting = loadProxySetting(PARAM_FTPPROXY);
+		socksProxySetting = loadProxySetting(PARAM_SOCKSPROXY);
+		noProxySetting = loadProxySetting(PARAM_NOPROXY);
 		
 		formParserProperties = loadFormParserConfig(FORM_PARSER_CONFIG_FILE);
 		
-		this.downloadsDir = new File(loadProperty(properties, "DownloadsDir", "downloads/"));
-		disableLeavePageAlert = Boolean.parseBoolean(loadProperty(properties, "DisableLeavePageAlert", "true"));
-		createDownloadSubDir = Boolean.parseBoolean(loadProperty(properties, "CreateDownloadSubDir", "true"));
+		this.downloadsDir = new File(this.loadProperty("DownloadsDir", "downloads/"));
+		disableLeavePageAlert = this.loadProperty("DisableLeavePageAlert", true, Boolean::parseBoolean);
+		createDownloadSubDir = this.loadProperty("CreateDownloadSubDir", true, Boolean::parseBoolean);
 	}
 
 	@Override
@@ -130,23 +130,11 @@ public class WebConfiguration extends Configuration{
 		defProperties.setProperty(PARAM_NOPROXY, DEF_PROXY);
 		return defProperties;
 	}
-
-	private String loadProperty(Properties properties, String name, String defaultValue)
-	{
-		String property = properties.getProperty(name, "");
-		if (property.isEmpty())
-		{
-			logger.warn(format(PROPERTY_NOT_SET, name, defaultValue));
-			property = defaultValue;
-		}
-		else 
-			logger.info("{} = {}", name, property);
-		return property;
-	}
 	
-	private String loadProxySetting(Properties properties, String propertyName)
+	private String loadProxySetting(String propertyName)
 	{
-		String setting = properties.getProperty(propertyName, "");
+		String setting = this.loadProperty(propertyName, "");
+		
 		if (setting.isEmpty())
 			logger.warn(format("Property '%s' is not set.", propertyName));
 		else 
@@ -158,23 +146,9 @@ public class WebConfiguration extends Configuration{
 		return setting;
 	}
 	
-	private Level loadLogLevel(Properties properties, String propertyName)
+	private Level loadLogLevel(String propertyName)
 	{
-		Level level = null;
-		if (properties.containsKey(propertyName))
-		{
-			String levelTxt = properties.getProperty(propertyName);
-			try
-			{
-				level = Level.parse(levelTxt);
-			}
-			catch (IllegalArgumentException e)
-			{
-				logger.warn(format("Invalid %s '%s'. Default level %s will be used.", 
-						propertyName, levelTxt, DEF_LOG_LEVEL));
-			}
-		}
-		return (level != null) ? level : DEF_LOG_LEVEL;
+		return this.loadProperty(propertyName, DEF_LOG_LEVEL, Level::parse);
 	}
 	
 	protected Properties loadFormParserConfig(String fileName)

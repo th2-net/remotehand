@@ -11,6 +11,7 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.IDriverManager;
 import com.exactprosystems.remotehand.RhConfigurationException;
 import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
 import org.openqa.selenium.Proxy;
@@ -44,7 +45,7 @@ import static java.lang.Thread.currentThread;
 /**
  * Created by alexey.karpukhin on 2/1/16.
  */
-public class WebDriverManager 
+public class WebDriverManager implements IDriverManager
 {
 	private static final Logger log = LoggerFactory.getLogger(WebDriverManager.class);
 	
@@ -64,6 +65,7 @@ public class WebDriverManager
 		}
 	}
 
+	@Override
 	public void initDriverPool()
 	{
 		WebConfiguration config = (WebConfiguration) Configuration.getInstance();
@@ -311,6 +313,7 @@ public class WebDriverManager
 		}
 	}
 
+	@Override
 	public void clearDriverPool()
 	{
 		DriverStorage driverStorage;

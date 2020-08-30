@@ -50,6 +50,12 @@ public class HttpLogonHandler extends LogonHandler implements HttpHandler
 	
 	private String getUsedBrowser()
 	{
-		return ((WebConfiguration)Configuration.getInstance()).getBrowserToUse().getLabel();
+		Configuration instance = Configuration.getInstance();
+		
+		if (instance instanceof WebConfiguration) {
+			return ((WebConfiguration) instance).getBrowserToUse().getLabel();
+		} else {
+			return "none";
+		}
 	}
 }
