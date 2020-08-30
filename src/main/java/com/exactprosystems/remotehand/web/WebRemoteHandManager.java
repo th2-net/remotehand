@@ -15,7 +15,6 @@ import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.openqa.selenium.WebDriver;
 
 /**
@@ -51,11 +50,6 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		webSessionContext.setWebDriverManager(webDriverManager);
 		webSessionContext.setWebDriver(webDriverManager.getWebDriver(webSessionContext));
 		return webSessionContext;
-	}
-
-	@Override
-	public Option[] getAdditionalOptions() {
-		return new Option[0];
 	}
 
 	@Override

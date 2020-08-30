@@ -1,16 +1,27 @@
 plugins {
     id "java"
+    id 'application'
+    id 'com.palantir.docker' version '0.25.0' apply false
 }
+
+apply plugin: 'com.palantir.docker'
+
+applicationName = "remotehand"
 
 ext {
     if (!project.hasProperty('build_version')) {
         build_version = 'local_build'
     }
+    dockerImageVersion      = "${version_major}.${version_minor}.${version_maintenance}.${version_build}"
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+application {
+    mainClassName = "com.exactprosystems.remotehand.RemoteHandStarter"
 }
 
 repositories {
@@ -19,8 +30,8 @@ repositories {
         url 'http://arti.exactpro.com/libs-release'
     }
     maven {
-        name 'Artifactory-local'
-        url 'http://arti.exactpro.com/libs-release-local'
+        name 'Artifactory snapshot'
+        url 'http://artifactory5.exp.exactpro.com/artifactory/libs-snapshot'
     }
 }
 
@@ -40,6 +51,9 @@ dependencies {
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-opera-driver'
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-safari-driver'
     }
+    
+    compile 'io.appium:java-client:7.3.0'
+//    compile "org.mvel:mvel2:2.4.7.Final"
 }
 
 jar {
@@ -70,6 +84,21 @@ task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     into ("lib/") {
         from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
     }
+}
+
+distTar {
+    archiveName "${applicationName}.tar"
+}
+
+docker {
+    name "${target_docker_repository}/${docke_image_name}:${dockerImageVersion}"
+    tag 'local-version', "${docke_image_name}:${dockerImageVersion}"
+
+    copySpec.from(tarTree("$buildDir/distributions/${archivesBaseName}.tar"))
+}
+
+dockerPrepare {
+    dependsOn distTar
 }
 
 wrapper {

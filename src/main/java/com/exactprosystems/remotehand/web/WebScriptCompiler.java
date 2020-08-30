@@ -36,12 +36,12 @@ public class WebScriptCompiler extends ScriptCompiler
 {
 	private static final Logger logger = LoggerFactory.getLogger(WebScriptCompiler.class);
 
-	private static final String SCRIPT_LINE_SEPARATOR = "&#13";
+	public static final String SCRIPT_LINE_SEPARATOR = "&#13";
 	
 	// csv
-	private static final char DELIMITER = Configuration.getInstance().getDelimiter();
-	private static final char TEXT_QUALIFIER = Configuration.getInstance().getTextQualifier();
-	private static final String HEADER_DELIMITER = "#";
+	public static final char DELIMITER = Configuration.getInstance().getDelimiter();
+	public static final char TEXT_QUALIFIER = Configuration.getInstance().getTextQualifier();
+	public static final String HEADER_DELIMITER = "#";
 	public static final String COMMENT_INDICATOR = "//";
 
 	// script action elements
@@ -180,9 +180,9 @@ public class WebScriptCompiler extends ScriptCompiler
 
 		webAction = WebActionsMapping.getInstance().getByName(params.get(WEB_ACTION));
 		if (params.get(WEB_LOCATOR) != null)
-			webLocator = WebLocatorsMapping.getInstance().getByName(params.get(WEB_LOCATOR));
+			webLocator = WebLocatorsMapping.getByName(params.get(WEB_LOCATOR));
 		else if (webAction.isNeedLocator())
-			webLocator = WebLocatorsMapping.getInstance().getByName(((WebConfiguration)Configuration.getInstance()).getDefaultLocator());
+			webLocator = WebLocatorsMapping.getByName(((WebConfiguration)Configuration.getInstance()).getDefaultLocator());
 		params.remove(WEB_ACTION);
 		params.remove(WEB_LOCATOR);
 		

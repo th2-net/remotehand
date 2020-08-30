@@ -14,7 +14,6 @@ import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -31,7 +30,7 @@ public interface IRemoteHandManager {
 
 	LogonHandler createLogonHandler();
 
-	Option[] getAdditionalOptions();
-
 	void close(SessionContext sessionContext);
+
+	IDriverManager getWebDriverManager();
 }

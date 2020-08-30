@@ -369,7 +369,7 @@ public class SendKeys extends WebAction
 		{
 			try
 			{
-				By locator2 = WebLocatorsMapping.getInstance().getByName(locator2Name).getWebLocator(webDriver, matcher2);
+				By locator2 = WebLocatorsMapping.getByName(locator2Name).getWebLocator(webDriver, matcher2);
 				if (!waitForElement(webDriver, wait2, locator2))
 					return false;
 			}

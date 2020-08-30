@@ -11,7 +11,6 @@
 package com.exactprosystems.remotehand;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +18,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.function.Function;
+
+import static java.lang.String.format;
 
 public class Configuration
 {
@@ -53,6 +55,8 @@ public class Configuration
 	private volatile int driverPoolSize;
 	private volatile File fileStorage;
 	
+	protected boolean acceptEnvVars;
+	
 	protected Configuration(CommandLine commandLine)
 	{
 		if (instance != null) {
@@ -64,6 +68,9 @@ public class Configuration
 
 		String configFileName = commandLine.getOptionValue(RemoteHandStarter.CONFIG_PARAM, CONFIG_FILE_NAME);
 		logger.info(String.format("Using configuration file '%s'", configFileName));
+
+		this.acceptEnvVars = commandLine.hasOption(RemoteHandStarter.ENV_VARS_PARAM);
+		logger.info("Allowed configuration options from env vars {}", acceptEnvVars);
 		
 		FileInputStream fs = null;
 		try
@@ -88,78 +95,13 @@ public class Configuration
 			}
 		}
 		
-		
-		host = properties.getProperty(PARAM_HOST);
-		if (StringUtils.isBlank(host))
-		{
-			host = DEF_HOST;
-			logger.info(String.format("Property '%s' is empty. Using default value = <%s>", PARAM_HOST, host));
-		}
-		
-		try
-		{
-			port = Integer.parseInt(properties.getProperty(PARAM_PORT));
-		}
-		catch (Exception ex)
-		{
-			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_PORT, DEF_PORT));
-			port = DEF_PORT;
-		}
-
-		final String delim = getProperty(PARAM_DELIMITER);
-		if (!delim.isEmpty())
-			scriptDelimiter = delim.charAt(0);
-		else
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_DELIMITER, String.valueOf(DEF_DELIMITER)));
-			scriptDelimiter = DEF_DELIMITER;
-		}
-		
-		String qualifier = getProperty(PARAM_TEXT_QUALIFIER);
-		if (qualifier != null && !qualifier.isEmpty())
-			scriptTextQualifier = qualifier.charAt(0);
-		else 
-		{
-			logger.warn(String.format(PROPERTY_NOT_SET, PARAM_TEXT_QUALIFIER, DEF_TEXT_QUALIFIER));
-			scriptTextQualifier = DEF_TEXT_QUALIFIER;
-		}
-
-		try
-		{
-			sessionExpire = Integer.parseInt(properties.getProperty(PARAM_SESSIONEXPIRE));
-		}
-		catch (Exception ex)
-		{
-			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", sessionExpire, DEF_SESSION_EXPIRE));
-			sessionExpire = DEF_SESSION_EXPIRE;
-		}
-
-		try
-		{
-			String fileStorageString = properties.getProperty(PARAM_FILE_STORAGE);
-			if (fileStorageString == null || fileStorageString.trim().isEmpty()) {
-				logger.info(String.format("Property '%s' is empty. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
-				fileStorageString = DEF_FILE_STORAGE;
-			}
-
-			fileStorage = new File(fileStorageString);
-		}
-		catch (Exception ex)
-		{
-			logger.warn(String.format("Error while reading property '%s'. Using default value = <%s>", PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
-			fileStorage = new File(DEF_FILE_STORAGE);
-		}
-
-		try
-		{
-			driverPoolSize = Integer.parseInt(properties.getProperty(PARAM_DRIVER_POOL_SIZE));
-		}
-		catch (Exception ex)
-		{
-			logger.warn("Error while reading property '{}'. Using default value = <{}>", PARAM_DRIVER_POOL_SIZE,
-			            DEF_DRIVER_POOL_SIZE);
-			driverPoolSize = DEF_DRIVER_POOL_SIZE;
-		}
+		this.host = this.loadProperty(PARAM_HOST, DEF_HOST);
+		this.port = this.loadProperty(PARAM_PORT, DEF_PORT, Integer::parseInt);
+		this.scriptDelimiter = this.loadProperty(PARAM_DELIMITER, DEF_DELIMITER, s -> s.charAt(0));
+		this.scriptTextQualifier = this.loadProperty(PARAM_TEXT_QUALIFIER, DEF_TEXT_QUALIFIER, s -> s.charAt(0));
+		this.sessionExpire = this.loadProperty(PARAM_SESSIONEXPIRE, DEF_SESSION_EXPIRE, Integer::parseInt);
+		this.fileStorage = new File(this.loadProperty(PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
+		this.driverPoolSize = this.loadProperty(PARAM_DRIVER_POOL_SIZE, DEF_DRIVER_POOL_SIZE, Integer::parseInt);
 	}
 	
 	protected Properties getDefaultProperties()
@@ -170,6 +112,73 @@ public class Configuration
 		defProperties.setProperty(PARAM_TEXT_QUALIFIER, String.valueOf(DEF_TEXT_QUALIFIER));
 		defProperties.setProperty(PARAM_SESSIONEXPIRE, String.valueOf(DEF_SESSION_EXPIRE));
 		return defProperties;
+	}
+
+	protected String getENVName(String name) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("RH");
+		name.chars().forEach(value -> {
+			if (Character.isUpperCase(value)) {
+				sb.append('_').append((char) value);
+			} else {
+				sb.append(Character.toUpperCase((char) value));
+			}
+		});
+		return sb.toString();
+	}
+
+	protected <T> T loadProperty(String name, T defaultValue, Function<String, T> function)
+	{
+		return loadProperty(name, defaultValue, function, true);
+	}
+
+	protected <T> T loadProperty(String name, T defaultValue, Function<String, T> function, boolean writeToLog)
+	{
+		String stringProp = this.loadProperty(name, "", false);
+		if (stringProp.isEmpty()) {
+			if (writeToLog)
+				logger.warn(format(PROPERTY_NOT_SET, name, defaultValue));
+			return defaultValue;
+		}
+		try {
+			T apply = function.apply(stringProp);
+			if (writeToLog) {
+				logger.info("{} = {}", name, defaultValue);
+			}
+			return apply;
+		} catch (Exception e) {
+			if (writeToLog)
+				logger.warn("Cannot parse property" + name + ". Using default value: " + defaultValue.toString(), e);
+			return defaultValue;
+		}
+	}
+
+	protected String loadProperty(String name, String defaultValue)
+	{
+		return loadProperty(name, defaultValue, true);
+	}
+	
+	protected String loadProperty(String name, String defaultValue, boolean writeToLog)
+	{
+		String property = null;
+		if (acceptEnvVars) {
+			String envVarName = this.getENVName(name);
+			property = System.getenv(envVarName);
+		}
+		if (property == null || property.isEmpty()) {
+			if (acceptEnvVars && writeToLog)
+				logger.warn("Env property is not set {}", name);
+			property = properties.getProperty(name, "");
+		}
+		if (property.isEmpty() && defaultValue != null)
+		{
+			if (writeToLog)
+				logger.warn(format(PROPERTY_NOT_SET, name, defaultValue));
+			property = defaultValue;
+		}
+		else if (writeToLog)
+			logger.info("{} = {}", name, property);
+		return property;
 	}
 
 	public static Configuration getInstance()
