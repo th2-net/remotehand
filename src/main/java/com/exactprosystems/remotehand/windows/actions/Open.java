@@ -34,11 +34,11 @@ public class Open extends WindowsAction {
 		
 		// closing previous drivers
 		if (driverWrapper.getDriverNullable() != null) {
-			this.logger.debug("Disposing previous drivers");
+			this.logger.debug("Disposing previously created drivers");
 			try {
 				driverWrapper.getDriverNullable().close();
 			} catch (Exception e) {
-				logger.warn("Cannot old dispose driver", e);
+				logger.warn("Error while disposing driver", e);
 			}
 			driverWrapper.setDriver(null);
 		}
