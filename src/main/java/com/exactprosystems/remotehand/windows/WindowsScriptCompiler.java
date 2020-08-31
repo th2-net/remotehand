@@ -75,26 +75,21 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 					if (header == null)
 						throw new ScriptCompileException("Header is not defined for action");
 
-					if (isExecutable(header, values))
-					{
-						if (inputParams != null) {
-							for (int i = 0; i < values.length; i++) {
-								if (values[i].startsWith("%") && values[i].endsWith("%")) {
-									String key = values[i].substring(1, values[i].length() - 1);
-									values[i] = inputParams.get(key);
-								}
+					if (inputParams != null) {
+						for (int i = 0; i < values.length; i++) {
+							if (values[i].startsWith("%") && values[i].endsWith("%")) {
+								String key = values[i].substring(1, values[i].length() - 1);
+								values[i] = inputParams.get(key);
 							}
 						}
-
-						final WindowsAction action = generateAction(header, values, lineNumber, webSessionContext);
-
-						RhUtils.logInfo(logger, sessionId, String.format("%s: %s",
-								action.getClass().getSimpleName(), action.getParams()));
-
-						result.add(action);
 					}
-					else
-						RhUtils.logInfo(logger, sessionId, String.format("Action at line %d will be skipped.", lineNumber));
+
+					final WindowsAction action = generateAction(header, values, lineNumber, webSessionContext);
+
+					RhUtils.logInfo(logger, sessionId, String.format("%s: %s",
+							action.getClass().getSimpleName(), action.getParams()));
+
+					result.add(action);
 				}
 			}
 			reader.close();
@@ -156,8 +151,6 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 		for (int inx = 0; inx < header.length; inx++)
 		{
 			String name = header[inx].toLowerCase();
-			if (EXECUTE.equals(name))
-				continue;
 			String value = (inx < values.length ? values[inx] : null);
 			params.put(name, value);
 		}
