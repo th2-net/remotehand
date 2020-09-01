@@ -51,8 +51,8 @@ public class Open extends WindowsAction {
 		Path exeFilePath = workDirPath.resolve(execFile).normalize();
 
 		DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-		capabilities.setCapability("app", exeFilePath.toAbsolutePath().toString());
-		capabilities.setCapability("appWorkingDir", workDirPath.toAbsolutePath().toString());
+		capabilities.setCapability("app", exeFilePath.toString().replace('/', '\\'));
+		capabilities.setCapability("appWorkingDir", workDirPath.toString().replace('/', '\\'));
 
 		capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
 		if (driverWrapper.getWaitForApp() != null) {
