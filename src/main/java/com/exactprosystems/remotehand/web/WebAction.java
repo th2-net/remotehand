@@ -303,7 +303,7 @@ public abstract class WebAction extends Action
 	
 	private String createScreenshotFileName(String name)
 	{
-		return (name != null ? name : "screenshot") + SCREENSHOT_TIMESTAMP_FORMAT.format(LocalDateTime.now()) + SCREENSHOT_EXTENSION;
+		return SCREENSHOT_TIMESTAMP_FORMAT.format(LocalDateTime.now()) + "_" + (name != null ? name : "screenshot") + SCREENSHOT_EXTENSION;
 	}
 	
 	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
