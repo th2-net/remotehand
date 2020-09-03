@@ -60,8 +60,9 @@ public class WindowsDriverWrapper {
 	
 	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities) {
 		WindowsDriver<WebElement> driver = new WindowsDriver<>(driverUrl, capabilities);
+		Integer implTimeout = getImplicityWaitTimeout();
 		if (windowsConfiguration.getImplicityWaitTimeout() != null) {
-			driver.manage().timeouts().implicitlyWait(windowsConfiguration.getImplicityWaitTimeout(), TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(implTimeout, TimeUnit.SECONDS);
 		}
 		return driver;
 	}
@@ -82,6 +83,10 @@ public class WindowsDriverWrapper {
 		return windowsConfiguration.getNewCommandTimeout();
 	}
 
+	public Integer getImplicityWaitTimeout() {
+		return windowsConfiguration.getImplicityWaitTimeout();
+	}
+	
 	public void close() {
 		WindowsDriver<?> driverNullable = getDriverNullable();
 		if (driverNullable != null)

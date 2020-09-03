@@ -16,13 +16,16 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ElementSearcher {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(ElementSearcher.class);
 	
 	private List<Pair<String, String>> processFrom(Map<String, String> str000) {
 		
@@ -61,6 +64,7 @@ public class ElementSearcher {
 		for (Pair<String, String> pair : pairs) {
 		
 			By by = parseBy(pair.getKey(), pair.getValue());
+			logger.trace("Searching by {} = {}", pair.getKey(), pair.getValue());
 			
 			if (we == null) {
 				we = driver.findElement(by);
@@ -70,6 +74,30 @@ public class ElementSearcher {
 			
 		}
 		
+		return we;
+	}
+
+	public List<? extends WebElement> searchElementsWithoutWait(Map<String, String> map, WindowsDriver<?> driver) {
+		List<Pair<String, String>> pairs = this.processFrom(map);
+
+		List<? extends WebElement> we = null;
+		for (Pair<String, String> pair : pairs) {
+
+			By by = parseBy(pair.getKey(), pair.getValue());
+			logger.trace("Searching by {} = {}", pair.getKey(), pair.getValue());
+			
+			if (we == null) {
+				we = driver.findElements(by);
+				logger.trace("Found {} elements.", we.size());
+			} else {
+				if (we.isEmpty()) {
+					return null;
+				}
+				we = we.iterator().next().findElements(by);
+				logger.trace("Found {} elements.", we.size());
+			}
+		}
+
 		return we;
 	}
 	

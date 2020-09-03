@@ -13,8 +13,10 @@ package com.exactprosystems.remotehand.windows;
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import org.mvel2.MVEL;
 import org.slf4j.Logger;
 
+import java.io.Serializable;
 import java.util.Map;
 
 public abstract class WindowsAction extends Action {
@@ -47,23 +49,40 @@ public abstract class WindowsAction extends Action {
 	}
 	
 	private boolean checkIsExecute() {
-
-//		String execute = getParams().get("execute");
-//		if (execute == null || execute.isEmpty()) {
+		String execute = getParams().get("execute");
+		if (execute == null || execute.isEmpty()) {
 			return true;
-//		} else {
-//			return org.mvel2.MVEL.executeExpression(execute, windowsSessionContext.getMvelVars(), Boolean.class);
-//		}
+		} else {
+			logger.trace("Checking condition: {}", execute);
+			boolean result = false;
+			try {
+				Serializable compiled = MVEL.compileExpression(execute);
+				result = org.mvel2.MVEL.executeExpression(compiled, windowsSessionContext.getMvelVars(), Boolean.class);
+			} catch (Exception e) {
+				logger.warn("Error while executing expression: " + execute, e);
+			}
+			logger.trace("Calculated execute field: {}", result);
+			return result;
+		}
 	}
 
 	@Override
 	public String execute() throws ScriptExecuteException {
 		this.logger.info("Executing action in line: {} id {}", lineNumber, id);
 		
-		String result = this.run(windowsSessionContext.getCurrentDriver(), params);
-		if (result != null && id != null) {
-			windowsSessionContext.getMvelVars().put(id, result);
+		String result = null;
+		
+		if (checkIsExecute()) {
+			result = this.run(windowsSessionContext.getCurrentDriver(), params);
+			logger.debug("Action result: {}", result);
+			if (result != null && id != null) {
+				windowsSessionContext.getMvelVars().put(id, result);
+				logger.trace("Action result saved to id: {}", id);
+			}
+		} else {
+			this.logger.info("Action was not executed due condition. And will be skipped");
 		}
+		
 		return result;
 	}
 }

@@ -53,6 +53,7 @@ dependencies {
     }
     
     compile 'io.appium:java-client:7.3.0'
+    compile "org.mvel:mvel2:2.4.7.Final"
 }
 
 jar {

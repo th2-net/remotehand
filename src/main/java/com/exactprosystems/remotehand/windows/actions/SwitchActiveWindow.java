@@ -22,14 +22,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class SwitchActiveWindow extends WindowsAction {
-	
+
 	private static final String WINDOW_NAME_PARAM = "windowname";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
-		
+
 		String targetWindowName = params.get(WINDOW_NAME_PARAM);
 		WindowsDriver<?> driver = driverWrapper.getDriver();
 		if (targetWindowName.equals(driver.getTitle())) {
@@ -42,7 +42,7 @@ public class SwitchActiveWindow extends WindowsAction {
 
 		this.logger.debug("Current handle: {}", currentHandle);
 		this.logger.debug("Handles: {}", handles);
-		
+
 		handles.remove(currentHandle);
 
 		for (String handle : handles) {
@@ -53,7 +53,7 @@ public class SwitchActiveWindow extends WindowsAction {
 				return null;
 			}
 		}
-		
+
 		throw new ScriptExecuteException("Cannot switch to specified window '" + targetWindowName + "'");
 	}
 
