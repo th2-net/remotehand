@@ -18,6 +18,7 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -240,7 +241,7 @@ public class WebDriverManager implements IDriverManager
 				for (Entry<String, Object> capability : dc.asMap().entrySet())
 					options.setCapability(capability.getKey(), capability.getValue());
 			}
-			return new ChromeDriver(options);
+			return new ChromeDriver(ChromeDriverService.createDefaultService(), options);
 		}
 		catch (Exception e)
 		{

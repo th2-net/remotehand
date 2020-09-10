@@ -56,7 +56,7 @@ public abstract class SessionHandler
 	public SessionHandler(String id, IRemoteHandManager manager)
 	{
 		this.id = id;
-		SessionWatcher.getWatcher().addSession(this);
+		SessionWatcher.watchSession(this);
 		this.manager = manager;
 		logger.info("Created session <" + id + ">");
 	}
@@ -67,7 +67,7 @@ public abstract class SessionHandler
 	
 	public void handle(RhRequest request, SessionExchange exchange) throws IOException
 	{
-		SessionWatcher.getWatcher().updateSession(this);
+		SessionWatcher.updateSession(this);
 		if (request instanceof ExecutionRequest)
 			handleExecution((ExecutionRequest)request, exchange);
 		else if (request instanceof FileUploadRequest)
@@ -129,6 +129,11 @@ public abstract class SessionHandler
 		{
 			logError(logger, id, "An error occurred:", e);
 			sendErrorMessage(exchange, "Internal error. " + e.getMessage());
+		}
+		catch (Throwable e)
+		{
+			logError(logger, id, "An unexpected error occurred:", e);
+			sendErrorMessage(exchange, "Internal unexpected error. " + e.getMessage());
 		}
 	}
 	

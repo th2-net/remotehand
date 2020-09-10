@@ -439,7 +439,7 @@ public class RemoteHandStarter
 		if ((watcher = SessionWatcher.getWatcher()) != null)
 			new Thread(watcher).start();
 		else
-			logger.info("Thread watcher is not running");
+			logger.warn("Session watcher thread is not running");
 	}
 	
 	private static void cleanUpAfterFail(ActionsLauncher launcher, ScriptCompiler compiler, SessionContext context)
