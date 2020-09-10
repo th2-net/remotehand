@@ -17,10 +17,12 @@ import com.exactprosystems.remotehand.windows.actions.GetElementAttribute;
 import com.exactprosystems.remotehand.windows.actions.GetWindow;
 import com.exactprosystems.remotehand.windows.actions.Open;
 import com.exactprosystems.remotehand.windows.actions.Click;
+import com.exactprosystems.remotehand.windows.actions.SearchElement;
 import com.exactprosystems.remotehand.windows.actions.SwitchActiveWindow;
 import com.exactprosystems.remotehand.windows.actions.SendText;
 import com.exactprosystems.remotehand.windows.actions.ToggleCheckBox;
 import com.exactprosystems.remotehand.windows.actions.Wait;
+import com.exactprosystems.remotehand.windows.actions.WaitForAttribute;
 
 public class WindowsActionsMapping {
 
@@ -35,7 +37,9 @@ public class WindowsActionsMapping {
 		ToggleCheckBox,
 		CheckElement,
 		ClickContextMenu,
-		GetWindow;
+		GetWindow,
+		SearchElement,
+		WaitForAttribute;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -59,6 +63,8 @@ public class WindowsActionsMapping {
 			case ToggleCheckBox:		return new ToggleCheckBox();
 			case ClickContextMenu:		return new ClickContextMenu();
 			case GetWindow:				return new GetWindow();
+			case SearchElement:			return new SearchElement();
+			case WaitForAttribute:		return new WaitForAttribute();
 			default : 
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}

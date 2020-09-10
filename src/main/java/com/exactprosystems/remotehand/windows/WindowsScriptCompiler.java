@@ -41,7 +41,15 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 	public static final String WIN_LOCATOR = "locator";
 	public static final String WIN_ID = "id";
 	public static final String WIN_MATCHER = "matcher";
-
+	
+	private boolean isEmpty (String[] empty) {
+		for (String s : empty) {
+			if (s != null && !s.isEmpty())
+				return false;
+		}
+		return true;
+	}
+	
 	@Override
 	//TODO this method contains much copypaste from web script compile. Need refactoring
 	public List<Action> build(String script, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException {
@@ -64,6 +72,9 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 			{
 				lineNumber++;
 				String[] values = reader.getValues();
+				if (isEmpty(values)) {
+					continue;
+				}
 
 				if (values[0].startsWith(WebScriptCompiler.COMMENT_INDICATOR))
 					continue;

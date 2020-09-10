@@ -59,7 +59,7 @@ public class WindowsDriverWrapper {
 	}
 	
 	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities) {
-		WindowsDriver<WebElement> driver = new WindowsDriver<>(driverUrl, capabilities);
+		WindowsDriver<WebElement> driver = new WindowsLoggingDriver<>(driverUrl, capabilities);
 		Integer implTimeout = getImplicityWaitTimeout();
 		if (windowsConfiguration.getImplicityWaitTimeout() != null) {
 			driver.manage().timeouts().implicitlyWait(implTimeout, TimeUnit.SECONDS);

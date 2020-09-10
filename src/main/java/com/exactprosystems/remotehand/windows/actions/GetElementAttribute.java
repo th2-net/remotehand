@@ -14,6 +14,7 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,9 @@ public class GetElementAttribute extends WindowsAction {
 	private static final Logger logger = LoggerFactory.getLogger(GetElementAttribute.class);
 
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 		ElementSearcher es = new ElementSearcher();
-		WebElement element = es.searchElement(params, driverWrapper.getDriver());
+		WebElement element = es.searchElement(params, driverWrapper.getDriver(), cachedWebElements);
 		
 		String attributeName = params.get("attributename");
 		return element.getAttribute(attributeName);

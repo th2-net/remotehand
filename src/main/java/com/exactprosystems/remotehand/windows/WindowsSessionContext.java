@@ -11,6 +11,7 @@
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.sessions.SessionContext;
+import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -21,10 +22,12 @@ public class WindowsSessionContext extends SessionContext {
 	private WindowsDriverWrapper currentDriver;
 	private URL winApiDriverURL;
 	private final Map<String, Object> mvelVars;
+	private final CachedWebElements cachedObjects;
 
 	public WindowsSessionContext(String sessionId) {
 		super(sessionId);
 		this.mvelVars = new HashMap<>();
+		this.cachedObjects = new CachedWebElements();
 	}
 
 	public WindowsDriverWrapper getCurrentDriver() {
@@ -45,5 +48,25 @@ public class WindowsSessionContext extends SessionContext {
 
 	public Map<String, Object> getMvelVars() {
 		return mvelVars;
+	}
+
+	public CachedWebElements getCachedObjects() {
+		return cachedObjects;
+	}
+
+	public static class CachedWebElements {
+		private final Map<String, WebElement> cachedObjects;
+
+		public CachedWebElements() {
+			this.cachedObjects = new HashMap<>();
+		}
+		
+		public void storeWebElement(String id, WebElement webElement) {
+			this.cachedObjects.put(id, webElement);
+		}
+
+		public WebElement getWebElement(String id) {
+			return this.cachedObjects.get(id);
+		}
 	}
 }
