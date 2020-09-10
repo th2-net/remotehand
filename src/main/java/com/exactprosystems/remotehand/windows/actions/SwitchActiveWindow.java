@@ -13,6 +13,7 @@ package com.exactprosystems.remotehand.windows.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,7 @@ public class SwitchActiveWindow extends WindowsAction {
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
 		String targetWindowName = params.get(WINDOW_NAME_PARAM);
 		WindowsDriver<?> driver = driverWrapper.getDriver();

@@ -14,6 +14,7 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -29,10 +30,10 @@ public class Click extends WindowsAction {
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
 
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 		
 		ElementSearcher es = new ElementSearcher();
-		WebElement element = es.searchElement(params, driverWrapper.getDriver());
+		WebElement element = es.searchElement(params, driverWrapper.getDriver(), cachedWebElements);
 
 		String button = params.get(BUTTON);
 		if (button == null)

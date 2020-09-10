@@ -13,6 +13,7 @@ package com.exactprosystems.remotehand.windows;
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import org.mvel2.MVEL;
 import org.slf4j.Logger;
 
@@ -37,7 +38,9 @@ public abstract class WindowsAction extends Action {
 		this.logger = new SessionLogger(context.getSessionId(), getLoggerInstance());
 	}
 	
-	public abstract String run (WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException;
+	public abstract String run (WindowsDriverWrapper driverWrapper, Map<String, String> params,
+								CachedWebElements cachedElements) throws ScriptExecuteException;
+	
 	protected abstract Logger getLoggerInstance();
 		
 	protected String[] mandatoryParams() {
@@ -66,6 +69,10 @@ public abstract class WindowsAction extends Action {
 		}
 	}
 
+	public String getId() {
+		return id;
+	}
+
 	@Override
 	public String execute() throws ScriptExecuteException {
 		this.logger.info("Executing action in line: {} id {}", lineNumber, id);
@@ -73,7 +80,7 @@ public abstract class WindowsAction extends Action {
 		String result = null;
 		
 		if (checkIsExecute()) {
-			result = this.run(windowsSessionContext.getCurrentDriver(), params);
+			result = this.run(windowsSessionContext.getCurrentDriver(), params, windowsSessionContext.getCachedObjects());
 			logger.debug("Action result: {}", result);
 			if (result != null && id != null) {
 				windowsSessionContext.getMvelVars().put(id, result);

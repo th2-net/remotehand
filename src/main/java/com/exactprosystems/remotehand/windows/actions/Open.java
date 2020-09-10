@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand.windows.actions;
 
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class Open extends WindowsAction {
 	}
 
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) {
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) {
 		
 		// closing previous drivers
 		if (driverWrapper.getDriverNullable() != null) {

@@ -10,18 +10,23 @@
 
 package com.exactprosystems.remotehand.windows;
 
+import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import com.exactprosystems.remotehand.windows.locator.ByAccessibilityId;
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ElementSearcher {
 
@@ -57,48 +62,79 @@ public class ElementSearcher {
 	}
 	
 	
-	public WebElement searchElement(Map<String, String> map, WindowsDriver<?> driver) {
+	public WebElement searchElement(Map<String, String> map, WindowsDriver<?> driver,
+									CachedWebElements webElements) throws ScriptExecuteException {
 		List<Pair<String, String>> pairs = this.processFrom(map);
 
 		WebElement we = null;
 		for (Pair<String, String> pair : pairs) {
-		
-			By by = parseBy(pair.getKey(), pair.getValue());
-			logger.trace("Searching by {} = {}", pair.getKey(), pair.getValue());
-			
-			if (we == null) {
-				we = driver.findElement(by);
+
+			String value = pair.getValue();
+			if ("cachedId".equals(pair.getKey())) {
+				logger.trace("Get element from cache by {} = {}", pair.getKey(), value);
+				we = webElements.getWebElement(value);
+				if (we == null) {
+					throw new ScriptExecuteException("Saved elements with rh-id " + value + " is not found");
+				}
+				if (logger.isDebugEnabled()) {
+					logger.debug("Found rh-id {} win_id {}", value,
+							we instanceof RemoteWebElement ? ((RemoteWebElement) we).getId() : "");
+				}
 			} else {
-				we = we.findElement(by);
+				By by = parseBy(pair.getKey(), value);
+				logger.trace("Searching by {} = {}", pair.getKey(), value);
+
+				if (we == null) {
+					we = driver.findElement(by);
+				} else {
+					we = we.findElement(by);
+				}
 			}
-			
 		}
 		
 		return we;
 	}
 
-	public List<? extends WebElement> searchElementsWithoutWait(Map<String, String> map, WindowsDriver<?> driver) {
+	public WebElement searchElementWithoutWait(Map<String, String> map, WindowsDriver<?> driver, int implicitTimeout) {
 		List<Pair<String, String>> pairs = this.processFrom(map);
+		
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		try {
+			WebElement we = null;
+			for (Pair<String, String> pair : pairs) {
 
-		List<? extends WebElement> we = null;
-		for (Pair<String, String> pair : pairs) {
+				By by = parseBy(pair.getKey(), pair.getValue());
+				logger.trace("Searching by {} = {}", pair.getKey(), pair.getValue());
 
-			By by = parseBy(pair.getKey(), pair.getValue());
-			logger.trace("Searching by {} = {}", pair.getKey(), pair.getValue());
-			
-			if (we == null) {
-				we = driver.findElements(by);
-				logger.trace("Found {} elements.", we.size());
-			} else {
-				if (we.isEmpty()) {
-					return null;
+				if (we == null) {
+					we = driver.findElement(by);
+					if (logger.isTraceEnabled()) {
+						logger.trace("Element found: {}.", (we instanceof RemoteWebElement)
+								? ((RemoteWebElement) we).getId() : "");
+					}
+					if (we == null) {
+						return null;
+					}
+
+				} else {
+					we = we.findElement(by);
+					if (logger.isTraceEnabled()) {
+						logger.trace("Element found: {}.", (we instanceof RemoteWebElement)
+								? ((RemoteWebElement) we).getId() : "");
+					}
+					if (we == null) {
+						return null;
+					}
 				}
-				we = we.iterator().next().findElements(by);
-				logger.trace("Found {} elements.", we.size());
 			}
-		}
 
-		return we;
+			return we;
+		} catch (NoSuchElementException e) {
+			logger.trace("Element not found");
+			return null;
+		} finally {
+			driver.manage().timeouts().implicitlyWait(implicitTimeout, TimeUnit.SECONDS);	
+		}
 	}
 	
 	

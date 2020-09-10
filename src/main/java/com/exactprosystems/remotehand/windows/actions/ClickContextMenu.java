@@ -14,6 +14,7 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -27,7 +28,7 @@ public class ClickContextMenu extends WindowsAction {
 	private static final Logger loggerInstance = LoggerFactory.getLogger(ClickContextMenu.class);
 	
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
 		DesiredCapabilities commonCapabilities = driverWrapper.createCommonCapabilities();
 		commonCapabilities.setCapability("app", "Root");
@@ -37,7 +38,7 @@ public class ClickContextMenu extends WindowsAction {
 			driver = driverWrapper.newDriver(commonCapabilities);
 			
 			ElementSearcher es = new ElementSearcher();
-			WebElement element = es.searchElement(params, driver);
+			WebElement element = es.searchElement(params, driver, cachedWebElements);
 			
 			element.click();
 		} finally {
