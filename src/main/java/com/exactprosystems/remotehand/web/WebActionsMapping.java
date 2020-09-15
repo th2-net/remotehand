@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -12,7 +12,6 @@ package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.web.actions.*;
-import com.exactprosystems.remotehand.web.actions.mtable.*;
 
 public class WebActionsMapping
 {
@@ -46,14 +45,9 @@ public class WebActionsMapping
 		FindElement,
 		SetCheckbox,
 		GetFromCanvasTable,
-		MTableGetValue,
-		MTableGetRow,
-		MTableGetTable,
-		MTableGetRowCount,
 		SendKeysToActive,
 		KeyAction,
 		PressKey,
-		GetFormFields,
 		GetScreenshot,
 		SwitchWindow,
 		UploadFile,
@@ -69,7 +63,8 @@ public class WebActionsMapping
 		GetElementInnerHtml,
 		AcceptAlert,
 		DismissAlert,
-		CheckImageAvailability;
+		CheckImageAvailability,
+		ExecuteJS;
 		
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
@@ -106,14 +101,9 @@ public class WebActionsMapping
 		case SelectFrame :         return new SelectFrame();
 		case FindElement :         return new FindElement();
 		case SetCheckbox :         return new SetCheckbox();
-		case MTableGetValue :      return new MTableGetValue();
-		case MTableGetRow :        return new MTableGetRow();
-		case MTableGetTable :      return new MTableGetTable();
-		case MTableGetRowCount :   return new MTableGetRowCount();
 		case SendKeysToActive:     return new SendKeysToActive();
 		case KeyAction:
 		case PressKey:             return new KeyAction();
-		case GetFormFields:        return new GetFormFields();
 		case GetScreenshot:        return new GetScreenshot();
 		case SwitchWindow:         return new SwitchWindow();
 		case UploadFile:           return new UploadFile();
@@ -130,6 +120,7 @@ public class WebActionsMapping
 		case AcceptAlert:          return new AcceptAlert();
 		case DismissAlert:         return new DismissAlert();
 		case CheckImageAvailability: return new CheckImageAvailability();
+		case ExecuteJS:            return new ExecuteJS();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
