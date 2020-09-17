@@ -46,7 +46,15 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 		WindowsSessionContext windowsSessionContext = new WindowsSessionContext(sessionId);
 		WindowsConfiguration instance = (WindowsConfiguration) Configuration.getInstance();
 		try {
-			windowsSessionContext.setWinApiDriverURL(new URL(String.format("http://%s:%s/", instance.getWinAppHost(), instance.getWinAppPort())));
+			String urlPath = instance.getWinAppUrlPath();
+			if (!urlPath.startsWith("/")) {
+				urlPath = "/" + urlPath;
+			}
+			if (!urlPath.endsWith("/")) {
+				urlPath = urlPath + "/";
+			}
+			windowsSessionContext.setWinApiDriverURL(new URL(String.format("http://%s:%s%s",
+					instance.getWinAppHost(), instance.getWinAppPort(), urlPath)));
 			windowsSessionContext.setCurrentDriver(new WindowsDriverWrapper(windowsSessionContext.getWinApiDriverURL()));
 		} catch (MalformedURLException e) {
 			throw new RhConfigurationException("Cannot create URL", e);
