@@ -54,8 +54,8 @@ public class WaitForAttribute extends WindowsAction {
 				driver = driverWrapper.getDriver();
 			}
 
-			ElementSearcher elementSearcher = new ElementSearcher();
-			WebElement element = elementSearcher.searchElement(params, driver, cachedElements);
+			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
+			WebElement element = elementSearcher.searchElement();
 
 			if (StringUtils.isEmpty(attributeName)) {
 				throw new ScriptExecuteException(String.format(PARAM_NOT_SET, ATTRIBUTE_NAME_PARAM));

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -35,9 +36,9 @@ public class Click extends WebAction
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
 	
 	private static final Map<String, CharSequence> MODIFIER_KEYS = new HashMap<String, CharSequence>() {{
-		put(SendKeys.SHIFT, Keys.SHIFT);
-		put(SendKeys.CTRL, Keys.CONTROL);
-		put(SendKeys.ALT, Keys.ALT);
+		put(SendKeysHandler.SHIFT, Keys.SHIFT);
+		put(SendKeysHandler.CTRL, Keys.CONTROL);
+		put(SendKeysHandler.ALT, Keys.ALT);
 	}};
 	
 	@Override

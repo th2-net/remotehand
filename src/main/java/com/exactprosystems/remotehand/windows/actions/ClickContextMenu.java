@@ -37,8 +37,8 @@ public class ClickContextMenu extends WindowsAction {
 			logger.debug("Creating new driver for clicking context menu");
 			driver = driverWrapper.newDriver(commonCapabilities);
 			
-			ElementSearcher es = new ElementSearcher();
-			WebElement element = es.searchElement(params, driver, cachedWebElements);
+			ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
+			WebElement element = es.searchElement();
 			
 			element.click();
 		} finally {

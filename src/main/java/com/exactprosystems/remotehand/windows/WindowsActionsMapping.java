@@ -17,6 +17,7 @@ import com.exactprosystems.remotehand.windows.actions.GetElementAttribute;
 import com.exactprosystems.remotehand.windows.actions.GetWindow;
 import com.exactprosystems.remotehand.windows.actions.Open;
 import com.exactprosystems.remotehand.windows.actions.Click;
+import com.exactprosystems.remotehand.windows.actions.ScrollByText;
 import com.exactprosystems.remotehand.windows.actions.SearchElement;
 import com.exactprosystems.remotehand.windows.actions.SwitchActiveWindow;
 import com.exactprosystems.remotehand.windows.actions.SendText;
@@ -39,7 +40,8 @@ public class WindowsActionsMapping {
 		ClickContextMenu,
 		GetWindow,
 		SearchElement,
-		WaitForAttribute;
+		WaitForAttribute,
+		ScrollUsingText;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -65,6 +67,7 @@ public class WindowsActionsMapping {
 			case GetWindow:				return new GetWindow();
 			case SearchElement:			return new SearchElement();
 			case WaitForAttribute:		return new WaitForAttribute();
+			case ScrollUsingText:		return new ScrollByText();
 			default : 
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}

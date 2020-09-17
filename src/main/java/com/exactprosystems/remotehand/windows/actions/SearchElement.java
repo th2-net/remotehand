@@ -32,9 +32,8 @@ public class SearchElement extends WindowsAction {
 			throw new ScriptExecuteException("Id is not specified");
 		}
 
-		ElementSearcher elementSearcher = new ElementSearcher();
-		WebElement webElement = elementSearcher.searchElement(params, driverWrapper.getDriver(), cachedWebElements);
-			
+		ElementSearcher elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		WebElement webElement = elementSearcher.searchElement();
 		cachedWebElements.storeWebElement(getId(), webElement);
 		
 		if (logger.isDebugEnabled()) {

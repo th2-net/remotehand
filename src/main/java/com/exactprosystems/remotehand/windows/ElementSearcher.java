@@ -14,6 +14,7 @@ import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import com.exactprosystems.remotehand.windows.locator.ByAccessibilityId;
 import io.appium.java_client.windows.WindowsDriver;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
@@ -32,16 +33,29 @@ public class ElementSearcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElementSearcher.class);
 	
-	private List<Pair<String, String>> processFrom(Map<String, String> str000) {
+	private final Map<String, String> record;
+	private final WindowsDriver<?> driver;
+	private final CachedWebElements webElements;
+	
+	private static final Pair<String, String> DEFAULT_KEYS = new ImmutablePair<>("locator", "matcher");
+
+	public ElementSearcher(Map<String, String> record, WindowsDriver<?> driver, CachedWebElements webElements) {
+		this.record = record;
+		this.driver = driver;
+		this.webElements = webElements;
+	}
+
+	private List<Pair<String, String>> processFrom(Pair<String, String> keys) {
 		
 		int ind = 1;
 		String locator, matcher;
 		List<Pair<String, String>> l = new ArrayList<>();
 		do {
-			locator = str000.get("locator" + (ind == 1 ? "" : ind));
-			matcher = str000.get("matcher" + (ind == 1 ? "" : ind));
+			String indexSuffix = ind == 1 ? "" : String.valueOf(ind);
+			locator = record.get(keys.getKey() + indexSuffix);
+			matcher = record.get(keys.getValue() + indexSuffix);
 			ind++;
-			if (locator != null && matcher != null) {
+			if (StringUtils.isNotEmpty(locator) && StringUtils.isNotEmpty(matcher)) {
 				l.add(new ImmutablePair<>(locator, matcher));
 			}
 			
@@ -61,10 +75,20 @@ public class ElementSearcher {
 		throw new IllegalArgumentException("unknown using methods");
 	}
 	
+	public boolean isLocatorsAvailable(Pair<String, String> keys) {
+		return this.record.get(keys.getKey()) != null && this.record.get(keys.getValue()) != null;
+	}
+
+	public boolean isLocatorsAvailable() {
+		return isLocatorsAvailable(DEFAULT_KEYS);
+	}
+
+	public WebElement searchElement() throws ScriptExecuteException {
+		return searchElement(DEFAULT_KEYS);
+	}
 	
-	public WebElement searchElement(Map<String, String> map, WindowsDriver<?> driver,
-									CachedWebElements webElements) throws ScriptExecuteException {
-		List<Pair<String, String>> pairs = this.processFrom(map);
+	public WebElement searchElement(Pair<String, String> keys) throws ScriptExecuteException {
+		List<Pair<String, String>> pairs = this.processFrom(keys);
 
 		WebElement we = null;
 		for (Pair<String, String> pair : pairs) {
@@ -95,40 +119,14 @@ public class ElementSearcher {
 		return we;
 	}
 
-	public WebElement searchElementWithoutWait(Map<String, String> map, WindowsDriver<?> driver, int implicitTimeout) {
-		List<Pair<String, String>> pairs = this.processFrom(map);
-		
+	public WebElement searchElementWithoutWait(int implicitTimeout) throws ScriptExecuteException {
+		return searchElementWithoutWait(DEFAULT_KEYS, implicitTimeout);
+	}
+
+	public WebElement searchElementWithoutWait(Pair<String, String> keys, int implicitTimeout) throws ScriptExecuteException {
 		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		try {
-			WebElement we = null;
-			for (Pair<String, String> pair : pairs) {
-
-				By by = parseBy(pair.getKey(), pair.getValue());
-				logger.trace("Searching by {} = {}", pair.getKey(), pair.getValue());
-
-				if (we == null) {
-					we = driver.findElement(by);
-					if (logger.isTraceEnabled()) {
-						logger.trace("Element found: {}.", (we instanceof RemoteWebElement)
-								? ((RemoteWebElement) we).getId() : "");
-					}
-					if (we == null) {
-						return null;
-					}
-
-				} else {
-					we = we.findElement(by);
-					if (logger.isTraceEnabled()) {
-						logger.trace("Element found: {}.", (we instanceof RemoteWebElement)
-								? ((RemoteWebElement) we).getId() : "");
-					}
-					if (we == null) {
-						return null;
-					}
-				}
-			}
-
-			return we;
+			return searchElement(keys);
 		} catch (NoSuchElementException e) {
 			logger.trace("Element not found");
 			return null;
