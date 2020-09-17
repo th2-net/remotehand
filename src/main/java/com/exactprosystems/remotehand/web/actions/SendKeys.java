@@ -13,6 +13,7 @@ package com.exactprosystems.remotehand.web.actions;
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.web.WebAction;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
+import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import com.exactprosystems.remotehand.web.webelements.WebLocatorsMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
@@ -42,16 +43,13 @@ public class SendKeys extends WebAction
 			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
 			PARAM_CHECKINPUT = "checkinput",
 			PARAM_NEEDCLICK = "needclick",
-			KEY_SIGN = "#",
 			CLEAR_BEFORE = "clear",
-			CAN_BE_DISABLED = "canbedisabled",
-			HASH = "#hash";
+			CAN_BE_DISABLED = "canbedisabled";
 
 	private static final int MAX_RETRIES = 3;
-
-	public static final String SHIFT = "shift", CTRL = "ctrl", ALT = "alt";
 	
 	private boolean holdShift, holdCtrl, holdAlt;
+	private final SendKeysHandler handler = new SendKeysHandler();
 
 	public SendKeys()
 	{
@@ -129,7 +127,8 @@ public class SendKeys extends WebAction
 	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries,
 			boolean checkInput, boolean needClick) throws ScriptExecuteException
 	{
-		List<String> strings = processInputText(text);
+		
+		List<String> strings = handler.processInputText(text);
 		
 		if (retries > 0)
 		{
@@ -147,14 +146,14 @@ public class SendKeys extends WebAction
 		
 		for (String str : strings)
 		{
-			if (str.startsWith(KEY_SIGN))
+			if (str.startsWith(SendKeysHandler.KEY_SIGN))
 			{
-				sendSpecialKey(actions, str, locator);
+				handler.sendSpecialKey(actions, str, locator);
 				continue;
 			}
 
 			String inputAtStart = input.getAttribute("value");
-			doSendKeys(actions, str);
+			handler.doSendKeys(actions, str);
 			if (inputAtStart == null)
 			{
 				logWarn("Input field does not contain value attribute. Sending text as is.");
@@ -205,21 +204,21 @@ public class SendKeys extends WebAction
 			String holdKey = holdMatcher.group(1);
 			switch (holdKey)
 			{
-				case SHIFT:
+				case SendKeysHandler.SHIFT:
 					if (!holdShift)
 					{
 						logInfo("Shift key will be holded during keys sending");
 						holdShift = replace = true;
 					}
 					break;
-				case CTRL:
+				case SendKeysHandler.CTRL:
 					if (!holdCtrl)
 					{
 						logInfo("Ctrl key will be holded during keys sending");
 						holdCtrl = replace = true;
 					}
 					break;
-				case ALT:
+				case SendKeysHandler.ALT:
 					if (!holdAlt)
 					{
 						logInfo("Alt key will be holded during keys sending");
@@ -260,91 +259,6 @@ public class SendKeys extends WebAction
 			a.keyUp(Keys.CONTROL).perform();
 		if (holdAlt)
 			a.keyUp(Keys.ALT).perform();
-	}
-
-	protected void doSendKeys(Actions a, CharSequence keys)
-	{
-		a.sendKeys(keys);
-		a.build().perform();
-	}
-
-	protected void sendSpecialKey(Actions a, String specKey, By locator)
-	{
-		logger.trace("Sending key {}", specKey);
-		CharSequence key = getKeysByLabel(specKey.substring(1));
-		if (StringUtils.isNotEmpty(key))
-		{
-			if (logger.isTraceEnabled())
-			{
-				StringBuilder sb = new StringBuilder();
-				for (int i = 0, len = key.length(); i < len; i++)
-				{
-					sb.append("\\u").append(Integer.toHexString(key.charAt(i))).append(" ");
-				}
-				logger.trace("Put to {} text {}", locator, sb);
-			}
-			doSendKeys(a, key);
-		}
-	}
-	
-	protected static List<String> processInputText(String text)
-	{
-		if (StringUtils.isEmpty(text))
-			return Collections.emptyList();
-
-		List<String> strings = new ArrayList<>();
-		boolean afterKey = false;
-		for (String s : text.split("(?=#)"))
-		{
-			if (s.startsWith(KEY_SIGN))
-			{
-				if (isSpecialKey(s))
-				{
-					strings.add(s);
-					afterKey = true;
-				}
-				else
-				{
-					if (afterKey)
-						afterKey = false;
-					else
-						strings.add(HASH);
-					
-					if (s.length() > 1)
-						strings.add(s.substring(1));
-				}
-			}
-			else
-			{
-				strings.add(s);
-			}
-		}
-		return strings;
-	}
-
-	protected static boolean isSpecialKey(String s)
-	{
-		if (StringUtils.isEmpty(s))
-			return false;
-		int plusIndex = s.indexOf('+');
-		String firstKey = s.substring(1, plusIndex != -1 ? plusIndex : s.length()).toLowerCase();
-		return KEYS.containsKey(firstKey);
-	}
-	
-	public static CharSequence getKeysByLabel(String label)
-	{
-		if (!label.contains("+"))
-			return KEYS.get(label.toLowerCase());
-
-		String[] src = label.split("\\+");
-		int size = src.length;
-		CharSequence[] res = new CharSequence[size];
-		for (int i = 0; i < size; i++)
-		{
-			CharSequence c = KEYS.get(src[i].toLowerCase());
-			res[i] = c == null ? src[i] : c;
-		}
-		return Keys.chord(res);
 	}
 	
 	protected boolean needEnable(WebElement element, Map<String, String> params)
@@ -402,53 +316,4 @@ public class SendKeys extends WebAction
 		return src.replace("(","#openbracket#")
 				.replace("$rhGenerated", Configuration.getInstance().getFileStorage().getAbsolutePath());
 	}
-	
-	public static final Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
-		put("up", Keys.UP);
-		put("down", Keys.DOWN);
-		put("left", Keys.LEFT);
-		put("right", Keys.RIGHT);
-		put("return", Keys.RETURN);
-		put("space", Keys.SPACE);
-		put(HASH, Keys.chord(Keys.SHIFT, "3"));
-		put("dollar", Keys.chord(Keys.SHIFT, "4"));
-		put("percent", Keys.chord(Keys.SHIFT, "5"));
-		put("openbracket", Keys.chord(Keys.SHIFT, "9"));
-		put("tab", Keys.TAB);
-		put("enter", Keys.ENTER);
-		put(SHIFT, Keys.SHIFT);
-		put(CTRL, Keys.CONTROL);
-		put(ALT, Keys.ALT);
-		put("esc", Keys.ESCAPE);
-		put("end", Keys.END);
-		put("home", Keys.HOME);
-		put("insert", Keys.INSERT);
-		put("delete", Keys.DELETE);
-		put("backspace", Keys.BACK_SPACE);
-		put("f1", Keys.F1);
-		put("f2", Keys.F2);
-		put("f3", Keys.F3);
-		put("f4", Keys.F4);
-		put("f5", Keys.F5);
-		put("f6", Keys.F6);
-		put("f7", Keys.F7);
-		put("f8", Keys.F8);
-		put("f9", Keys.F9);
-		put("f10", Keys.F10);
-		put("f11", Keys.F11);
-		put("f12", Keys.F12);
-		put("nbsp", SpecialKeys.NON_BREAKING_SPACE);
-		put("num0", Keys.NUMPAD0);
-		put("num1", Keys.NUMPAD1);
-		put("num2", Keys.NUMPAD2);
-		put("num3", Keys.NUMPAD3);
-		put("num4", Keys.NUMPAD4);
-		put("num5", Keys.NUMPAD5);
-		put("num6", Keys.NUMPAD6);
-		put("num7", Keys.NUMPAD7);
-		put("num8", Keys.NUMPAD8);
-		put("num9", Keys.NUMPAD9);
-		put("subtract", Keys.SUBTRACT);
-		put("add", Keys.ADD);
-	}};
 }

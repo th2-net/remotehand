@@ -28,8 +28,8 @@ public class ToggleCheckBox extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		ElementSearcher es = new ElementSearcher();
-		WebElement element = es.searchElement(params, driverWrapper.getDriver(), cachedWebElements);
+		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		WebElement element = es.searchElement();
 		
 		String expectedState = params.get("expectedstate");
 		expectedState = expectedState != null ? expectedState.toLowerCase() : null;

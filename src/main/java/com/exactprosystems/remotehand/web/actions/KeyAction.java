@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
+import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -23,16 +24,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-import static com.exactprosystems.remotehand.web.actions.SendKeys.getKeysByLabel;
-import static com.exactprosystems.remotehand.web.actions.SendKeys.processInputText;
-
 public class KeyAction extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(KeyAction.class);
 	
 	private static final String PARAM_KEY = "key", PARAM_KEYACTION = "keyaction";
-
 	private static final String ACTION_PRESS = "press";
+	private final SendKeysHandler handler = new SendKeysHandler();
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
@@ -43,7 +41,7 @@ public class KeyAction extends WebAction
 		String keyParam = params.get(PARAM_KEY);
 		if (!StringUtils.isEmpty(keyParam))
 		{
-			List<String> keys = processInputText(keyParam);
+			List<String> keys = handler.processInputText(keyParam);
 			for (String key : keys)
 			{
 				performKeyAction(webDriver, getKey(key), actionType);
@@ -58,7 +56,7 @@ public class KeyAction extends WebAction
 		if (s.length() < 2)
 			return null;
 		String name = s.substring(1);
-		CharSequence key = getKeysByLabel(name);
+		CharSequence key = handler.getKeysByLabel(name);
 		if (key == null)
 			throw new ScriptExecuteException("Unknown key: " + name);
 		return key;

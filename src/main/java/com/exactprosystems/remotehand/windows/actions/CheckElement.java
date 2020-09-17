@@ -29,8 +29,8 @@ public class CheckElement extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		ElementSearcher es = new ElementSearcher();
-		WebElement element = es.searchElementWithoutWait(params, driverWrapper.getDriver(), driverWrapper.getImplicityWaitTimeout());
+		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		WebElement element = es.searchElementWithoutWait(driverWrapper.getImplicityWaitTimeout());
 
 		String attributeName = params.get("attributename");
 		if (attributeName != null && element != null) {
