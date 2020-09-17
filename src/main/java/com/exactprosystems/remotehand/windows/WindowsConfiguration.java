@@ -17,6 +17,7 @@ public class WindowsConfiguration extends Configuration {
 	
 	private static final String WINAPP_HOST = "WinAppDriverHost";
 	private static final String WINAPP_PORT = "WinAppDriverPort";
+	private static final String WINAPP_URL_PATH = "WinAppDriverUrlPath";
 	private static final String WINAPP_EXPERIMENTAL_DRIVER = "WinAppExperimentalDriver";
 	private static final String WINAPP_WAIT_FOR_APP = "WinAppWaitForApp";
 	private static final String WINAPP_IMPL_WAIT = "WinAppImplicitlyTimeout";
@@ -25,6 +26,7 @@ public class WindowsConfiguration extends Configuration {
 	
 	private static final String WINAPP_HOST_DEFAULT = "localhost";
 	private static final String WINAPP_PORT_DEFAULT = "4723";
+	private static final String WINAPP_URL_PATH_DEFAULT = "";
 	private static final boolean WINAPP_EXPERIMENTAL_DRIVER_DEFAULT = true;
 	private static final String WINAPP_WAIT_FOR_APP_DEFAULT = "20";
 	private static final Integer WINAPP_IMPL_WAIT_DEFAULT = 5;
@@ -33,6 +35,7 @@ public class WindowsConfiguration extends Configuration {
 	
 	private final String winAppHost;
 	private final String winAppPort;
+	private final String winAppUrlPath;
 	private final boolean experimentalDriver;
 	private final String waitForApp;
 	private final Integer implicityWaitTimeout;
@@ -44,6 +47,7 @@ public class WindowsConfiguration extends Configuration {
 		
 		this.winAppHost = this.loadProperty(WINAPP_HOST, WINAPP_HOST_DEFAULT);
 		this.winAppPort = this.loadProperty(WINAPP_PORT, WINAPP_PORT_DEFAULT);
+		this.winAppUrlPath = this.loadProperty(WINAPP_URL_PATH, WINAPP_URL_PATH_DEFAULT);
 		
 		this.experimentalDriver = this.loadProperty(WINAPP_EXPERIMENTAL_DRIVER,
 				WINAPP_EXPERIMENTAL_DRIVER_DEFAULT, Boolean::parseBoolean);
@@ -81,6 +85,10 @@ public class WindowsConfiguration extends Configuration {
 
 	public Integer getNewCommandTimeout() {
 		return newCommandTimeout;
+	}
+
+	public String getWinAppUrlPath() {
+		return winAppUrlPath;
 	}
 
 	private static Integer nullableParseInt(String value) {
