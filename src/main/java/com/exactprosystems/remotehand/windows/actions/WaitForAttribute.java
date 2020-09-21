@@ -47,9 +47,7 @@ public class WaitForAttribute extends WindowsAction {
 		WindowsDriver<?> driver = null;
 		try {
 			if (fromRoot) {
-				DesiredCapabilities commonCapabilities = driverWrapper.createCommonCapabilities();
-				commonCapabilities.setCapability("app", "Root");
-				driver = driverWrapper.newDriver(commonCapabilities);
+				driver = driverWrapper.getOrCreateRootDriver();
 			} else {
 				driver = driverWrapper.getDriver();
 			}
@@ -80,6 +78,7 @@ public class WaitForAttribute extends WindowsAction {
 
 			do {
 				if (!firstRun) {
+					logger.debug("Waiting for {} ms", checkInterval);
 					Thread.sleep(checkInterval);
 				}
 				firstRun = false;
@@ -95,15 +94,7 @@ public class WaitForAttribute extends WindowsAction {
 
 		} catch (InterruptedException e) {
 			throw new ScriptExecuteException("Waiting interrupted", e);			
-		} finally {
-			if (fromRoot && driver != null) {
-				try {
-					driver.close();
-				} catch (Exception e) {
-					logger.warn("Error while disposing driver", e);
-				}
-			}
-		}		
+		}	
 		return null;		
 	}
 

@@ -12,16 +12,22 @@ package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class WindowsDriverWrapper {
+
+	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
 	
 	private WindowsDriver<?> driver;
+	private WindowsDriver<?> rootDriver;
 	private URL driverUrl;
 	
 	private WindowsConfiguration windowsConfiguration;
@@ -52,19 +58,35 @@ public class WindowsDriverWrapper {
 
 	public DesiredCapabilities createCommonCapabilities() {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities.setCapability("platformVersion", "10");
-		capabilities.setCapability("platformName", "Windows");
-		capabilities.setCapability("deviceName", "WindowsPC");
+		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "10");
+		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Windows");
+		capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "WindowsPC");
 		return capabilities;
 	}
-	
+
+	public DesiredCapabilities createRootCapabilities() {
+		DesiredCapabilities capabilities = this.createCommonCapabilities();
+		capabilities.setCapability(MobileCapabilityType.APP, "Root");
+		return capabilities;
+	}
+
 	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities) {
+		return newDriver(capabilities, getImplicityWaitTimeout());
+	}
+	
+	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities, Integer implTimeout) {
 		WindowsDriver<WebElement> driver = new WindowsLoggingDriver<>(driverUrl, capabilities);
-		Integer implTimeout = getImplicityWaitTimeout();
-		if (windowsConfiguration.getImplicityWaitTimeout() != null) {
+		if (implTimeout != null) {
 			driver.manage().timeouts().implicitlyWait(implTimeout, TimeUnit.SECONDS);
 		}
 		return driver;
+	}
+	
+	public WindowsDriver<?> getOrCreateRootDriver() {
+		if (rootDriver == null) {
+			rootDriver = this.newDriver(this.createRootCapabilities());
+		}
+		return rootDriver;
 	}
 
 	public boolean isExperimentalDriver() {
@@ -88,8 +110,19 @@ public class WindowsDriverWrapper {
 	}
 	
 	public void close() {
-		WindowsDriver<?> driverNullable = getDriverNullable();
-		if (driverNullable != null)
-			driverNullable.close();
+		if (driver != null) {
+			try {
+				driver.close();
+			} catch (Exception e) {
+				logger.warn("Error disposing driver", e);
+			}
+		}
+		if (rootDriver != null) {
+			try {
+				rootDriver.close();
+			} catch (Exception e) {
+				logger.warn("Error disposing ROOT driver", e);
+			}
+		}
 	}
 }
