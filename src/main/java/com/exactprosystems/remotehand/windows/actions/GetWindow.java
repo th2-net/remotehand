@@ -34,65 +34,49 @@ public class GetWindow extends WindowsAction {
 
 		String targetWindowName = params.get(WINDOW_NAME_PARAM);
 
-		DesiredCapabilities commonCapabilities = driverWrapper.createCommonCapabilities();
-		commonCapabilities.setCapability("app", "Root");
-		WindowsDriver<?> driver1 = null;
-		try {
-			driver1 = driverWrapper.newDriver(commonCapabilities);
-			List<? extends WebElement> elements = driver1.findElementsByName(targetWindowName);
-			if (elements.size() == 1) {
+		WindowsDriver<?> driver1 = driverWrapper.getOrCreateRootDriver();
+		List<? extends WebElement> elements = driver1.findElementsByName(targetWindowName);
+		if (elements.size() == 1) {
+			String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
+			logger.debug("Handle str for window : {} {}", targetWindowName, handleString);
+			int handleInt = Integer.parseInt(handleString);
+			String handleHex = Integer.toHexString(handleInt);
 
-				String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
-				logger.debug("Handle str for window : {} {}", targetWindowName, handleString);
-				int handleInt = Integer.parseInt(handleString);
-				String handleHex = Integer.toHexString(handleInt);
-
-				boolean newDriver = true;
-				if (driverWrapper.getDriverNullable() != null) {
-					try {
-						driverWrapper.getDriver().switchTo().window(handleHex);
-						newDriver = false;
-					} catch (Exception e) {
-						logger.error("Error while switching window", e);
-						try {
-							driverWrapper.getDriverNullable().close();
-						} catch (Exception e1) {
-							logger.error("Error while closing driver", e1);
-						}
-						newDriver = true;
-					}
-				}
-
-				if (newDriver) {
-					DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-					capabilities.setCapability("appTopLevelWindow", handleHex);
-
-					capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
-					if (driverWrapper.getCreateSessionTimeout() != null) {
-						capabilities.setCapability("createSessionTimeout", driverWrapper.getCreateSessionTimeout());
-					}
-					if (driverWrapper.getNewCommandTimeout() != null) {
-						capabilities.setCapability("newCommandTimeout", driverWrapper.getNewCommandTimeout());
-					}
-					driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
-				}
-				return null;
-			} else {
-				String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowName);
-				logger.error(errorText);
-				throw new ScriptExecuteException(errorText);
-			}
-
-		} finally {
-			if (driver1 != null) {
+			boolean newDriver = true;
+			if (driverWrapper.getDriverNullable() != null) {
 				try {
-					driver1.close();
-				} catch (Exception e1) {
-					logger.error("Error while disposing driver", e1);
+					driverWrapper.getDriver().switchTo().window(handleHex);
+					newDriver = false;
+				} catch (Exception e) {
+					logger.error("Error while switching window", e);
+					try {
+						driverWrapper.getDriverNullable().close();
+					} catch (Exception e1) {
+						logger.error("Error while closing driver", e1);
+					}
+					newDriver = true;
 				}
 			}
-		}
 
+			if (newDriver) {
+				DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
+				capabilities.setCapability("appTopLevelWindow", handleHex);
+
+				capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
+				if (driverWrapper.getCreateSessionTimeout() != null) {
+					capabilities.setCapability("createSessionTimeout", driverWrapper.getCreateSessionTimeout());
+				}
+				if (driverWrapper.getNewCommandTimeout() != null) {
+					capabilities.setCapability("newCommandTimeout", driverWrapper.getNewCommandTimeout());
+				}
+				driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
+			}
+			return null;
+		} else {
+			String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowName);
+			logger.error(errorText);
+			throw new ScriptExecuteException(errorText);
+		}
 	}
 
 	@Override

@@ -30,21 +30,12 @@ public class ClickContextMenu extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		DesiredCapabilities commonCapabilities = driverWrapper.createCommonCapabilities();
-		commonCapabilities.setCapability("app", "Root");
-		WindowsDriver<?> driver = null;
-		try {
-			logger.debug("Creating new driver for clicking context menu");
-			driver = driverWrapper.newDriver(commonCapabilities);
-			
-			ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
-			WebElement element = es.searchElement();
-			
-			element.click();
-		} finally {
-			if (driver != null)
-				driver.close();
-		}
+		WindowsDriver<?> driver = driverWrapper.getOrCreateRootDriver();
+		
+		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
+		WebElement element = es.searchElement();
+		
+		element.click();
 		
 		return null;
 	}
