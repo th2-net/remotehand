@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -19,4 +19,9 @@ public abstract class Action {
 	public abstract String execute() throws ScriptExecuteException;
 
 	public void beforeExecute() {}
+
+	public String getActionName()
+	{
+		return this.getClass().getSimpleName();
+	}
 }
