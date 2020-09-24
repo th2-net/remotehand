@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -11,13 +11,18 @@
 package com.exactprosystems.remotehand;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.sessions.SessionContext;
+import com.exactprosystems.remotehand.utils.ExceptionUtils;
+import com.exactprosystems.remotehand.windows.WindowsAction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.String.format;
 
 public class ActionsLauncher
 {
@@ -37,24 +42,30 @@ public class ActionsLauncher
 		RhScriptResult result = new RhScriptResult();
 		
 		String sessionId = getSessionId();
-		logger.info(String.format("<%s> Script execution starting...", sessionId));
+		logger.info(format("<%s> Script execution starting...", sessionId));
 		long startTimeMs = System.currentTimeMillis();
 		
 		for (Action action : scriptActions)
 		{
-			action.beforeExecute();
-			final String actionResult = action.execute();
-			if (actionResult != null)
-				processActionResult(result, action, actionResult);
-
-			if (parent != null && parent.isClosing())
+			try
 			{
-				return null;
+				action.beforeExecute();
+				final String actionResult = action.execute();
+				if (actionResult != null)
+					processActionResult(result, action, actionResult);
+
+				if (parent != null && parent.isClosing())
+					return null;
+			}
+			catch (Exception e)
+			{
+				RhUtils.logError(logger, sessionId, e.getMessage(), e);
+				return ErrorRespondent.getRespondent().error(e, buildErrorMessage(action, e));
 			}
 		}
 		
 		long duration = System.currentTimeMillis() - startTimeMs;
-		logger.info(String.format("<%s> Script execution time: %d sec.", sessionId, 
+		logger.info(format("<%s> Script execution time: %d sec.", sessionId,
 				TimeUnit.MILLISECONDS.toSeconds(duration)));
 
 		return result;
@@ -71,4 +82,16 @@ public class ActionsLauncher
 	}
 	
 	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException { }
+
+
+	private String buildErrorMessage(Action action, Throwable e) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("An error occurred while executing action '").append(action.getActionName()).append("'");
+		if (action instanceof WindowsAction)
+			builder.append(" with parameters ").append(((WindowsAction) action).getParams());
+		builder.append(ExceptionUtils.EOL);
+		builder.append("Cause: ").append(ExceptionUtils.getDetailedMessage(e));
+
+		return builder.toString();
+	}
 }
