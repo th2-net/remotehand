@@ -17,7 +17,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowableList
 
 public class ExceptionUtils
 {
-	private static final String EOL = "\r\n";
+	public static final String EOL = "\r\n";
 
 
 	public static String getDetailedMessage(Throwable e)

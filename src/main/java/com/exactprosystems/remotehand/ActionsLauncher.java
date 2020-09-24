@@ -14,6 +14,7 @@ import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.http.ErrorRespondent;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.utils.ExceptionUtils;
+import com.exactprosystems.remotehand.windows.WindowsAction;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,9 +60,7 @@ public class ActionsLauncher
 			catch (Exception e)
 			{
 				RhUtils.logError(logger, sessionId, e.getMessage(), e);
-				String errorMessage = format("An error occurred while executing action '%s'\r\nCause: %s",
-						action.getActionName(), ExceptionUtils.getDetailedMessage(e)) ;
-				return ErrorRespondent.getRespondent().error(e, errorMessage);
+				return ErrorRespondent.getRespondent().error(e, buildErrorMessage(action, e));
 			}
 		}
 		
@@ -83,4 +82,16 @@ public class ActionsLauncher
 	}
 	
 	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException { }
+
+
+	private String buildErrorMessage(Action action, Throwable e) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("An error occurred while executing action '").append(action.getActionName()).append("'");
+		if (action instanceof WindowsAction)
+			builder.append(" with parameters ").append(((WindowsAction) action).getParams());
+		builder.append(ExceptionUtils.EOL);
+		builder.append("Cause: ").append(ExceptionUtils.getDetailedMessage(e));
+
+		return builder.toString();
+	}
 }
