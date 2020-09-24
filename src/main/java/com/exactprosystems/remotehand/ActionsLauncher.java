@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class ActionsLauncher
 {
@@ -60,7 +59,7 @@ public class ActionsLauncher
 			catch (Exception e)
 			{
 				RhUtils.logError(logger, sessionId, e.getMessage(), e);
-				String errorMessage = format("An error occurred while executing RemoteHand action '%s'\r\nCause: %s",
+				String errorMessage = format("An error occurred while executing action '%s'\r\nCause: %s",
 						action.getActionName(), ExceptionUtils.getDetailedMessage(e)) ;
 				return ErrorRespondent.getRespondent().error(e, errorMessage);
 			}
