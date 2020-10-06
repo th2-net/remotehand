@@ -221,6 +221,8 @@ public class WebDriverManager implements IDriverManager
 				options.addArguments("window-size=1920x1080");
 			}
 			options.addArguments("--no-sandbox");
+			options.addArguments("--ignore-ssl-errors=yes");
+			options.addArguments("--ignore-certificate-errors");
 			String binaryParam = cfg.getBinary();
 			if (binaryParam != null && !binaryParam.isEmpty())
 			{
