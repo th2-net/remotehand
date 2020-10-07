@@ -92,7 +92,8 @@ public class KeyAction extends WebAction
 
 	protected void pressKey(WebDriver webDriver, CharSequence key)
 	{
-		((RemoteWebDriver) webDriver).getKeyboard().pressKey(key);
+		Actions actions = new Actions(webDriver);
+		actions.sendKeys(key).perform();
 	}
 
 	protected void keyDown(WebDriver webDriver, CharSequence key)
