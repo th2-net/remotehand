@@ -17,17 +17,16 @@ import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SendKeysHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(SendKeysHandler.class);
 
 	public static final String SHIFT = "shift", CTRL = "ctrl", ALT = "alt", KEY_SIGN = "#", HASH = "#hash";
+
+	public static final List<CharSequence> MODIFIER_KEYS = Arrays.asList(Keys.SHIFT, Keys.CONTROL, Keys.ALT,
+			Keys.META, Keys.COMMAND, Keys.LEFT_ALT, Keys.LEFT_CONTROL, Keys.LEFT_SHIFT);
 
 	public static final Map<String, CharSequence> KEYS = new HashMap<String, CharSequence>() {{
 		put("up", Keys.UP);
@@ -128,20 +127,39 @@ public class SendKeysHandler {
 
 	public void sendSpecialKey(Actions a, String specKey, Object logElementIdentifier)
 	{
-		logger.trace("Sending key {}", specKey);
+		logger.trace("Sending key: {}", specKey);
+		if (specKey.contains("+"))
+			sendSpecialKeysCombination(a, specKey, logElementIdentifier);
+		else
+			sendSingleSpecialKey(a, specKey, logElementIdentifier);
+	}
+
+	protected void sendSingleSpecialKey(Actions a, String specKey, Object logElementIdentifier)
+	{
 		CharSequence key = getKeysByLabel(specKey.substring(1));
 		if (StringUtils.isNotEmpty(key))
 		{
 			if (logger.isTraceEnabled())
+				logger.trace("Sending text '{}' to element '{}'", Integer.toHexString(key.charAt(0)), logElementIdentifier);
+			doSendKeys(a, key);
+		}
+	}
+
+	protected void sendSpecialKeysCombination(Actions a, String specKey, Object logElementIdentifier)
+	{
+		CharSequence[] keys = getKeysArrayByLabel(specKey.substring(1));
+		if (keys.length != 0)
+		{
+			if (logger.isTraceEnabled())
 			{
 				StringBuilder sb = new StringBuilder();
-				for (int i = 0, len = key.length(); i < len; i++)
+				for (CharSequence key : keys)
 				{
-					sb.append("\\u").append(Integer.toHexString(key.charAt(i))).append(" ");
+					sb.append("\\u").append(Integer.toHexString(key.charAt(0))).append(" ");
 				}
-				logger.trace("Put to {} text {}", logElementIdentifier, sb);
+				logger.trace("Sending text '{}' to element '{}'", sb, logElementIdentifier);
 			}
-			doSendKeys(a, key);
+			doSendKeysCombination(a, keys);
 		}
 	}
 
@@ -151,20 +169,45 @@ public class SendKeysHandler {
 		a.build().perform();
 	}
 
+	public void doSendKeysCombination(Actions a, CharSequence[] keys)
+	{
+		List<CharSequence> modifierKeys = new LinkedList<>(), usualKeys = new LinkedList<>();
+		for (CharSequence key : keys)
+		{
+			if (MODIFIER_KEYS.contains(key))
+			{
+				modifierKeys.add(key);
+				a.keyDown(key);
+			}
+			else
+			{
+				usualKeys.add(key);
+			}
+		}
+		a.sendKeys(usualKeys.toArray(new CharSequence[0]));
+		for (CharSequence key : modifierKeys)
+		{
+			a.keyUp(key);
+		}
+		a.build().perform();
+	}
+
 	public CharSequence getKeysByLabel(String label)
 	{
 		if (!label.contains("+"))
 			return KEYS.get(label.toLowerCase());
+		return Keys.chord(getKeysArrayByLabel(label));
+	}
 
+	public CharSequence[] getKeysArrayByLabel(String label)
+	{
 		String[] src = label.split("\\+");
-		int size = src.length;
-		CharSequence[] res = new CharSequence[size];
-		for (int i = 0; i < size; i++)
+		CharSequence[] res = new CharSequence[src.length];
+		for (int i = 0; i < src.length; i++)
 		{
 			CharSequence c = KEYS.get(src[i].toLowerCase());
 			res[i] = c == null ? src[i] : c;
 		}
-		return Keys.chord(res);
+		return res;
 	}
-
 }
