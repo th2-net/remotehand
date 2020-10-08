@@ -10,7 +10,6 @@
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.TimeoutException;
@@ -29,7 +28,7 @@ import static java.lang.String.format;
 public class WebUtils {
 	
 	public static File createDownloadDirectory() {
-		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
+		WebConfiguration configuration = WebConfiguration.getInstance();
 		File downloadsDir = configuration.getDownloadsDir();
 		if (!configuration.isCreateDownloadSubDir())
 		{
@@ -43,7 +42,7 @@ public class WebUtils {
 
 	public static void deleteDownloadDirectory(File downloadDir)
 	{
-		if (!((WebConfiguration) Configuration.getInstance()).isCreateDownloadSubDir())
+		if (!WebConfiguration.getInstance().isCreateDownloadSubDir())
 			return;
 		
 		File[] tmp;

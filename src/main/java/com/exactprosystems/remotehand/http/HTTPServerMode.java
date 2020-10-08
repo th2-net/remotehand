@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.sessions.DownloadHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +30,13 @@ public class HTTPServerMode
 
 	private static volatile HttpServer server = null;
 
-	public static boolean init(LogonHandler logonHandler) {
+	public static boolean init(HttpHandler logonHandler) {
 		if (server != null)
 			return false;
 		
 		try {
 			server = HttpServer.create(new InetSocketAddress(HTTP_SRV_PORT), 0);
-			server.createContext(LOGIN_LISTENER, (HttpLogonHandler)logonHandler);
+			server.createContext(LOGIN_LISTENER, logonHandler);
 			server.createContext(DOWNLOAD_LISTENER, new HttpDownloadHandler(new DownloadHandler()));
 			server.setExecutor(null); // creates a default executor
 			server.start();

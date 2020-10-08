@@ -209,7 +209,7 @@ public abstract class WebAction extends Action
 	
 	public boolean isNeedDisableLeavePageAlert()
 	{
-		return ((WebConfiguration) Configuration.getInstance()).isDisableLeavePageAlert();
+		return WebConfiguration.getInstance().isDisableLeavePageAlert();
 	}
 
 	public void disableLeavePageAlert(WebDriver webDriver)

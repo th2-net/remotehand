@@ -41,7 +41,7 @@ public class DownloadHandler
 
 	private void sendFile(SessionExchange exchange, String fileLocation) throws IOException
 	{
-		File downloadDir = ((WebConfiguration) Configuration.getInstance()).getDownloadsDir();
+		File downloadDir = WebConfiguration.getInstance().getDownloadsDir();
 		File file = new File(downloadDir, fileLocation);
 		sendFile(exchange, file, "application/octet-stream", fileLocation, fileLocation);
 	}

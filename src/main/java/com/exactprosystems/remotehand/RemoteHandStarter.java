@@ -11,11 +11,15 @@
 package com.exactprosystems.remotehand;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.grid.GridRemoteHandManager;
 import com.exactprosystems.remotehand.http.HTTPServerMode;
+import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.sessions.SessionWatcher;
 import com.exactprosystems.remotehand.tcp.TcpClientMode;
+import com.exactprosystems.remotehand.web.WebDriverPoolProvider;
 import com.exactprosystems.remotehand.web.WebRemoteHandManager;
+import com.exactprosystems.remotehand.windows.WindowsDriverPoolProvider;
 import com.exactprosystems.remotehand.windows.WindowsRemoteHandManager;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
@@ -46,7 +50,8 @@ public class RemoteHandStarter
 			DYNAMIC_INPUT_NAME_PARAM = "dynamicInputName",
 			INPUT_NAME_PARAMS = "inputParamsName",
 			CONFIG_FILE_OPTIONS_PARAM = "configFileOption", 
-			WINDOWS_OPTIONS_PARAM = "windowsMode";
+			WINDOWS_OPTIONS_PARAM = "windowsMode",
+			GRID_MODE_OPTIONS_PARAM = "gridMode";
 	public static final String ENV_VARS_PARAM = "enableEnvVars";
 
 
@@ -62,11 +67,17 @@ public class RemoteHandStarter
 		Options options = createOptions(optionMap);
 		CommandLine line = getCommandLine(args, options);
 
+		if (line.hasOption(optionMap.get(GRID_MODE_OPTIONS_PARAM).getOpt()))
+		{
+			startGridMode(line);
+			return;
+		}
+
 		IRemoteHandManager manager = null;
 		if (line.hasOption(optionMap.get(WINDOWS_OPTIONS_PARAM).getOpt())) {
-			manager = new WindowsRemoteHandManager();
+			manager = new WindowsRemoteHandManager(new WindowsDriverPoolProvider());
 		} else {
-			manager = new WebRemoteHandManager();
+			manager = new WebRemoteHandManager(new WebDriverPoolProvider());
 		}
 		
 		IDriverManager webDriverManager = manager.getWebDriverManager();
@@ -105,6 +116,14 @@ public class RemoteHandStarter
 		}
 	}
 
+	private static void startGridMode(CommandLine commandLine)
+	{
+		GridRemoteHandManager gridManager = new GridRemoteHandManager();
+		gridManager.createConfigurations(commandLine);
+		HTTPServerMode.init(gridManager.createLogonHandler());
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(gridManager));
+	}
+
 	private static void startLocalMode(
 			IRemoteHandManager manager,
 			IDriverManager webDriverManager,
@@ -120,9 +139,9 @@ public class RemoteHandStarter
 
 		ActionsLauncher launcher = manager.createActionsLauncher(null);
 		ScriptCompiler compiler = manager.createScriptCompiler();
+		webDriverManager.initDriverPool();
 		SessionContext sessionContext = getSessionContext(manager);
 
-		webDriverManager.initDriverPool();
 
 		processAllScriptsFromDirectory(input, output, inputParams, launcher, compiler, sessionContext);
 		if (dynInput != null)
@@ -206,7 +225,7 @@ public class RemoteHandStarter
 		//ClearTH sends further requests to that URL directly.
 		//This way multiple simultaneous sessions are handled by HTTP server nature.
 
-		if (!HTTPServerMode.init(manager.createLogonHandler()))
+		if (!HTTPServerMode.init((HttpLogonHandler)manager.createLogonHandler()))
 			logger.info("Application stopped with error");
 		else
 			webDriverManager.initDriverPool();
@@ -296,7 +315,7 @@ public class RemoteHandStarter
 	@SuppressWarnings("static-access")
 	private static Map<String, Option> createOptionMap()
 	{
-		Map<String, Option> optionMap = new HashMap<>(7);
+		Map<String, Option> optionMap = new HashMap<>(10);
 
 		Option enableServerMode = OptionBuilder
 				.isRequired(false)
@@ -351,6 +370,12 @@ public class RemoteHandStarter
 				.withDescription("Windows mode. Works with windows app driver")
 				.create("windowsMode");
 		optionMap.put(WINDOWS_OPTIONS_PARAM, windowsMode);
+
+		Option gridMode = OptionBuilder
+				.isRequired(false)
+				.withDescription("Grid mode. Works with ......")
+				.create(GRID_MODE_OPTIONS_PARAM);
+		optionMap.put(GRID_MODE_OPTIONS_PARAM, gridMode);
 
 		Option envVarsMode = OptionBuilder
 				.isRequired(false)

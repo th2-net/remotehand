@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -20,12 +20,17 @@ import org.openqa.selenium.WebDriver;
 /**
  * Created by alexey.karpukhin on 2/2/16.
  */
-public class WebRemoteHandManager implements IRemoteHandManager {
+public class WebRemoteHandManager implements IRemoteHandManager
+{
+	private final RemoteManagerType managerType = RemoteManagerType.WEB;
 
-	private WebDriverManager webDriverManager;
+	protected WebDriverManager webDriverManager;
+	protected static WebConfiguration configuration;
 
-	public WebRemoteHandManager () {
-		webDriverManager = new WebDriverManager();
+
+	public WebRemoteHandManager(DriverPoolProvider<? extends DriverWrapper<WebDriver>> driverPoolProvider)
+	{
+		webDriverManager = new WebDriverManager(driverPoolProvider);
 	}
 
 	@Override
@@ -72,5 +77,11 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public WebDriverManager getWebDriverManager()
 	{
 		return webDriverManager;
+	}
+
+	@Override
+	public RemoteManagerType getManagerType()
+	{
+		return managerType;
 	}
 }

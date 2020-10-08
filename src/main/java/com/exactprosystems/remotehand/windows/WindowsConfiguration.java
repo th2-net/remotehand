@@ -14,7 +14,8 @@ import com.exactprosystems.remotehand.Configuration;
 import org.apache.commons.cli.CommandLine;
 
 public class WindowsConfiguration extends Configuration {
-	
+	private static volatile WindowsConfiguration instance;
+
 	private static final String WINAPP_HOST = "WinAppDriverHost";
 	private static final String WINAPP_PORT = "WinAppDriverPort";
 	private static final String WINAPP_URL_PATH = "WinAppDriverUrlPath";
@@ -42,9 +43,14 @@ public class WindowsConfiguration extends Configuration {
 	private final String createSessionTimeout;
 	private final Integer newCommandTimeout;
 	
-	protected WindowsConfiguration(CommandLine commandLine) {
+	public WindowsConfiguration(CommandLine commandLine) {
 		super(commandLine);
-		
+
+		if (instance != null) {
+			throw new RuntimeException("Windows configuration is already exist. Use getInstance method");
+		}
+		instance = this;
+
 		this.winAppHost = this.loadProperty(WINAPP_HOST, WINAPP_HOST_DEFAULT);
 		this.winAppPort = this.loadProperty(WINAPP_PORT, WINAPP_PORT_DEFAULT);
 		this.winAppUrlPath = this.loadProperty(WINAPP_URL_PATH, WINAPP_URL_PATH_DEFAULT);
@@ -97,6 +103,9 @@ public class WindowsConfiguration extends Configuration {
 		}
 		return Integer.parseInt(value);
 	}
-	
-	
+
+	public static WindowsConfiguration getInstance()
+	{
+		return instance;
+	}
 }

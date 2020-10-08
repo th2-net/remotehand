@@ -182,7 +182,7 @@ public class WebScriptCompiler extends ScriptCompiler
 		if (params.get(WEB_LOCATOR) != null)
 			webLocator = WebLocatorsMapping.getByName(params.get(WEB_LOCATOR));
 		else if (webAction.isNeedLocator())
-			webLocator = WebLocatorsMapping.getByName(((WebConfiguration)Configuration.getInstance()).getDefaultLocator());
+			webLocator = WebLocatorsMapping.getByName(WebConfiguration.getInstance().getDefaultLocator());
 		params.remove(WEB_ACTION);
 		params.remove(WEB_LOCATOR);
 		

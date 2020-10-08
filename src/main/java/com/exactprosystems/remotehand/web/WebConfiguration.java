@@ -31,6 +31,7 @@ import com.exactprosystems.remotehand.web.actions.GetFormFields;
 public class WebConfiguration extends Configuration {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
+	private static volatile WebConfiguration instance;
 
 	public static final Browser DEF_BROWSER = Browser.FIREFOX;
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
@@ -80,8 +81,13 @@ public class WebConfiguration extends Configuration {
 	private boolean disableLeavePageAlert;
 	private boolean createDownloadSubDir;
 
-	protected WebConfiguration(CommandLine commandLine) {
+	public WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
+
+		if (instance != null) {
+			throw new RuntimeException("Web configuration is already exist. Use getInstance method");
+		}
+		instance = this;
 
 		browserToUse = Browser.valueByLabel(this.loadProperty(PARAM_BROWSER, ""));
 		if (browserToUse == Browser.INVALID)
@@ -297,5 +303,10 @@ public class WebConfiguration extends Configuration {
 	public boolean isCreateDownloadSubDir()
 	{
 		return createDownloadSubDir;
+	}
+
+	public static WebConfiguration getInstance()
+	{
+		return instance;
 	}
 }

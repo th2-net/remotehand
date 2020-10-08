@@ -10,22 +10,25 @@
 
 package com.exactprosystems.remotehand.windows;
 
-import com.exactprosystems.remotehand.ActionsLauncher;
-import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.IDriverManager;
-import com.exactprosystems.remotehand.IRemoteHandManager;
-import com.exactprosystems.remotehand.RhConfigurationException;
-import com.exactprosystems.remotehand.ScriptCompiler;
-import com.exactprosystems.remotehand.ScriptProcessorThread;
+import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
+
+import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.cli.CommandLine;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class WindowsRemoteHandManager implements IRemoteHandManager {
+	private final RemoteManagerType managerType = RemoteManagerType.WINDOWS;
+	private final DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider;
+
+
+	public WindowsRemoteHandManager(DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider)
+	{
+		this.driverPoolProvider = driverPoolProvider;
+	}
+
+
 	@Override
 	public ScriptCompiler createScriptCompiler() {
 		return new WindowsScriptCompiler();
@@ -42,23 +45,12 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 	}
 
 	@Override
-	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException {
+	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
+	{
 		WindowsSessionContext windowsSessionContext = new WindowsSessionContext(sessionId);
-		WindowsConfiguration instance = (WindowsConfiguration) Configuration.getInstance();
-		try {
-			String urlPath = instance.getWinAppUrlPath();
-			if (!urlPath.startsWith("/")) {
-				urlPath = "/" + urlPath;
-			}
-			if (!urlPath.endsWith("/")) {
-				urlPath = urlPath + "/";
-			}
-			windowsSessionContext.setWinApiDriverURL(new URL(String.format("http://%s:%s%s",
-					instance.getWinAppHost(), instance.getWinAppPort(), urlPath)));
-			windowsSessionContext.setCurrentDriver(new WindowsDriverWrapper(windowsSessionContext.getWinApiDriverURL()));
-		} catch (MalformedURLException e) {
-			throw new RhConfigurationException("Cannot create URL", e);
-		}
+		WindowsDriverWrapper driverWrapper = (WindowsDriverWrapper)driverPoolProvider.getDriverWrapper(windowsSessionContext);
+		windowsSessionContext.setWinApiDriverURL(driverWrapper.getDriverUrl());
+		windowsSessionContext.setCurrentDriver(driverWrapper);
 		return windowsSessionContext;
 	}
 
@@ -72,11 +64,18 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 		WindowsSessionContext windowsSessionContext = (WindowsSessionContext) sessionContext;
 		if (windowsSessionContext.getCurrentDriver() != null) {
 			windowsSessionContext.getCurrentDriver().close();
+			driverPoolProvider.closeDriver(sessionContext.getSessionId(), null);
 		}
 	}
 
 	@Override
 	public IDriverManager getWebDriverManager() {
 		return new WindowsDriverManager();
+	}
+
+	@Override
+	public RemoteManagerType getManagerType()
+	{
+		return managerType;
 	}
 }
