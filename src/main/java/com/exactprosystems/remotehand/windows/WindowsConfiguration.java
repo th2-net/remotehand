@@ -11,6 +11,8 @@
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.web.WebConfiguration;
+
 import org.apache.commons.cli.CommandLine;
 
 public class WindowsConfiguration extends Configuration {
@@ -42,13 +44,10 @@ public class WindowsConfiguration extends Configuration {
 	private final Integer implicityWaitTimeout;
 	private final String createSessionTimeout;
 	private final Integer newCommandTimeout;
-	
-	public WindowsConfiguration(CommandLine commandLine) {
+
+	private WindowsConfiguration(CommandLine commandLine) {
 		super(commandLine);
 
-		if (instance != null) {
-			throw new RuntimeException("Windows configuration is already exist. Use getInstance method");
-		}
 		instance = this;
 
 		this.winAppHost = this.loadProperty(WINAPP_HOST, WINAPP_HOST_DEFAULT);
@@ -102,6 +101,14 @@ public class WindowsConfiguration extends Configuration {
 			return null;
 		}
 		return Integer.parseInt(value);
+	}
+
+	public static void init(CommandLine commandLine)
+	{
+		if (instance != null)
+			throw new RuntimeException("Windows configuration already exists");
+
+		instance = new WindowsConfiguration(commandLine);
 	}
 
 	public static WindowsConfiguration getInstance()

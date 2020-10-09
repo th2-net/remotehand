@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Function;
 
+import com.exactprosystems.remotehand.web.WebConfiguration;
+
 import static java.lang.String.format;
 
 public abstract class Configuration

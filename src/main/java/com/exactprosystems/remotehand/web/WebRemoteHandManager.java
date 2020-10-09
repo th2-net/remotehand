@@ -40,7 +40,8 @@ public class WebRemoteHandManager implements IRemoteHandManager
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		return new WebConfiguration(commandLine);
+		WebConfiguration.init(commandLine);
+		return WebConfiguration.getInstance();
 	}
 
 	@Override

@@ -81,12 +81,9 @@ public class WebConfiguration extends Configuration {
 	private boolean disableLeavePageAlert;
 	private boolean createDownloadSubDir;
 
-	public WebConfiguration(CommandLine commandLine) {
+	private WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
 
-		if (instance != null) {
-			throw new RuntimeException("Web configuration is already exist. Use getInstance method");
-		}
 		instance = this;
 
 		browserToUse = Browser.valueByLabel(this.loadProperty(PARAM_BROWSER, ""));
@@ -303,6 +300,14 @@ public class WebConfiguration extends Configuration {
 	public boolean isCreateDownloadSubDir()
 	{
 		return createDownloadSubDir;
+	}
+
+	public static void init(CommandLine commandLine)
+	{
+		if (instance != null)
+			throw new RuntimeException("Web configuration already exists");
+
+		instance = new WebConfiguration(commandLine);
 	}
 
 	public static WebConfiguration getInstance()

@@ -14,6 +14,7 @@ import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
+import com.exactprosystems.remotehand.web.WebConfiguration;
 
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.cli.CommandLine;
@@ -36,7 +37,8 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		return new WindowsConfiguration(commandLine);
+		WindowsConfiguration.init(commandLine);
+		return WindowsConfiguration.getInstance();
 	}
 
 	@Override

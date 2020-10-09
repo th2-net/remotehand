@@ -29,6 +29,9 @@ import com.exactprosystems.remotehand.sessions.SessionContext;
 
 public class WindowsDriverPoolProvider implements DriverPoolProvider<WindowsDriverWrapper>
 {
+	private static final String URL_DELIMITER = "/";
+
+
 	@Override
 	public WindowsDriverWrapper getDriverWrapper(SessionContext context) throws RhConfigurationException
 	{
@@ -58,13 +61,13 @@ public class WindowsDriverPoolProvider implements DriverPoolProvider<WindowsDriv
 	{
 		WindowsConfiguration instance = WindowsConfiguration.getInstance();
 		String urlPath = instance.getWinAppUrlPath();
-		if (!urlPath.startsWith("/"))
+		if (!urlPath.startsWith(URL_DELIMITER))
 		{
-			urlPath = "/" + urlPath;
+			urlPath = URL_DELIMITER + urlPath;
 		}
-		if (!urlPath.endsWith("/"))
+		if (!urlPath.endsWith(URL_DELIMITER))
 		{
-			urlPath = urlPath + "/";
+			urlPath = urlPath + URL_DELIMITER;
 		}
 
 		return String.format("http://%s:%s%s", instance.getWinAppHost(), instance.getWinAppPort(), urlPath);

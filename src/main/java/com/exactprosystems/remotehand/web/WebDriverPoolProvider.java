@@ -58,7 +58,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (RhConfigurationException e)
 		{
-			logger.warn("Unable init driver pool", e);
+			logger.warn("Could not initialize driver pool", e);
 		}
 	}
 
@@ -242,7 +242,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (Exception e)
 		{
-			throw new RhConfigurationException("Unable to create FireFox driver: " + e.getMessage(), e);
+			throw new RhConfigurationException("Unable to create Firefox driver: " + e.getMessage(), e);
 		}
 	}
 	
@@ -289,7 +289,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (Exception e)
 		{
-			logger.error("Error while closing driver.", e);
+			logger.error("Error while closing driver", e);
 		}
 	}
 }

@@ -373,7 +373,7 @@ public class RemoteHandStarter
 
 		Option gridMode = OptionBuilder
 				.isRequired(false)
-				.withDescription("Grid mode. Works with ......")
+				.withDescription("Grid mode. Works with windows app driver and web remote driver")
 				.create(GRID_MODE_OPTIONS_PARAM);
 		optionMap.put(GRID_MODE_OPTIONS_PARAM, gridMode);
 
