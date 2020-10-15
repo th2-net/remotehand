@@ -15,8 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -189,16 +187,5 @@ public class Click extends WebAction
 		
 		for (CharSequence c : modifiers)
 			actions.keyUp(c);
-	}
-
-	private int getChromeDriverVersion(ChromeDriver chromeDriver)
-	{
-		Map<String, String> chromeCap = (Map<String, String>) chromeDriver.getCapabilities().getCapability("chrome");
-		String ver = chromeCap.get("chromedriverVersion");
-		Matcher m = Pattern.compile("^\\d*").matcher(ver);
-		if (m.find())
-			return Integer.parseInt(m.group());
-		else
-			return -1;
 	}
 }

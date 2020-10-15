@@ -20,6 +20,7 @@ import com.jhlabs.image.PosterizeFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,6 +35,8 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 
@@ -402,6 +405,18 @@ public abstract class WebAction extends Action
 	{
 		WebElement element = findElement(webDriver, webLocator);
 		return takeElementScreenshot(webDriver, element);
+	}
+	
+	
+	protected int getChromeDriverVersion(ChromeDriver chromeDriver)
+	{
+		Map<String, String> chromeCap = (Map<String, String>) chromeDriver.getCapabilities().getCapability("chrome");
+		String ver = chromeCap.get("chromedriverVersion");
+		Matcher m = Pattern.compile("^\\d*").matcher(ver);
+		if (m.find())
+			return Integer.parseInt(m.group());
+		else
+			return -1;
 	}
 	
 	
