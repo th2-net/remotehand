@@ -19,6 +19,7 @@ import java.util.Set;
 import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
@@ -74,28 +75,7 @@ public class Click extends WebAction
 		if (button == null)
 			button = LEFT;
 		
-		String xOffsetStr, yOffsetStr;
-		int xOffset = 0, yOffset = 0;
-		xOffsetStr = params.get(X_OFFSET);
-		yOffsetStr = params.get(Y_OFFSET);
-		
-		Actions actions = new Actions(webDriver);
-		
-		if ((xOffsetStr != null && !xOffsetStr.isEmpty()) && (yOffsetStr != null && !yOffsetStr.isEmpty()))
-		{
-			try
-			{
-				xOffset = Integer.valueOf(xOffsetStr);
-				yOffset = Integer.valueOf(yOffsetStr);
-			}
-			catch (Exception e)
-			{
-				logError("xoffset or yoffset is not integer value");
-			}
-			actions = actions.moveToElement(element, xOffset, yOffset);
-		}
-		else
-			actions = actions.moveToElement(element);
+		Actions actions = moveToElement(webDriver, element, params.get(X_OFFSET), params.get(Y_OFFSET));
 		logInfo("Moved to element: %s", webLocator);
 		
 		try
@@ -155,6 +135,32 @@ public class Click extends WebAction
 		return true;
 	}
 	
+	private Actions moveToElement(WebDriver webDriver, WebElement element, String xOffsetStr, String yOffsetStr)
+	{
+		Actions actions = new Actions(webDriver);
+		
+		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr))
+		{
+			int xOffset = 0, yOffset = 0;
+			try
+			{
+				xOffset = Integer.parseInt(xOffsetStr);
+				yOffset = Integer.parseInt(yOffsetStr);
+			}
+			catch (NumberFormatException e)
+			{
+				logError("xoffset or yoffset is not integer value");
+			}
+			
+			if (webDriver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) webDriver) > 74)
+			{
+				xOffset -= element.getSize().getWidth() / 2;
+				yOffset -= element.getSize().getHeight() / 2;
+			}
+			return actions.moveToElement(element, xOffset, yOffset);
+		}
+		return actions.moveToElement(element);
+	}
 	
 	private Set<CharSequence> applyModifiers(Actions actions, String modifiers)
 	{
