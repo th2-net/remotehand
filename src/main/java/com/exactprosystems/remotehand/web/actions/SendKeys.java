@@ -46,7 +46,7 @@ public class SendKeys extends WebAction
 			CLEAR_BEFORE = "clear",
 			CAN_BE_DISABLED = "canbedisabled";
 
-	private static final int MAX_RETRIES = 3;
+	private static final int MAX_RETRIES = Configuration.getInstance().getSendKeysMaxRetries();
 	
 	private boolean holdShift, holdCtrl, holdAlt;
 	private final SendKeysHandler handler = new SendKeysHandler();
