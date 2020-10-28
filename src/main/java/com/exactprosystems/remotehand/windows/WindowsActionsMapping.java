@@ -11,20 +11,7 @@
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
-import com.exactprosystems.remotehand.windows.actions.CheckElement;
-import com.exactprosystems.remotehand.windows.actions.ClickContextMenu;
-import com.exactprosystems.remotehand.windows.actions.GetDataFromClipboard;
-import com.exactprosystems.remotehand.windows.actions.GetElementAttribute;
-import com.exactprosystems.remotehand.windows.actions.GetWindow;
-import com.exactprosystems.remotehand.windows.actions.Open;
-import com.exactprosystems.remotehand.windows.actions.Click;
-import com.exactprosystems.remotehand.windows.actions.ScrollByText;
-import com.exactprosystems.remotehand.windows.actions.SearchElement;
-import com.exactprosystems.remotehand.windows.actions.SwitchActiveWindow;
-import com.exactprosystems.remotehand.windows.actions.SendText;
-import com.exactprosystems.remotehand.windows.actions.ToggleCheckBox;
-import com.exactprosystems.remotehand.windows.actions.Wait;
-import com.exactprosystems.remotehand.windows.actions.WaitForAttribute;
+import com.exactprosystems.remotehand.windows.actions.*;
 
 public class WindowsActionsMapping {
 
@@ -43,7 +30,8 @@ public class WindowsActionsMapping {
 		SearchElement,
 		WaitForAttribute,
 		ScrollUsingText,
-		GetDataFromClipboard;
+		GetDataFromClipboard,
+		TableClick;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -71,9 +59,10 @@ public class WindowsActionsMapping {
 			case WaitForAttribute:		return new WaitForAttribute();
 			case ScrollUsingText:		return new ScrollByText();
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
-			default : 
+			case TableClick:			return new TableClick();
+			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
-	
+
 }
