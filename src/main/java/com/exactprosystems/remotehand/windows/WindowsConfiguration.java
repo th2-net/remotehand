@@ -38,7 +38,7 @@ public class WindowsConfiguration extends Configuration {
 	private final String winAppUrlPath;
 	private final boolean experimentalDriver;
 	private final String waitForApp;
-	private final Integer implicityWaitTimeout;
+	private final Integer implicitlyWaitTimeout;
 	private final String createSessionTimeout;
 	private final Integer newCommandTimeout;
 	
@@ -52,7 +52,7 @@ public class WindowsConfiguration extends Configuration {
 		this.experimentalDriver = this.loadProperty(WINAPP_EXPERIMENTAL_DRIVER,
 				WINAPP_EXPERIMENTAL_DRIVER_DEFAULT, Boolean::parseBoolean);
 		this.waitForApp = this.loadProperty(WINAPP_WAIT_FOR_APP, WINAPP_WAIT_FOR_APP_DEFAULT);
-		this.implicityWaitTimeout = this.loadProperty(WINAPP_IMPL_WAIT,
+		this.implicitlyWaitTimeout = this.loadProperty(WINAPP_IMPL_WAIT,
 				WINAPP_IMPL_WAIT_DEFAULT, WindowsConfiguration::nullableParseInt);
 		this.createSessionTimeout = this.loadProperty(WINAPP_CREATE_SESSION_TIMEOUT, WINAPP_CREATE_SESSION_TIMEOUT_DEFAULT);
 		this.newCommandTimeout = this.loadProperty(WINAPP_NEW_COMMAND_TIMEOUT,
@@ -75,8 +75,8 @@ public class WindowsConfiguration extends Configuration {
 		return waitForApp;
 	}
 
-	public Integer getImplicityWaitTimeout() {
-		return implicityWaitTimeout;
+	public Integer getImplicitlyWaitTimeout() {
+		return implicitlyWaitTimeout;
 	}
 
 	public String getCreateSessionTimeout() {
