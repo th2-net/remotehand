@@ -33,7 +33,7 @@ import static java.lang.String.format;
 public class TableClick extends WindowsAction {
 	private static final Logger logInstance = LoggerFactory.getLogger(TableClick.class);
 	private static final String FILTER = "filter";
-	private static final String TARGET = "target";
+	private static final String TARGET_COLUMN = "column";
 	private static final String INDEX = "index";
 	private static final String ROW_FORMAT = "Row %s";
 	private static final String ROW_ELEMENT_FORMAT = "%s row %s";
@@ -94,7 +94,7 @@ public class TableClick extends WindowsAction {
 
 	private WebElement getTargetColumn(WebElement row, Map<String, String> params, int rowIndex) throws ScriptExecuteException {
 		int columnIndex = getColumnIndex(params);
-		By columnLocator = By.name(format(ROW_ELEMENT_FORMAT, params.get(TARGET), rowIndex - 1));
+		By columnLocator = By.name(format(ROW_ELEMENT_FORMAT, params.get(TARGET_COLUMN), rowIndex - 1));
 		if (columnIndex > 0) {
 			List<WebElement> elements = row.findElements(columnLocator);
 			if (columnIndex > elements.size())
