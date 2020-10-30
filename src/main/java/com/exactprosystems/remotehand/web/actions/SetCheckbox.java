@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -78,7 +78,7 @@ public class SetCheckbox extends WebAction
 		}
 		catch (WebDriverException e)
 		{
-			if (e.getMessage().contains("Element is not clickable") && checkbox.isSelected() != shouldBeChecked) // Case from LCH frontend
+			if (e.getMessage().contains("Element is not clickable") && checkbox.isSelected() != shouldBeChecked)
 			{
 				WebElement parent = checkbox.findElement(By.xpath(".."));
 				logInfo("Trying to click on parent element: %s", parent);
