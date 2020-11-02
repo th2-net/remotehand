@@ -36,6 +36,7 @@ public abstract class Configuration
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
 	public final int DEF_DRIVER_POOL_SIZE = 1;
+	public final int DEF_SEND_KEYS_MAX_RETRIES = 3;
 	public final String DEF_FILE_STORAGE = "generated/",
 			DEF_HOST = "localhost";
 
@@ -45,7 +46,8 @@ public abstract class Configuration
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire",
 			PARAM_FILE_STORAGE = "DefaultFileStorage",
-			PARAM_DRIVER_POOL_SIZE = "WebDriverPoolSize";
+			PARAM_DRIVER_POOL_SIZE = "WebDriverPoolSize",
+			PARAM_SEND_KEYS_MAX_RETRIES = "SendKeysMaxRetries";
 
 	private volatile String host;
 	private volatile int port;
@@ -53,6 +55,7 @@ public abstract class Configuration
 	private volatile char scriptTextQualifier;
 	private volatile int sessionExpire;
 	private volatile int driverPoolSize;
+	private volatile int sendKeysMaxRetries;
 	private volatile File fileStorage;
 	
 	protected boolean acceptEnvVars;
@@ -99,6 +102,7 @@ public abstract class Configuration
 		this.sessionExpire = this.loadProperty(PARAM_SESSIONEXPIRE, DEF_SESSION_EXPIRE, Integer::parseInt);
 		this.fileStorage = new File(this.loadProperty(PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
 		this.driverPoolSize = this.loadProperty(PARAM_DRIVER_POOL_SIZE, DEF_DRIVER_POOL_SIZE, Integer::parseInt);
+		this.sendKeysMaxRetries = this.loadProperty(PARAM_SEND_KEYS_MAX_RETRIES, DEF_SEND_KEYS_MAX_RETRIES, Integer::parseInt);
 	}
 	
 	protected Properties getDefaultProperties()
@@ -221,5 +225,10 @@ public abstract class Configuration
 	public int getDriverPoolSize()
 	{
 		return driverPoolSize;
+	}
+
+	public int getSendKeysMaxRetries()
+	{
+		return sendKeysMaxRetries;
 	}
 }

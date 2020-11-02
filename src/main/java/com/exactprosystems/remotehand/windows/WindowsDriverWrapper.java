@@ -73,7 +73,7 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 	}
 
 	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities) {
-		return newDriver(capabilities, getImplicityWaitTimeout());
+		return newDriver(capabilities, getImplicitlyWaitTimeout());
 	}
 	
 	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities, Integer implTimeout) {
@@ -107,8 +107,8 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 		return windowsConfiguration.getNewCommandTimeout();
 	}
 
-	public Integer getImplicityWaitTimeout() {
-		return windowsConfiguration.getImplicityWaitTimeout();
+	public Integer getImplicitlyWaitTimeout() {
+		return windowsConfiguration.getImplicitlyWaitTimeout();
 	}
 	
 	public void close() {

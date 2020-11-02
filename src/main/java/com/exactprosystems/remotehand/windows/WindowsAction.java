@@ -13,8 +13,10 @@ package com.exactprosystems.remotehand.windows;
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import org.mvel2.MVEL;
+import org.openqa.selenium.NoSuchElementException;
 import org.slf4j.Logger;
 
 import java.io.Serializable;
@@ -80,16 +82,36 @@ public abstract class WindowsAction extends Action {
 		String result = null;
 		
 		if (checkIsExecute()) {
-			result = this.run(windowsSessionContext.getCurrentDriver(), params, windowsSessionContext.getCachedObjects());
-			logger.debug("Action result: {}", result);
-			if (result != null && id != null) {
-				windowsSessionContext.getMvelVars().put(id, result);
-				logger.trace("Action result saved to id: {}", id);
+			try {
+				result = this.run(windowsSessionContext.getCurrentDriver(), params, windowsSessionContext.getCachedObjects());
+				logger.debug("Action result: {}", result);
+				if (result != null && id != null) {
+					windowsSessionContext.getMvelVars().put(id, result);
+					logger.trace("Action result saved to id: {}", id);
+				}
+			} catch (NoSuchElementException e) {
+				throw new ScriptExecuteException(String.format("Action '%s' cannot be executed", getActionName()), e);
 			}
 		} else {
 			this.logger.info("Action was not executed due condition. And will be skipped");
 		}
+		result = this.checkMultiline(result);
 		
-		return result;
+		if (result != null && id != null) {
+			return id + "=" + result;
+		} else {
+			return result;	
+		}
 	}
+	
+	//todo this logic should be in common. Check carefully web - part
+	private String checkMultiline(String str) {
+		if (str != null && str.indexOf('\n') >=0) {
+			return str.replaceAll("\\r?\\n", WebScriptCompiler.SCRIPT_LINE_SEPARATOR);
+		} else {
+			return str;
+		}
+	}
+	
+	
 }

@@ -11,35 +11,31 @@
 package com.exactprosystems.remotehand.windows.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
-import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.util.Map;
 
-public class CheckElement extends WindowsAction {
+public class GetDataFromClipboard extends WindowsAction {
 
-	private static final Logger loggerInstance = LoggerFactory.getLogger(CheckElement.class);
-
+	private static final Logger loggerInstance = LoggerFactory.getLogger(GetDataFromClipboard.class);
+	
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
-		WebElement element = es.searchElementWithoutWait(driverWrapper.getImplicitlyWaitTimeout());
-
-		String attributeName = params.get("attributename");
-		if (attributeName != null && element != null) {
-			return element.getAttribute(attributeName);
-		} else if (element != null) {
-			return "found";
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
+		
+		try {
+			Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			return (String) systemClipboard.getData(DataFlavor.stringFlavor);
+		} catch (Exception e) {
+			throw new ScriptExecuteException("Cannot get data from clipboard", e);
 		}
-
-		return "not found";
+		
 	}
 
 	@Override
