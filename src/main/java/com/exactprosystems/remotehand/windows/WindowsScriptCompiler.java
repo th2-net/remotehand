@@ -51,7 +51,7 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 	}
 	
 	@Override
-	//TODO this method contains much copypaste from web script compile. Need refactoring
+	//FIXME: this method contains much copypaste from web script compile. Need refactoring
 	public List<Action> build(String script, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException {
 		WindowsSessionContext webSessionContext = (WindowsSessionContext) context;
 		String sessionId = webSessionContext.getSessionId();
@@ -116,7 +116,7 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 	}
 
 
-	//TODO copied from WEB
+	//FIXME: copied from WEB
 	private String[] parseValues(String[] rowValues)
 	{
 		String[] result = new String[rowValues.length];
@@ -132,7 +132,7 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 		return result;
 	}
 
-	//TODO copied from WEB
+	//FIXME: copied from WEB
 	private boolean isExecutable(String[] header, String[] values)
 	{
 		int foundAt = -1;

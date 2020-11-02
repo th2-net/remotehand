@@ -88,8 +88,8 @@ public class RemoteHandStarter
 			closeApp();
 		}
 
-		//In any mode RemoteHand handles requests from ClearTH.
-		//Requests flow should start with "logon" request, for which RemoteHand will assign a sessionID and return it to ClearTH for further reference.
+		//In any mode RemoteHand handles requests from external application.
+		//Requests flow should start with "logon" request, for which RemoteHand will assign a sessionID and return it to the application for further reference.
 
 		if (httpServerMode)
 		{
@@ -201,9 +201,9 @@ public class RemoteHandStarter
 
 	private static void startHttpServerMode(IRemoteHandManager manager, IDriverManager webDriverManager)
 	{
-		//In HTTP server mode RemoteHand waits for requests from ClearTH.
+		//In HTTP server mode RemoteHand waits for requests from external application.
 		//Once logon request is received, RemoteHand adds HttpSessionHandler to HTTP server, binding it to URL equal to sessionID.
-		//ClearTH sends further requests to that URL directly.
+		//The application sends further requests to that URL directly.
 		//This way multiple simultaneous sessions are handled by HTTP server nature.
 
 		if (!HTTPServerMode.init(manager.createLogonHandler()))

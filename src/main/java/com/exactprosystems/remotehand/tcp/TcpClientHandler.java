@@ -41,7 +41,7 @@ public class TcpClientHandler extends ChannelInboundHandlerAdapter
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-		//Once connected, let's tell ClearTH who we are
+		//Once connected, let's tell the server who we are
 		new TcpSessionExchange(ctx).sendResponse(0, "RemoteHand "+version);
 		logger.info("Connected to host "+ctx.channel().remoteAddress());
 	}

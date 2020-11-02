@@ -182,7 +182,7 @@ public class SendKeys extends WebAction
 				return;
 			}
 
-			// If field not filled as expected for current moment, restart operation at all
+			// If field is not filled as expected for current moment, redo the whole operation
 			logInfo("Missed input detected. Trying to resend keys.");
 			if (!waitForElement(driver, 10, locator))
 				throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");

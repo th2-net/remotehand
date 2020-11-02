@@ -58,7 +58,7 @@ public class TcpClientMode
 				}
 			});
 			
-			// Connecting to ClearTH
+			// Connecting to external application
 			clientFuture = b.connect(TCP_HOST, TCP_PORT).sync();
 			return true;
 		}
