@@ -11,10 +11,12 @@ STARTING REMOTEHAND
 RemoteHand is written in Java and is started as usual Java application:
 java -jar remotehand.jar
 
-There are two modes for RemoteHand to work: 
-1. to execute actions from given script file;
-2. to wait for commands from external source, e.g. ClearTH.
+There are 3 modes for RemoteHand to work: 
+1. to execute actions from given script file using local web driver;
+2. to execute incoming commands using local web driver;
+3. to execute incoming commands using remote web driver.
 
+The last 2 modes turn RemoteHand into an HTTP server. Commands to execute will come from external source, e.g. ClearTH.
 
 To start RemoteHand in 1st mode, use the following command:
 java -jar remotehand.jar -input <script file> -output <file for script output>
@@ -28,14 +30,17 @@ It makes RemoteHand wait for new script to arrive in specified file. After execu
 To start RemoteHand in 2nd mode, use the following command:
 java -jar remotehand.jar -httpserver
 
-In this mode RemoteHand will wait for script from HTTP request and send its output as HTTP response. 
-RemoteHand will use "Port" setting from config.ini to start HTTP server on.
-This mode is usual for ClearTH to trigger RemoteHand to operate.
+To make RemoteHand work in 3rd mode, use the following command:
+java -jar remotehand.jar -grid
 
-Alternatively, you can make RemoteHand connect to ClearTH to serve further requests:
+In these modes RemoteHand will wait for script from HTTP request and send its output as HTTP response. 
+RemoteHand will use "Port" setting from config.ini to start HTTP server on.
+This mode is usual for external application to trigger RemoteHand to operate.
+
+Alternatively, you can make RemoteHand connect to external application to serve further requests:
 java -jar remotehand.jar -tcpclient
 
-In this mode RemoteHand connects to ClearTH via TCP/IP. ClearTH after that can trigger RemoteHand to operate using connected socket.
+In this mode RemoteHand connects to another application via TCP/IP. The application after that can trigger RemoteHand to operate using connected socket.
 RemoteHand will use "Host" and "Port" settings from config.ini to connect to.
 
 

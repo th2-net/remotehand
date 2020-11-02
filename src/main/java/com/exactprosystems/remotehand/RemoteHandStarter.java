@@ -51,7 +51,7 @@ public class RemoteHandStarter
 			INPUT_NAME_PARAMS = "inputParamsName",
 			CONFIG_FILE_OPTIONS_PARAM = "configFileOption", 
 			WINDOWS_OPTIONS_PARAM = "windowsMode",
-			GRID_MODE_OPTIONS_PARAM = "gridMode";
+			GRID_MODE_OPTIONS_PARAM = "grid";
 	public static final String ENV_VARS_PARAM = "enableEnvVars";
 
 
@@ -367,13 +367,13 @@ public class RemoteHandStarter
 
 		Option windowsMode = OptionBuilder
 				.isRequired(false)
-				.withDescription("Windows mode. Works with windows app driver")
+				.withDescription("Windows mode. Works with Windows Application Driver")
 				.create("windowsMode");
 		optionMap.put(WINDOWS_OPTIONS_PARAM, windowsMode);
 
 		Option gridMode = OptionBuilder
 				.isRequired(false)
-				.withDescription("Grid mode. Works with Windows Application Driver and web remote driver")
+				.withDescription("Work in Grid mode using remote Windows Application Driver and remote Web Driver")
 				.create(GRID_MODE_OPTIONS_PARAM);
 		optionMap.put(GRID_MODE_OPTIONS_PARAM, gridMode);
 
