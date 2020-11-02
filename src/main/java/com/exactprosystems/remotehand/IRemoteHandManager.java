@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -33,4 +33,6 @@ public interface IRemoteHandManager {
 	void close(SessionContext sessionContext);
 
 	IDriverManager getWebDriverManager();
+
+	RemoteManagerType getManagerType();
 }

@@ -11,6 +11,7 @@
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.DriverWrapper;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.windows.WindowsDriver;
@@ -22,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-public class WindowsDriverWrapper {
-
+public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
+{
 	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
 	
 	private WindowsDriver<?> driver;
@@ -34,9 +35,10 @@ public class WindowsDriverWrapper {
 
 	public WindowsDriverWrapper(URL driverUrl) {
 		this.driverUrl = driverUrl;
-		this.windowsConfiguration = (WindowsConfiguration) Configuration.getInstance();
+		this.windowsConfiguration = WindowsConfiguration.getInstance();
 	}
 
+	@Override
 	public WindowsDriver<?> getDriver() throws ScriptExecuteException {
 		if (driver == null) {
 			throw new ScriptExecuteException("Driver was not created. Driver creating action was not performed");
@@ -114,14 +116,14 @@ public class WindowsDriverWrapper {
 			try {
 				driver.close();
 			} catch (Exception e) {
-				logger.warn("Error disposing driver", e);
+				logger.warn("Error while disposing driver", e);
 			}
 		}
 		if (rootDriver != null) {
 			try {
 				rootDriver.close();
 			} catch (Exception e) {
-				logger.warn("Error disposing ROOT driver", e);
+				logger.warn("Error while disposing ROOT driver", e);
 			}
 		}
 	}

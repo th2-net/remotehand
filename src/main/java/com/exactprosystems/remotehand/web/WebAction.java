@@ -212,7 +212,7 @@ public abstract class WebAction extends Action
 	
 	public boolean isNeedDisableLeavePageAlert()
 	{
-		return ((WebConfiguration) Configuration.getInstance()).isDisableLeavePageAlert();
+		return WebConfiguration.getInstance().isDisableLeavePageAlert();
 	}
 
 	public void disableLeavePageAlert(WebDriver webDriver)
@@ -331,7 +331,7 @@ public abstract class WebAction extends Action
 		}
 		catch (ScriptExecuteException e)
 		{
-			logError("Unable to create screenshot.", e);
+			logError("Could not create screenshot", e);
 			return null;
 		}
 	}

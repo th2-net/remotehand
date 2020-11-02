@@ -13,10 +13,7 @@ package com.exactprosystems.remotehand.sessions;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author anna.bykova.
- */
-public class SessionContext
+public abstract class SessionContext
 {
 	private final String sessionId;
 	private final Map<String, Object> contextData;

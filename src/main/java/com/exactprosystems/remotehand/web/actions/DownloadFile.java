@@ -133,7 +133,7 @@ public class DownloadFile extends WebAction {
 
 	private String createUrl(File file) throws ScriptExecuteException
 	{
-		File configDownloadDir = ((WebConfiguration) Configuration.getInstance()).getDownloadsDir();
+		File configDownloadDir = WebConfiguration.getInstance().getDownloadsDir();
 		String filePath = file.getPath().substring(configDownloadDir.getPath().length());
 		try
 		{

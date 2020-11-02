@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -14,9 +14,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.exactprosystems.remotehand.sessions.SessionExchange;
 import com.sun.net.httpserver.HttpExchange;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Adapter for HttpExchange to handle HTTP requests
@@ -58,5 +62,28 @@ public class HttpSessionExchange implements SessionExchange
 	public String getRemoteAddress()
 	{
 		return exchange.getRemoteAddress().getAddress().toString();
+	}
+
+	public Map<String, String> getRequestParams()
+	{
+		String query = exchange.getRequestURI().getQuery();
+
+		if (isEmpty(query))
+			return null;
+
+		Map<String, String> params = new HashMap<>();
+		String[] splitQuery =  query.split("&");
+
+		for (String kvPair : splitQuery)
+		{
+			String[] splitPairs = kvPair.split("=");
+
+			if (splitPairs.length != 2)
+				continue;
+
+			params.put(splitPairs[0], splitPairs[1]);
+		}
+
+		return params;
 	}
 }

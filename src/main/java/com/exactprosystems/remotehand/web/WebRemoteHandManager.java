@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -15,17 +15,15 @@ import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import org.apache.commons.cli.CommandLine;
-import org.openqa.selenium.WebDriver;
 
-/**
- * Created by alexey.karpukhin on 2/2/16.
- */
-public class WebRemoteHandManager implements IRemoteHandManager {
+public class WebRemoteHandManager implements IRemoteHandManager
+{
+	protected WebDriverManager webDriverManager;
+	protected static WebConfiguration configuration;
 
-	private WebDriverManager webDriverManager;
-
-	public WebRemoteHandManager () {
-		webDriverManager = new WebDriverManager();
+	public WebRemoteHandManager(DriverPoolProvider<WebDriverWrapper> driverPoolProvider)
+	{
+		webDriverManager = new WebDriverManager(driverPoolProvider);
 	}
 
 	@Override
@@ -35,7 +33,8 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		return new WebConfiguration(commandLine);
+		WebConfiguration.init(commandLine);
+		return WebConfiguration.getInstance();
 	}
 
 	@Override
@@ -47,8 +46,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
 		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
-		webSessionContext.setWebDriverManager(webDriverManager);
-		webSessionContext.setWebDriver(webDriverManager.getWebDriver(webSessionContext));
+		webDriverManager.createWebDriver(webSessionContext);
 		return webSessionContext;
 	}
 
@@ -58,7 +56,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		if (sessionContext == null)
 			return;
 		WebSessionContext webSessionContext = (WebSessionContext) sessionContext;
-		WebDriver webDriver = webSessionContext.getWebDriver();
+		WebDriverWrapper webDriver = webSessionContext.getWebDriverWrapper();
 		if (webDriver != null)
 			webDriverManager.closeWebDriver(webDriver, webSessionContext.getSessionId());
 		WebUtils.deleteDownloadDirectory(webSessionContext.getDownloadDir());
@@ -72,5 +70,11 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public WebDriverManager getWebDriverManager()
 	{
 		return webDriverManager;
+	}
+
+	@Override
+	public RemoteManagerType getManagerType()
+	{
+		return RemoteManagerType.WEB;
 	}
 }

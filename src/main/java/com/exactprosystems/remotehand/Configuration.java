@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
+ * Copyright (c) 2009-2020, Exactpro Systems LLC
  * www.exactpro.com
  * Build Software to Test Software
  *
@@ -22,7 +22,7 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 
-public class Configuration
+public abstract class Configuration
 {
 	private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 	protected static volatile Configuration instance = null;
@@ -62,9 +62,6 @@ public class Configuration
 	
 	protected Configuration(CommandLine commandLine)
 	{
-		if (instance != null) {
-			throw new RuntimeException("Configuration is already exist. Use getInstance method");
-		}
 		instance = this;
 
 		properties = new Properties(getDefaultProperties());

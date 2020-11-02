@@ -14,16 +14,12 @@ import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 
-/**
- * @author anna.bykova.
- */
 public class WebActionsLauncher extends ActionsLauncher
 {
 	private static final Logger logger = LoggerFactory.getLogger(WebActionsLauncher.class);
@@ -59,10 +55,10 @@ public class WebActionsLauncher extends ActionsLauncher
 
 	private void checkWebDriver(WebSessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
-		WebDriver webDriver = context.getWebDriver();
+		WebDriverWrapper webDriver = context.getWebDriverWrapper();
 		try
 		{
-			webDriver.getCurrentUrl();
+			webDriver.getDriver().getCurrentUrl();
 		}
 		catch (WebDriverException e)
 		{
@@ -71,11 +67,11 @@ public class WebActionsLauncher extends ActionsLauncher
 			if (isBrowserNotReachable(e))
 				updateWebDriver(context);
 			else
-				throw new ScriptExecuteException("Error while checking browser state: " + e.getMessage(), e);
+				throw new ScriptExecuteException("Error while checking browser state", e);
 		}
 	}
 
-	private void closeOldDriver(WebDriver driver, WebSessionContext context)
+	private void closeOldDriver(WebDriverWrapper driver, WebSessionContext context)
 	{
 		WebDriverManager manager = context.getWebDriverManager();
 		manager.closeWebDriver(driver, context.getSessionId());
@@ -85,6 +81,6 @@ public class WebActionsLauncher extends ActionsLauncher
 	{
 		logger.info("Trying to create new driver...");
 		WebDriverManager driverManager = context.getWebDriverManager();
-		context.setWebDriver(driverManager.getWebDriver(context));
+		driverManager.createWebDriver(context);
 	}
 }

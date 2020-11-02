@@ -16,67 +16,68 @@ import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import java.io.File;
 
-/**
- * @author anna.bykova.
- */
 public class WebSessionContext extends SessionContext
 {
 	private WebDriverManager webDriverManager;
-	private WebDriver webDriver;
+	private WebDriverWrapper webDriver;
 	private WebElementsDictionary dictionary;
-	private File downloadDir;
 	private String shutdownScript;
-
+	
 	public WebSessionContext(String sessionId)
 	{
 		super(sessionId);
 	}
-
+	
+	
 	public WebDriverManager getWebDriverManager()
 	{
 		return webDriverManager;
 	}
-
+	
 	public void setWebDriverManager(WebDriverManager webDriverManager)
 	{
 		this.webDriverManager = webDriverManager;
 	}
-
-	public WebDriver getWebDriver()
+	
+	
+	public WebDriverWrapper getWebDriverWrapper()
 	{
 		return webDriver;
 	}
-
-	public void setWebDriver(WebDriver webDriver)
+	
+	public void setWebDriverWrapper(WebDriverWrapper webDriver)
 	{
 		this.webDriver = webDriver;
 	}
-
+	
+	
 	public WebElementsDictionary getDictionary()
 	{
 		return dictionary;
 	}
-
+	
 	public void setDictionary(WebElementsDictionary dictionary)
 	{
 		this.dictionary = dictionary;
 	}
-
+	
+	
+	public WebDriver getWebDriver()
+	{
+		return webDriver.getDriver();
+	}
+	
 	public File getDownloadDir()
 	{
-		return downloadDir;
+		return webDriver.getDownloadDir();
 	}
-
-	public void setDownloadDir(File donwloadDir)
-	{
-		this.downloadDir = donwloadDir;
-	}
-
+	
+	
 	public String getShutdownScript()
 	{
 		return shutdownScript;
 	}
-
+	
 	public void setShutdownScript(String shutdownScript)
 	{
 		this.shutdownScript = shutdownScript;
