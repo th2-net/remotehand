@@ -198,10 +198,10 @@ public class RemoteHandStarter
 
 	private static void startTcpClientMode(IRemoteHandManager manager, IDriverManager webDriverManager, String version)
 	{
-		//In TCP client mode RemoteHand connects to ClearTH, telling that it is ready to serve.
-		//ClearTH sends logon request before sending commands to execute.
+		//In TCP client mode RemoteHand connects to another application, telling that it is ready to serve.
+		//Application sends logon request before sending commands to execute.
 		//Once logon request is received, RemoteHand adds TcpSessionHandler to session pool.
-		//Further requests from ClearTH must contain sessionID. Requests must have the following structure:
+		//Further requests from application must contain sessionID. Requests must have the following structure:
 
 		//int requestType
 		//int totalSize
@@ -373,7 +373,7 @@ public class RemoteHandStarter
 
 		Option gridMode = OptionBuilder
 				.isRequired(false)
-				.withDescription("Grid mode. Works with windows app driver and web remote driver")
+				.withDescription("Grid mode. Works with Windows Application Driver and web remote driver")
 				.create(GRID_MODE_OPTIONS_PARAM);
 		optionMap.put(GRID_MODE_OPTIONS_PARAM, gridMode);
 

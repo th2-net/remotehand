@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 {
-
 	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
 	
 	private WindowsDriver<?> driver;
@@ -117,14 +116,14 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 			try {
 				driver.close();
 			} catch (Exception e) {
-				logger.warn("Error disposing driver", e);
+				logger.warn("Error while disposing driver", e);
 			}
 		}
 		if (rootDriver != null) {
 			try {
 				rootDriver.close();
 			} catch (Exception e) {
-				logger.warn("Error disposing ROOT driver", e);
+				logger.warn("Error while disposing ROOT driver", e);
 			}
 		}
 	}

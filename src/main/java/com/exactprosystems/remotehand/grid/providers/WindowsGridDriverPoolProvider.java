@@ -27,7 +27,7 @@ public class WindowsGridDriverPoolProvider extends BaseGridDriverPoolProvider<Wi
 
 
 	@Override
-	public WindowsDriverWrapper getDriverWrapper(SessionContext context) throws RhConfigurationException
+	public WindowsDriverWrapper createDriverWrapper(SessionContext context) throws RhConfigurationException
 	{
 		WindowsDriverWrapper driverStorage = driversPool.get(context.getSessionId());
 		if (driverStorage == null)
@@ -43,9 +43,9 @@ public class WindowsGridDriverPoolProvider extends BaseGridDriverPoolProvider<Wi
 	public void clearDriverPool()
 	{
 		driversPool.forEach((session, driverWrapper) -> {
-			sessionTargetUrls.remove(session);
-			driverWrapper.close();
-		});
+				sessionTargetUrls.remove(session);
+				driverWrapper.close();
+			});
 		driversPool.clear();
 	}
 
@@ -59,8 +59,7 @@ public class WindowsGridDriverPoolProvider extends BaseGridDriverPoolProvider<Wi
 		}
 		catch (MalformedURLException e)
 		{
-			throw new RhConfigurationException("Cannot create URL", e);
+			throw new RhConfigurationException("Invalid driver URL", e);
 		}
 	}
-	
 }

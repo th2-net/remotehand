@@ -13,10 +13,6 @@ package com.exactprosystems.remotehand.web;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.web.logging.DriverLoggerThread;
 
@@ -27,13 +23,11 @@ import static java.lang.Thread.currentThread;
  */
 public class WebDriverManager implements IDriverManager
 {
-	private static final Logger log = LoggerFactory.getLogger(WebDriverManager.class);
-	
 	private final Map<String, DriverLoggerThread> loggers = new ConcurrentHashMap<>();
-	private final DriverPoolProvider<? extends DriverWrapper<WebDriver>> driverPoolProvider;
+	private final DriverPoolProvider<WebDriverWrapper> driverPoolProvider;
 
 
-	public WebDriverManager(DriverPoolProvider<? extends DriverWrapper<WebDriver>> driverPoolProvider)
+	public WebDriverManager(DriverPoolProvider<WebDriverWrapper> driverPoolProvider)
 	{
 		this.driverPoolProvider = driverPoolProvider;
 	}
@@ -45,11 +39,11 @@ public class WebDriverManager implements IDriverManager
 			((WebDriverPoolProvider) driverPoolProvider).initDriverPool();
 	}
 
-	public WebDriver getWebDriver(WebSessionContext context) throws RhConfigurationException
+	public WebDriverWrapper createWebDriver(WebSessionContext context) throws RhConfigurationException
 	{
-		WebDriverWrapper webDriverWrapper = (WebDriverWrapper)driverPoolProvider.getDriverWrapper(context);
-		WebDriver driver = webDriverWrapper.getDriver();
-		context.setDownloadDir(webDriverWrapper.getDownloadDir());
+		WebDriverWrapper driver = (WebDriverWrapper)driverPoolProvider.createDriverWrapper(context);
+		context.setWebDriverManager(this);
+		context.setWebDriverWrapper(driver);
 
 		if (WebConfiguration.getInstance().isDriverLoggingEnabled())
 			initLogger(driver, context.getSessionId());
@@ -57,15 +51,15 @@ public class WebDriverManager implements IDriverManager
 		return driver;
 	}
 
-	private void initLogger(WebDriver driver, String sessionId)
+	private void initLogger(WebDriverWrapper driver, String sessionId)
 	{
-		DriverLoggerThread logger = new DriverLoggerThread(sessionId, driver);
+		DriverLoggerThread logger = new DriverLoggerThread(sessionId, driver.getDriver());
 		logger.start();
 		loggers.put(sessionId, logger);
 	}
 	
 	
-	public void closeWebDriver(WebDriver driver, String sessionId)
+	public void closeWebDriver(WebDriverWrapper driver, String sessionId)
 	{
 		stopLogger(sessionId);
 		driverPoolProvider.closeDriver(sessionId, driver);

@@ -59,7 +59,7 @@ public class ActionsLauncher
 			}
 			catch (Exception e)
 			{
-				RhUtils.logError(logger, sessionId, e.getMessage(), e);
+				RhUtils.logError(logger, sessionId, "Error while executing actions", e);
 				return ErrorRespondent.getRespondent().error(e, buildErrorMessage(action, e));
 			}
 		}

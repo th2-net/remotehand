@@ -33,7 +33,6 @@ import com.exactprosystems.remotehand.requests.ExecutionStatusRequest;
 import com.exactprosystems.remotehand.requests.FileUploadRequest;
 import com.exactprosystems.remotehand.requests.LogoutRequest;
 import com.exactprosystems.remotehand.requests.RhRequest;
-import com.exactprosystems.remotehand.web.WebConfiguration;
 
 /**
  * Handles requests related to particular session

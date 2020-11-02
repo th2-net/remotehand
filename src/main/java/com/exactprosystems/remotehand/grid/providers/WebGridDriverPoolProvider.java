@@ -14,7 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -36,13 +35,13 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 
 
 	@Override
-	public WebDriverWrapper getDriverWrapper(SessionContext context) throws RhConfigurationException
+	public WebDriverWrapper createDriverWrapper(SessionContext context) throws RhConfigurationException
 	{
 		return createDriver(context);
 	}
 
 	@Override
-	public void closeDriver(String sessionId, WebDriver driver)
+	public void closeDriver(String sessionId, WebDriverWrapper driver)
 	{
 		super.closeDriver(sessionId, driver);
 		closeDriver(driver);
@@ -52,9 +51,9 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 	public void clearDriverPool()
 	{
 		driversPool.forEach((session, driverWrapper) -> {
-			sessionTargetUrls.remove(session);
-			closeDriver(driverWrapper.getDriver());
-		});
+				sessionTargetUrls.remove(session);
+				closeDriver(driverWrapper);
+			});
 		driversPool.clear();
 	}
 
@@ -71,7 +70,7 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 		}
 		catch (MalformedURLException e)
 		{
-			throw new RhConfigurationException("Unable to create Chrome driver: ", e);
+			throw new RhConfigurationException("Invalid driver URL", e);
 		}
 	}
 
@@ -84,15 +83,15 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 		return chromeOptions;
 	}
 
-	private void closeDriver(WebDriver driver)
+	private void closeDriver(WebDriverWrapper driver)
 	{
 		try
 		{
-			driver.quit();
+			driver.getDriver().quit();
 		}
 		catch (Exception e)
 		{
-			logger.error("Error while closing driver.", e);
+			logger.error("Error while closing driver", e);
 		}
 	}
 }

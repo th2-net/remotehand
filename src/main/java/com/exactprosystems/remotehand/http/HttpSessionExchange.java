@@ -66,24 +66,24 @@ public class HttpSessionExchange implements SessionExchange
 
 	public Map<String, String> getRequestParams()
 	{
-			String query = exchange.getRequestURI().getQuery();
+		String query = exchange.getRequestURI().getQuery();
 
-			if (isEmpty(query))
-				return null;
+		if (isEmpty(query))
+			return null;
 
-			Map<String, String> params = new HashMap<>();
-			String[] splitQuery =  query.split("&");
+		Map<String, String> params = new HashMap<>();
+		String[] splitQuery =  query.split("&");
 
-			for (String kvPair : splitQuery)
-			{
-				String[] splitPairs = kvPair.split("=");
+		for (String kvPair : splitQuery)
+		{
+			String[] splitPairs = kvPair.split("=");
 
-				if (splitPairs.length != 2)
-					continue;
+			if (splitPairs.length != 2)
+				continue;
 
-				params.put(splitPairs[0], splitPairs[1]);
-			}
+			params.put(splitPairs[0], splitPairs[1]);
+		}
 
-			return params;
+		return params;
 	}
 }

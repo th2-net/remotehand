@@ -328,7 +328,7 @@ public abstract class WebAction extends Action
 		}
 		catch (ScriptExecuteException e)
 		{
-			logError("Unable to create screenshot.", e);
+			logError("Could not create screenshot", e);
 			return null;
 		}
 	}

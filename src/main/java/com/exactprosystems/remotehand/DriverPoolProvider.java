@@ -10,15 +10,13 @@
 
 package com.exactprosystems.remotehand;
 
-import org.openqa.selenium.WebDriver;
-
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
 public interface DriverPoolProvider<T>
 {
-	T getDriverWrapper(SessionContext context) throws RhConfigurationException;
+	T createDriverWrapper(SessionContext context) throws RhConfigurationException;
 
 	void clearDriverPool();
 
-	void closeDriver(String sessionId, WebDriver driver);
+	void closeDriver(String sessionId, T driver);
 }

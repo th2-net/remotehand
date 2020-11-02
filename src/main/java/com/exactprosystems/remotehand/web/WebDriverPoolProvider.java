@@ -36,11 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.DriverPoolProvider;
-import com.exactprosystems.remotehand.DriverWrapper;
 import com.exactprosystems.remotehand.RhConfigurationException;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
-public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<WebDriver>>
+public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrapper>
 {
 	private static final Logger logger = LoggerFactory.getLogger(WebDriverPoolProvider.class);
 	private final Queue<WebDriverWrapper> webDriverPool = new ConcurrentLinkedQueue<>();
@@ -63,7 +62,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 	}
 
 	@Override
-	public WebDriverWrapper getDriverWrapper(SessionContext context) throws RhConfigurationException
+	public WebDriverWrapper createDriverWrapper(SessionContext context) throws RhConfigurationException
 	{
 		WebConfiguration config = WebConfiguration.getInstance();
 		WebDriverWrapper webDriverWrapper = webDriverPool.poll();
@@ -117,7 +116,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		while ((webDriverWrapper = webDriverPool.poll()) != null)
 		{
 			WebUtils.deleteDownloadDirectory(webDriverWrapper.getDownloadDir());
-			closeDriver(null, webDriverWrapper.getDriver());
+			closeDriver(null, webDriverWrapper);
 		}
 	}
 
@@ -150,7 +149,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (Exception e)
 		{
-			throw new RhConfigurationException("Unable to create Internet Explorer driver: " + e.getMessage(), e);
+			throw new RhConfigurationException("Could not create Internet Explorer driver", e);
 		}
 	}
 	
@@ -169,7 +168,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (Exception e)
 		{
-			throw new RhConfigurationException("Unable to create Microsoft Edge driver: " + e.getMessage(), e);
+			throw new RhConfigurationException("Could not create Microsoft Edge driver", e);
 		}
 	}
 	
@@ -209,7 +208,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (Exception e)
 		{
-			throw new RhConfigurationException("Unable to create Chrome driver: " + e.getMessage(), e);
+			throw new RhConfigurationException("Could not create Chrome driver", e);
 		}
 	}
 	
@@ -242,7 +241,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 		}
 		catch (Exception e)
 		{
-			throw new RhConfigurationException("Unable to create Firefox driver: " + e.getMessage(), e);
+			throw new RhConfigurationException("Could not create Firefox driver", e);
 		}
 	}
 	
@@ -281,11 +280,11 @@ public class WebDriverPoolProvider implements DriverPoolProvider<DriverWrapper<W
 	}
 
 	@Override
-	public void closeDriver(String sessionId, WebDriver driver)
+	public void closeDriver(String sessionId, WebDriverWrapper driver)
 	{
 		try
 		{
-			driver.quit();
+			driver.getDriver().quit();
 		}
 		catch (Exception e)
 		{

@@ -12,8 +12,8 @@ package com.exactprosystems.remotehand;
 
 public enum RemoteManagerType
 {
-	WEB("WebRemoteHandManager"),
-	WINDOWS("WindowsRemoteHandManager");
+	WEB("web"),
+	WINDOWS("windows");
 
 	private final String label;
 
@@ -38,5 +38,14 @@ public enum RemoteManagerType
 		}
 
 		return null;
+	}
+	
+	public static String[] labels()
+	{
+		String[] result = new String[values().length];
+		int i = 0;
+		for (RemoteManagerType t : values())
+			result[i++] = t.getLabel();
+		return result;
 	}
 }

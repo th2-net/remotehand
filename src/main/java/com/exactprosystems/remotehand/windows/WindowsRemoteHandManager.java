@@ -14,15 +14,12 @@ import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
-import com.exactprosystems.remotehand.web.WebConfiguration;
 
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.cli.CommandLine;
 
 public class WindowsRemoteHandManager implements IRemoteHandManager {
-	private final RemoteManagerType managerType = RemoteManagerType.WINDOWS;
 	private final DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider;
-
 
 	public WindowsRemoteHandManager(DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider)
 	{
@@ -50,7 +47,7 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
 		WindowsSessionContext windowsSessionContext = new WindowsSessionContext(sessionId);
-		WindowsDriverWrapper driverWrapper = (WindowsDriverWrapper)driverPoolProvider.getDriverWrapper(windowsSessionContext);
+		WindowsDriverWrapper driverWrapper = (WindowsDriverWrapper)driverPoolProvider.createDriverWrapper(windowsSessionContext);
 		windowsSessionContext.setWinApiDriverURL(driverWrapper.getDriverUrl());
 		windowsSessionContext.setCurrentDriver(driverWrapper);
 		return windowsSessionContext;
@@ -78,6 +75,6 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 	@Override
 	public RemoteManagerType getManagerType()
 	{
-		return managerType;
+		return RemoteManagerType.WINDOWS;
 	}
 }

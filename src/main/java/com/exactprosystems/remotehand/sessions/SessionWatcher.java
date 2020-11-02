@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.web.WebConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,8 +13,6 @@ package com.exactprosystems.remotehand.grid.providers;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.openqa.selenium.WebDriver;
-
 import com.exactprosystems.remotehand.DriverPoolProvider;
 import com.exactprosystems.remotehand.RhConfigurationException;
 import com.exactprosystems.remotehand.sessions.SessionContext;
@@ -32,7 +30,7 @@ public abstract class BaseGridDriverPoolProvider<T> implements DriverPoolProvide
 
 
 	@Override
-	public void closeDriver(String sessionId, WebDriver driver)
+	public void closeDriver(String sessionId, T driver)
 	{
 		sessionTargetUrls.remove(sessionId);
 		driversPool.remove(sessionId);
