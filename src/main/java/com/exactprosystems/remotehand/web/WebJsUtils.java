@@ -35,21 +35,9 @@ public class WebJsUtils
 		try
 		{
 			if (webDriver instanceof JavascriptExecutor)
-			{
 				((JavascriptExecutor) webDriver).executeScript(javaScript);
-				try
-				{
-					Thread.sleep(300);
-				}
-				catch (InterruptedException e)
-				{
-					logger.error("Error while creating javascript", e);
-				}
-			}
 			else
-			{
 				logger.error("Web driver is not Javascript executor. Javascript cannot be executed");
-			}
 		}
 		catch (Exception e)
 		{
