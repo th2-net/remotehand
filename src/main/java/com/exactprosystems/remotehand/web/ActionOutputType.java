@@ -16,9 +16,6 @@
 
 package com.exactprosystems.remotehand.web;
 
-/**
- * @author anna.bykova.
- */
 public enum ActionOutputType
 {
 	TEXT, SCREENSHOT, ENCODED_DATA

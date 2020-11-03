@@ -27,9 +27,6 @@ import java.util.Map;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.contains;
 
-/**
- * @author anna.bykova.
- */
 public class RhUtils
 {
 	public static final String SESSION_FOR_FILE_MODE = "Main";

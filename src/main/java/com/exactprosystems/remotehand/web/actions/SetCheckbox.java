@@ -29,9 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author anna.bykova.
- */
 public class SetCheckbox extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(SetCheckbox.class);

@@ -34,10 +34,6 @@ import static java.nio.file.Files.createDirectories;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 
-/**
- * @author anna.bykova.
- * 26 February 2018
- */
 public class DriverLoggerThread extends Thread
 {
 	private static final Logger logger = LoggerFactory.getLogger(DriverLoggerThread.class);

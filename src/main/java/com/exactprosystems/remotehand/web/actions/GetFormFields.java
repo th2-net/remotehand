@@ -40,9 +40,6 @@ import java.util.Properties;
 
 import static java.lang.String.format;
 
-/**
- * @author anna.bykova.
- */
 public class GetFormFields extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(GetFormFields.class);

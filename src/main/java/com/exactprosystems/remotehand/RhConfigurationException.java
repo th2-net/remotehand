@@ -16,10 +16,6 @@
 
 package com.exactprosystems.remotehand;
 
-/**
- * @author anna.bykova.
- *         23 November 2016
- */
 public class RhConfigurationException extends Exception
 {
 	public RhConfigurationException(String message)
