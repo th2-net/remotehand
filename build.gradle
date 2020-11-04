@@ -74,7 +74,6 @@ task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     from jar
     from ("${projectDir}") {
         include "config.ini"
-        include "formParser.properties"
         include "log4j.properties"
         include "Readme.txt"
     }

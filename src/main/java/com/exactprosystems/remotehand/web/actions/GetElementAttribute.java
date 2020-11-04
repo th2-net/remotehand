@@ -25,6 +25,7 @@ import java.util.Map;
 public class GetElementAttribute extends GetElement
 {
 	private static final String PARAM_ATTRIBUTE = "attribute";
+	private static final String DEFAULT_PARAM = "default";
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
@@ -34,6 +35,13 @@ public class GetElementAttribute extends GetElement
 			throw new ScriptExecuteException("Param '" + PARAM_ATTRIBUTE + "' cannot be empty");
 		
 		String attribute = findElement(webDriver, webLocator).getAttribute(attributeName);
+
+		if (attribute == null || attribute.isEmpty())
+		{
+			String defaultAttribute = params.get(DEFAULT_PARAM);
+			attribute = defaultAttribute != null ? defaultAttribute : "";
+		}
+
 		logInfo("Attribute '%s' value: %s.", attributeName, attribute);
 		return attribute;
 	}

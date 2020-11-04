@@ -19,8 +19,6 @@ package com.exactprosystems.remotehand.web;
 import static java.lang.String.format;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -29,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.exactprosystems.remotehand.Configuration;
-import com.exactprosystems.remotehand.web.actions.GetFormFields;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
@@ -46,8 +43,7 @@ public class WebConfiguration extends Configuration {
 	public static final String DEF_FIREFOXDRIVER_PATH = "geckodriver.exe";
 	public static final String DEF_PROXY = "";
 	public static final String DEF_LOCATOR = "xpath";
-	public static final String FORM_PARSER_CONFIG_FILE = "formParser.properties";
-	
+
 	public static final String PARAM_BROWSER = "Browser";
 	public static final String PARAM_IEDRIVERPATH = "IEDriverPath";
 	public static final String PARAM_EDGEDRIVERPATH = "EdgeDriverPath";
@@ -81,7 +77,6 @@ public class WebConfiguration extends Configuration {
 	private final Level driverLoggingLevel;
 	private final Level performanceLoggingLevel;
 	
-	private final Properties formParserProperties;
 	private boolean isProxySettingsSet;
 	private volatile File downloadsDir;
 	private boolean disableLeavePageAlert;
@@ -118,9 +113,6 @@ public class WebConfiguration extends Configuration {
 		ftpProxySetting = loadProxySetting(PARAM_FTPPROXY);
 		socksProxySetting = loadProxySetting(PARAM_SOCKSPROXY);
 		noProxySetting = loadProxySetting(PARAM_NOPROXY);
-		
-		formParserProperties = loadFormParserConfig(FORM_PARSER_CONFIG_FILE);
-		
 		this.downloadsDir = new File(this.loadProperty("DownloadsDir", "downloads/"));
 		disableLeavePageAlert = this.loadProperty("DisableLeavePageAlert", true, Boolean::parseBoolean);
 		createDownloadSubDir = this.loadProperty("CreateDownloadSubDir", true, Boolean::parseBoolean);
@@ -158,36 +150,6 @@ public class WebConfiguration extends Configuration {
 	private Level loadLogLevel(String propertyName)
 	{
 		return this.loadProperty(propertyName, DEF_LOG_LEVEL, Level::parse);
-	}
-	
-	protected Properties loadFormParserConfig(String fileName)
-	{
-		Properties properties = new Properties();
-		FileInputStream inputStream = null;
-		try
-		{
-			inputStream = new FileInputStream(new File(fileName));
-			properties.load(inputStream);
-		}
-		catch (Exception e)
-		{
-			logger.warn(format("Unable to load config '%s' for the action '%s'.", fileName, 
-					GetFormFields.class.getSimpleName()), e);
-			return null;
-		}
-		finally
-		{
-			if (inputStream != null)
-				try
-				{
-					inputStream.close();
-				}
-				catch (IOException e)
-				{
-					logger.error("Exception during close connection to file: {}.", fileName, e);
-				}
-		}
-		return properties;
 	}
 
 	public Browser getBrowserToUse()
@@ -258,11 +220,6 @@ public class WebConfiguration extends Configuration {
 	public String getDefaultLocator()
 	{
 		return defaultLocator;
-	}
-
-	public Properties getFormParserProperties()
-	{
-		return formParserProperties;
 	}
 
 	public File getDownloadsDir()
