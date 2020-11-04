@@ -70,6 +70,11 @@ public class GridRemoteHandManager implements IDriverManager
 		managers.forEach((managerType, remoteHandManager) -> remoteHandManager.createConfiguration(commandLine));
 	}
 
+	public void createConfigurations(CommandLine commandLine, Map<String, String> options)
+	{
+		managers.forEach((managerType, remoteHandManager) -> remoteHandManager.createConfiguration(commandLine, options));
+	}
+
 	@Override
 	public void initDriverPool()
 	{

@@ -24,6 +24,8 @@ import com.exactprosystems.remotehand.sessions.SessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.cli.CommandLine;
 
+import java.util.Map;
+
 public class WindowsRemoteHandManager implements IRemoteHandManager {
 	private final DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider;
 
@@ -41,6 +43,12 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
 		WindowsConfiguration.init(commandLine);
+		return WindowsConfiguration.getInstance();
+	}
+
+	@Override
+	public Configuration createConfiguration(CommandLine commandLine, Map<String, String> options) {
+		WindowsConfiguration.init(commandLine, options);
 		return WindowsConfiguration.getInstance();
 	}
 

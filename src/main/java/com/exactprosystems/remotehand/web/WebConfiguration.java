@@ -19,6 +19,8 @@ package com.exactprosystems.remotehand.web;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -83,7 +85,11 @@ public class WebConfiguration extends Configuration {
 	private boolean createDownloadSubDir;
 
 	private WebConfiguration(CommandLine commandLine) {
-		super(commandLine);
+		this(commandLine, Collections.emptyMap());
+	}
+	
+	private WebConfiguration(CommandLine commandLine, Map<String, String> options) {
+		super(commandLine, options);
 
 		instance = this;
 
@@ -271,6 +277,14 @@ public class WebConfiguration extends Configuration {
 			throw new RuntimeException("Web configuration already exists");
 
 		instance = new WebConfiguration(commandLine);
+	}
+
+	public static void init(CommandLine commandLine, Map<String, String> options)
+	{
+		if (instance != null)
+			throw new RuntimeException("Web configuration already exists");
+
+		instance = new WebConfiguration(commandLine, options);
 	}
 
 	public static WebConfiguration getInstance()
