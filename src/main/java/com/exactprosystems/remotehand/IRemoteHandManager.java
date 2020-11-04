@@ -21,6 +21,8 @@ import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import org.apache.commons.cli.CommandLine;
 
+import java.util.Map;
+
 /**
  * Created by alexey.karpukhin on 2/1/16.
  */
@@ -29,6 +31,7 @@ public interface IRemoteHandManager {
 	ScriptCompiler createScriptCompiler ();
 
 	Configuration createConfiguration(CommandLine commandLine);
+	Configuration createConfiguration(CommandLine commandLine, Map<String, String> options);
 
 	ActionsLauncher createActionsLauncher(ScriptProcessorThread thread);
 	

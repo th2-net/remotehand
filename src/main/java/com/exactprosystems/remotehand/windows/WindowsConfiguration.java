@@ -21,6 +21,9 @@ import com.exactprosystems.remotehand.web.WebConfiguration;
 
 import org.apache.commons.cli.CommandLine;
 
+import java.util.Collections;
+import java.util.Map;
+
 public class WindowsConfiguration extends Configuration {
 	private static volatile WindowsConfiguration instance;
 
@@ -52,7 +55,11 @@ public class WindowsConfiguration extends Configuration {
 	private final Integer newCommandTimeout;
 
 	private WindowsConfiguration(CommandLine commandLine) {
-		super(commandLine);
+		this(commandLine, Collections.emptyMap());
+	}
+
+	private WindowsConfiguration(CommandLine commandLine, Map<String, String> options) {
+		super(commandLine, options);
 
 		instance = this;
 
@@ -115,6 +122,14 @@ public class WindowsConfiguration extends Configuration {
 			throw new RuntimeException("Windows configuration already exists");
 
 		instance = new WindowsConfiguration(commandLine);
+	}
+
+	public static void init(CommandLine commandLine, Map<String, String> options)
+	{
+		if (instance != null)
+			throw new RuntimeException("Windows configuration already exists");
+
+		instance = new WindowsConfiguration(commandLine, options);
 	}
 
 	public static WindowsConfiguration getInstance()

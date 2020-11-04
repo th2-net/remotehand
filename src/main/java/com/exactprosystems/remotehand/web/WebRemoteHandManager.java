@@ -22,6 +22,8 @@ import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import org.apache.commons.cli.CommandLine;
 
+import java.util.Map;
+
 public class WebRemoteHandManager implements IRemoteHandManager
 {
 	protected WebDriverManager webDriverManager;
@@ -40,6 +42,12 @@ public class WebRemoteHandManager implements IRemoteHandManager
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
 		WebConfiguration.init(commandLine);
+		return WebConfiguration.getInstance();
+	}
+
+	@Override
+	public Configuration createConfiguration(CommandLine commandLine, Map<String, String> options) {
+		WebConfiguration.init(commandLine, options);
 		return WebConfiguration.getInstance();
 	}
 

@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
@@ -66,17 +68,31 @@ public abstract class Configuration
 	
 	protected boolean acceptEnvVars;
 	
+	protected Map<String, String> options;
+
 	protected Configuration(CommandLine commandLine)
 	{
+		this(commandLine, Collections.emptyMap());
+	}
+	
+	protected Configuration(CommandLine commandLine, Map<String, String> options)
+	{
 		instance = this;
-
+		this.options = options;
 		properties = new Properties(getDefaultProperties());
 
-		String configFileName = commandLine.getOptionValue(RemoteHandStarter.CONFIG_PARAM, CONFIG_FILE_NAME);
-		logger.info(String.format("Using configuration file '%s'", configFileName));
-
-		this.acceptEnvVars = commandLine.hasOption(RemoteHandStarter.ENV_VARS_PARAM);
-		logger.info("Allowed configuration options from env vars {}", acceptEnvVars);
+		String configFileName;
+		if (commandLine != null) {
+			configFileName = commandLine.getOptionValue(RemoteHandStarter.CONFIG_PARAM, CONFIG_FILE_NAME);
+			logger.info(String.format("Using configuration file '%s'", configFileName));
+			this.acceptEnvVars = commandLine.hasOption(RemoteHandStarter.ENV_VARS_PARAM);
+			logger.info("Allowed configuration options from env vars {}", acceptEnvVars);
+		} else {
+			configFileName = CONFIG_FILE_NAME;
+			logger.info("Used default config file");
+			this.acceptEnvVars = false;
+			logger.info("Env vars is not allowed");			
+		}
 		
 		FileInputStream fs = null;
 		try
@@ -168,13 +184,23 @@ public abstract class Configuration
 	protected String loadProperty(String name, String defaultValue, boolean writeToLog)
 	{
 		String property = null;
+		boolean notSet = true;
 		if (acceptEnvVars) {
 			String envVarName = this.getENVName(name);
 			property = System.getenv(envVarName);
-		}
-		if (property == null || property.isEmpty()) {
-			if (acceptEnvVars && writeToLog)
+			notSet = property == null || property.isEmpty();
+			if (notSet && writeToLog) {
 				logger.warn("Env property is not set {}", name);
+			}
+		}
+		if (notSet && !options.isEmpty()) {
+			property = options.get(name);
+			notSet = property == null || property.isEmpty();
+			if (notSet && writeToLog) {
+				logger.warn("Property from options is not set {}", name);
+			}
+		}
+		if (notSet) {				
 			property = properties.getProperty(name, "");
 		}
 		if (property.isEmpty() && defaultValue != null)

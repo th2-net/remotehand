@@ -55,9 +55,9 @@ public abstract class SessionHandler
 	
 	private final String id;
 
-	private ScriptProcessorThread scriptProcessor = null;
-	private IRemoteHandManager manager;
-	private JsonSerializer serializer = new JsonSerializer();
+	protected ScriptProcessorThread scriptProcessor = null;
+	protected IRemoteHandManager manager;
+	protected JsonSerializer serializer = new JsonSerializer();
 	
 	public SessionHandler(String id, IRemoteHandManager manager)
 	{
