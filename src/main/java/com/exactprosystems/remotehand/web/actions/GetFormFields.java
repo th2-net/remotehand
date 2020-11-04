@@ -16,10 +16,10 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import com.exactprosystems.clearth.connectivity.data.rhdata.JsonSerializer;
-import com.exactprosystems.clearth.connectivity.data.rhdata.form.FormDesc;
-import com.exactprosystems.clearth.connectivity.data.rhdata.form.FormFieldDesc;
-import com.exactprosystems.clearth.connectivity.data.rhdata.form.FormFieldType;
+import com.exactprosystems.remotehand.rhdata.JsonSerializer;
+import com.exactprosystems.remotehand.rhdata.form.FormDesc;
+import com.exactprosystems.remotehand.rhdata.form.FormFieldDesc;
+import com.exactprosystems.remotehand.rhdata.form.FormFieldType;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.ActionOutputType;
 import com.exactprosystems.remotehand.web.WebAction;
