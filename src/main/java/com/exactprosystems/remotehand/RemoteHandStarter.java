@@ -16,7 +16,7 @@
 
 package com.exactprosystems.remotehand;
 
-import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.grid.GridRemoteHandManager;
 import com.exactprosystems.remotehand.http.HTTPServerMode;
 import com.exactprosystems.remotehand.http.HttpLogonHandler;

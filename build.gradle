@@ -1,23 +1,22 @@
 plugins {
     id "java"
+    id 'java-library'
     id 'application'
-    id 'com.palantir.docker' version '0.25.0' apply false
+    id "com.jfrog.artifactory" version '4.15.1'
 }
 
-apply plugin: 'com.palantir.docker'
+apply plugin: "maven-publish"
 
-applicationName = "remotehand"
-
-ext {
-    if (!project.hasProperty('build_version')) {
-        build_version = 'local_build'
-    }
-    dockerImageVersion      = "${version_major}.${version_minor}.${version_maintenance}.${version_build}"
-}
+group = 'com.exactprosystems.remotehand'
+version = release_version
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+ext {
+    sharedDir = file("${project.rootDir}/shared")
 }
 
 application {
@@ -36,9 +35,7 @@ repositories {
 }
 
 dependencies {
-    compile (group: 'com.exactprosystems.clearth', name: 'clearth-rhdata', version: '1.0.10452') {
-        exclude group: 'com.exactprosystems.clearth', module: 'clearth-core'
-    }
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.2'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.6.4'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
@@ -57,23 +54,23 @@ dependencies {
 }
 
 jar {
-    archivesBaseName = 'remotehand'
+    archivesBaseName = "${archivesBaseName}"
     manifest {
         attributes 'Main-Class': 'com.exactprosystems.remotehand.RemoteHandStarter'
         attributes "Class-Path": configurations.runtimeClasspath.collect { "lib/${it.getName()}" }.join(' ')
         attributes('Created-By': System.getProperty('java.version') + ' (' + System.getProperty('java.vendor') + ')')
-        attributes('Specification-Title': '')
+        attributes('Specification-Title': 'Remotehand')
         attributes('Specification-Vendor': 'Exactpro Systems LLC')
         attributes('Implementation-Title': rootProject.name)
         attributes('Implementation-Vendor': 'Exactpro Systems LLC')
         attributes('Implementation-Vendor-Id': 'com.exactprosystems')
-        attributes('Implementation-Version': "1.0.0")
+        attributes('Implementation-Version': project.version)
     }
 }
 
 task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     archiveAppendix = new Date().format('yyyyMMdd')
-    archiveVersion = build_version
+    archiveVersion = release_version
     from jar
     from ("${projectDir}") {
         include "config.ini"
@@ -85,19 +82,51 @@ task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     }
 }
 
-distTar {
-    archiveName "${applicationName}.tar"
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'localRepo'
+            url = sharedDir
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'nexusRepository'
+            credentials {
+                username = "${nexus_user}"
+                password = "${nexus_password}"
+            }
+            url = "${nexus_url}"
+        }
+    }
 }
 
-docker {
-    name "${target_docker_repository}/${docke_image_name}:${dockerImageVersion}"
-    tag 'local-version', "${docke_image_name}:${dockerImageVersion}"
-
-    copySpec.from(tarTree("$buildDir/distributions/${archivesBaseName}.tar"))
-}
-
-dockerPrepare {
-    dependsOn distTar
+artifactory {
+    publish {
+        contextUrl = "${artifactory_url}"
+        repository {
+            repoKey = "${artifactory_deploy_repo_key}" // The Artifactory repository key to publish to
+            username = "${artifactory_user}" // The publisher user name
+            password = "${artifactory_password}" // The publisher password
+        }
+        defaults {
+            // Reference to Gradle publications defined in the build script.
+            // This is how we tell the Artifactory Plugin which artifacts should be
+            // published to Artifactory.
+            publications('mavenJava')
+            publishArtifacts = true
+            publishBuildInfo = true
+            // Properties to be attached to the published artifacts.
+            publishPom = true
+        }
+    }
 }
 
 wrapper {

@@ -26,9 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author anna.bykova.
- */
 public class GetScreenshot extends WebAction
 {
 	private static final Logger log = LoggerFactory.getLogger(GetScreenshot.class);
