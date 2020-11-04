@@ -27,9 +27,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.exactprosystems.clearth.connectivity.data.rhdata.JsonSerializer;
-import com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode;
-import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.rhdata.JsonSerializer;
+import com.exactprosystems.remotehand.rhdata.RhResponseCode;
+import com.exactprosystems.remotehand.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.IRemoteHandManager;
 import com.exactprosystems.remotehand.RhConfigurationException;

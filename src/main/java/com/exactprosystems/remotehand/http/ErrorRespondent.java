@@ -16,14 +16,14 @@
 
 package com.exactprosystems.remotehand.http;
 
-import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.utils.ExceptionUtils;
 
-import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.COMPILE_ERROR;
-import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.EXECUTION_ERROR;
-import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.RH_ERROR;
+import static com.exactprosystems.remotehand.rhdata.RhResponseCode.COMPILE_ERROR;
+import static com.exactprosystems.remotehand.rhdata.RhResponseCode.EXECUTION_ERROR;
+import static com.exactprosystems.remotehand.rhdata.RhResponseCode.RH_ERROR;
 
 public class ErrorRespondent
 {

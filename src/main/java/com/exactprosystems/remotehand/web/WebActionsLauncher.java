@@ -16,7 +16,7 @@
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
