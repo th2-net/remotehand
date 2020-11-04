@@ -1,16 +1,21 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.TimeoutException;
@@ -29,7 +34,7 @@ import static java.lang.String.format;
 public class WebUtils {
 	
 	public static File createDownloadDirectory() {
-		WebConfiguration configuration = (WebConfiguration) Configuration.getInstance();
+		WebConfiguration configuration = WebConfiguration.getInstance();
 		File downloadsDir = configuration.getDownloadsDir();
 		if (!configuration.isCreateDownloadSubDir())
 		{
@@ -43,7 +48,7 @@ public class WebUtils {
 
 	public static void deleteDownloadDirectory(File downloadDir)
 	{
-		if (!((WebConfiguration) Configuration.getInstance()).isCreateDownloadSubDir())
+		if (!WebConfiguration.getInstance().isCreateDownloadSubDir())
 			return;
 		
 		File[] tmp;

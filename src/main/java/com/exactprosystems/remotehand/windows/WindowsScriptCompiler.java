@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.windows;
 
@@ -41,9 +47,17 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 	public static final String WIN_LOCATOR = "locator";
 	public static final String WIN_ID = "id";
 	public static final String WIN_MATCHER = "matcher";
-
+	
+	private boolean isEmpty (String[] empty) {
+		for (String s : empty) {
+			if (s != null && !s.isEmpty())
+				return false;
+		}
+		return true;
+	}
+	
 	@Override
-	//TODO this method contains much copypaste from web script compile. Need refactoring
+	//FIXME: this method contains much copypaste from web script compile. Need refactoring
 	public List<Action> build(String script, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException {
 		WindowsSessionContext webSessionContext = (WindowsSessionContext) context;
 		String sessionId = webSessionContext.getSessionId();
@@ -64,6 +78,9 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 			{
 				lineNumber++;
 				String[] values = reader.getValues();
+				if (isEmpty(values)) {
+					continue;
+				}
 
 				if (values[0].startsWith(WebScriptCompiler.COMMENT_INDICATOR))
 					continue;
@@ -105,7 +122,7 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 	}
 
 
-	//TODO copied from WEB
+	//FIXME: copied from WEB
 	private String[] parseValues(String[] rowValues)
 	{
 		String[] result = new String[rowValues.length];
@@ -121,7 +138,7 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 		return result;
 	}
 
-	//TODO copied from WEB
+	//FIXME: copied from WEB
 	private boolean isExecutable(String[] header, String[] values)
 	{
 		int foundAt = -1;

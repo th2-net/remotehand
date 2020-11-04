@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
@@ -20,6 +26,7 @@ import com.jhlabs.image.PosterizeFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,6 +41,8 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 
@@ -209,7 +218,7 @@ public abstract class WebAction extends Action
 	
 	public boolean isNeedDisableLeavePageAlert()
 	{
-		return ((WebConfiguration) Configuration.getInstance()).isDisableLeavePageAlert();
+		return WebConfiguration.getInstance().isDisableLeavePageAlert();
 	}
 
 	public void disableLeavePageAlert(WebDriver webDriver)
@@ -328,7 +337,7 @@ public abstract class WebAction extends Action
 		}
 		catch (ScriptExecuteException e)
 		{
-			logError("Unable to create screenshot.", e);
+			logError("Could not create screenshot", e);
 			return null;
 		}
 	}
@@ -402,6 +411,18 @@ public abstract class WebAction extends Action
 	{
 		WebElement element = findElement(webDriver, webLocator);
 		return takeElementScreenshot(webDriver, element);
+	}
+	
+	
+	protected int getChromeDriverVersion(ChromeDriver chromeDriver)
+	{
+		Map<String, String> chromeCap = (Map<String, String>) chromeDriver.getCapabilities().getCapability("chrome");
+		String ver = chromeCap.get("chromedriverVersion");
+		Matcher m = Pattern.compile("^\\d*").matcher(ver);
+		if (m.find())
+			return Integer.parseInt(m.group());
+		else
+			return -1;
 	}
 	
 	

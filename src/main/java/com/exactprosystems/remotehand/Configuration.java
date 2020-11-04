@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand;
 
@@ -22,7 +28,7 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 
-public class Configuration
+public abstract class Configuration
 {
 	private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 	protected static volatile Configuration instance = null;
@@ -36,6 +42,7 @@ public class Configuration
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
 	public final int DEF_DRIVER_POOL_SIZE = 1;
+	public final int DEF_SEND_KEYS_MAX_RETRIES = 3;
 	public final String DEF_FILE_STORAGE = "generated/",
 			DEF_HOST = "localhost";
 
@@ -45,7 +52,8 @@ public class Configuration
 			PARAM_TEXT_QUALIFIER = "TextQualifier",
 			PARAM_SESSIONEXPIRE = "SessionExpire",
 			PARAM_FILE_STORAGE = "DefaultFileStorage",
-			PARAM_DRIVER_POOL_SIZE = "WebDriverPoolSize";
+			PARAM_DRIVER_POOL_SIZE = "WebDriverPoolSize",
+			PARAM_SEND_KEYS_MAX_RETRIES = "SendKeysMaxRetries";
 
 	private volatile String host;
 	private volatile int port;
@@ -53,15 +61,13 @@ public class Configuration
 	private volatile char scriptTextQualifier;
 	private volatile int sessionExpire;
 	private volatile int driverPoolSize;
+	private volatile int sendKeysMaxRetries;
 	private volatile File fileStorage;
 	
 	protected boolean acceptEnvVars;
 	
 	protected Configuration(CommandLine commandLine)
 	{
-		if (instance != null) {
-			throw new RuntimeException("Configuration is already exist. Use getInstance method");
-		}
 		instance = this;
 
 		properties = new Properties(getDefaultProperties());
@@ -102,6 +108,7 @@ public class Configuration
 		this.sessionExpire = this.loadProperty(PARAM_SESSIONEXPIRE, DEF_SESSION_EXPIRE, Integer::parseInt);
 		this.fileStorage = new File(this.loadProperty(PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
 		this.driverPoolSize = this.loadProperty(PARAM_DRIVER_POOL_SIZE, DEF_DRIVER_POOL_SIZE, Integer::parseInt);
+		this.sendKeysMaxRetries = this.loadProperty(PARAM_SEND_KEYS_MAX_RETRIES, DEF_SEND_KEYS_MAX_RETRIES, Integer::parseInt);
 	}
 	
 	protected Properties getDefaultProperties()
@@ -224,5 +231,10 @@ public class Configuration
 	public int getDriverPoolSize()
 	{
 		return driverPoolSize;
+	}
+
+	public int getSendKeysMaxRetries()
+	{
+		return sendKeysMaxRetries;
 	}
 }

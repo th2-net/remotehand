@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.sessions;
 
@@ -32,6 +38,12 @@ public class SessionWatcher implements Runnable
 
 	public static SessionWatcher getWatcher()
 	{
+		if (SESSION_EXPIRE_IN_MINUTES < 1)
+		{
+			logger.info("Session watcher is not created: session expiry time less or equal to 0");
+			return null;
+		}
+		
 		SessionWatcher localInstance = watcher;
 		if (localInstance == null)
 		{
@@ -48,13 +60,7 @@ public class SessionWatcher implements Runnable
 	@Override
 	public void run()
 	{
-		if (SESSION_EXPIRE == 0)
-		{
-			logger.info("Session watcher is not executed because session expiry time equals 0");
-			return;
-		}
-
-		logger.info("Session watcher is executed. SessionExpire (min) = " + SESSION_EXPIRE_IN_MINUTES);
+		logger.info("Session watcher thread is running. Session expire time: {} min", SESSION_EXPIRE_IN_MINUTES);
 
 		while (true)
 		{
@@ -65,12 +71,12 @@ public class SessionWatcher implements Runnable
 			}
 			catch (InterruptedException e)
 			{
-				// do nothing
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
 
-	public long closeSessionIfTimeOver()
+	private long closeSessionIfTimeOver()
 	{
 		long timeToNextSessionEnd = SESSION_EXPIRE;
 		synchronized (timeSessions)
@@ -89,9 +95,8 @@ public class SessionWatcher implements Runnable
 					SessionHandler session = entry.getKey();
 					if (session != null)
 					{
-						logger.warn("Session " + session.getId() + " is inactive more than " + 
-								SESSION_EXPIRE_IN_MINUTES + " minutes. " +
-								"It will be closed due to timeout");
+						logger.warn("Session {} is inactive more than {} minutes. It will be closed due to timeout",
+								session.getId(), SESSION_EXPIRE_IN_MINUTES);
 						session.close();
 						iterator.remove();
 					}
@@ -103,7 +108,15 @@ public class SessionWatcher implements Runnable
 		return timeToNextSessionEnd;
 	}
 
-	public void addSession(SessionHandler session)
+	public static void watchSession(SessionHandler session)
+	{
+		if (watcher != null)
+			watcher.addSession(session);
+		else
+			logger.trace("Unable to watch session: session watcher was not created");
+	}
+	
+	private void addSession(SessionHandler session)
 	{
 		synchronized (timeSessions)
 		{
@@ -112,7 +125,15 @@ public class SessionWatcher implements Runnable
 		}
 	}
 	
-	public void updateSession(SessionHandler session)
+	public static void updateSession(SessionHandler session)
+	{
+		if (watcher != null)
+			watcher.updateSessionTime(session);
+		else
+			logger.trace("Unable to update session: session watcher was not created");
+	}
+	
+	private void updateSessionTime(SessionHandler session)
 	{
 		synchronized (timeSessions)
 		{

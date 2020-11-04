@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
@@ -28,6 +34,7 @@ import com.exactprosystems.remotehand.Configuration;
 public class WebConfiguration extends Configuration {
 
 	private static final Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
+	private static volatile WebConfiguration instance;
 
 	public static final Browser DEF_BROWSER = Browser.FIREFOX;
 	public static final String DEF_IEDRIVER_PATH = "IEDriverServer.exe";
@@ -75,8 +82,10 @@ public class WebConfiguration extends Configuration {
 	private boolean disableLeavePageAlert;
 	private boolean createDownloadSubDir;
 
-	protected WebConfiguration(CommandLine commandLine) {
+	private WebConfiguration(CommandLine commandLine) {
 		super(commandLine);
+
+		instance = this;
 
 		browserToUse = Browser.valueByLabel(this.loadProperty(PARAM_BROWSER, ""));
 		if (browserToUse == Browser.INVALID)
@@ -104,7 +113,6 @@ public class WebConfiguration extends Configuration {
 		ftpProxySetting = loadProxySetting(PARAM_FTPPROXY);
 		socksProxySetting = loadProxySetting(PARAM_SOCKSPROXY);
 		noProxySetting = loadProxySetting(PARAM_NOPROXY);
-
 		this.downloadsDir = new File(this.loadProperty("DownloadsDir", "downloads/"));
 		disableLeavePageAlert = this.loadProperty("DisableLeavePageAlert", true, Boolean::parseBoolean);
 		createDownloadSubDir = this.loadProperty("CreateDownloadSubDir", true, Boolean::parseBoolean);
@@ -255,5 +263,18 @@ public class WebConfiguration extends Configuration {
 	public boolean isCreateDownloadSubDir()
 	{
 		return createDownloadSubDir;
+	}
+
+	public static void init(CommandLine commandLine)
+	{
+		if (instance != null)
+			throw new RuntimeException("Web configuration already exists");
+
+		instance = new WebConfiguration(commandLine);
+	}
+
+	public static WebConfiguration getInstance()
+	{
+		return instance;
 	}
 }

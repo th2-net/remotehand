@@ -1,18 +1,25 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.windows.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -29,69 +36,53 @@ public class GetWindow extends WindowsAction {
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
 		String targetWindowName = params.get(WINDOW_NAME_PARAM);
 
-		DesiredCapabilities commonCapabilities = driverWrapper.createCommonCapabilities();
-		commonCapabilities.setCapability("app", "Root");
-		WindowsDriver<?> driver1 = null;
-		try {
-			driver1 = driverWrapper.newDriver(commonCapabilities);
-			List<? extends WebElement> elements = driver1.findElementsByName(targetWindowName);
-			if (elements.size() == 1) {
+		WindowsDriver<?> driver1 = driverWrapper.getOrCreateRootDriver();
+		List<? extends WebElement> elements = driver1.findElementsByName(targetWindowName);
+		if (elements.size() == 1) {
+			String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
+			logger.debug("Handle str for window : {} {}", targetWindowName, handleString);
+			int handleInt = Integer.parseInt(handleString);
+			String handleHex = Integer.toHexString(handleInt);
 
-				String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
-				logger.debug("Handle str for window : {} {}", targetWindowName, handleString);
-				int handleInt = Integer.parseInt(handleString);
-				String handleHex = Integer.toHexString(handleInt);
-
-				boolean newDriver = true;
-				if (driverWrapper.getDriverNullable() != null) {
-					try {
-						driverWrapper.getDriver().switchTo().window(handleHex);
-						newDriver = false;
-					} catch (Exception e) {
-						logger.error("Error while switching window", e);
-						try {
-							driverWrapper.getDriverNullable().close();
-						} catch (Exception e1) {
-							logger.error("Error while closing driver", e1);
-						}
-						newDriver = true;
-					}
-				}
-
-				if (newDriver) {
-					DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-					capabilities.setCapability("appTopLevelWindow", handleHex);
-
-					capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
-					if (driverWrapper.getCreateSessionTimeout() != null) {
-						capabilities.setCapability("createSessionTimeout", driverWrapper.getCreateSessionTimeout());
-					}
-					if (driverWrapper.getNewCommandTimeout() != null) {
-						capabilities.setCapability("newCommandTimeout", driverWrapper.getNewCommandTimeout());
-					}
-					driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
-				}
-				return null;
-			} else {
-				String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowName);
-				logger.error(errorText);
-				throw new ScriptExecuteException(errorText);
-			}
-
-		} finally {
-			if (driver1 != null) {
+			boolean newDriver = true;
+			if (driverWrapper.getDriverNullable() != null) {
 				try {
-					driver1.close();
-				} catch (Exception e1) {
-					logger.error("Error while disposing driver", e1);
+					driverWrapper.getDriver().switchTo().window(handleHex);
+					newDriver = false;
+				} catch (Exception e) {
+					logger.error("Error while switching window", e);
+					try {
+						driverWrapper.getDriverNullable().close();
+					} catch (Exception e1) {
+						logger.error("Error while closing driver", e1);
+					}
+					newDriver = true;
 				}
 			}
-		}
 
+			if (newDriver) {
+				DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
+				capabilities.setCapability("appTopLevelWindow", handleHex);
+
+				capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
+				if (driverWrapper.getCreateSessionTimeout() != null) {
+					capabilities.setCapability("createSessionTimeout", driverWrapper.getCreateSessionTimeout());
+				}
+				if (driverWrapper.getNewCommandTimeout() != null) {
+					capabilities.setCapability("newCommandTimeout", driverWrapper.getNewCommandTimeout());
+				}
+				driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
+			}
+			return null;
+		} else {
+			String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowName);
+			logger.error(errorText);
+			throw new ScriptExecuteException(errorText);
+		}
 	}
 
 	@Override

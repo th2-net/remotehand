@@ -1,22 +1,32 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.web.WebConfiguration;
+
 import org.apache.commons.cli.CommandLine;
 
 public class WindowsConfiguration extends Configuration {
-	
+	private static volatile WindowsConfiguration instance;
+
 	private static final String WINAPP_HOST = "WinAppDriverHost";
 	private static final String WINAPP_PORT = "WinAppDriverPort";
+	private static final String WINAPP_URL_PATH = "WinAppDriverUrlPath";
 	private static final String WINAPP_EXPERIMENTAL_DRIVER = "WinAppExperimentalDriver";
 	private static final String WINAPP_WAIT_FOR_APP = "WinAppWaitForApp";
 	private static final String WINAPP_IMPL_WAIT = "WinAppImplicitlyTimeout";
@@ -25,6 +35,7 @@ public class WindowsConfiguration extends Configuration {
 	
 	private static final String WINAPP_HOST_DEFAULT = "localhost";
 	private static final String WINAPP_PORT_DEFAULT = "4723";
+	private static final String WINAPP_URL_PATH_DEFAULT = "";
 	private static final boolean WINAPP_EXPERIMENTAL_DRIVER_DEFAULT = true;
 	private static final String WINAPP_WAIT_FOR_APP_DEFAULT = "20";
 	private static final Integer WINAPP_IMPL_WAIT_DEFAULT = 5;
@@ -33,22 +44,26 @@ public class WindowsConfiguration extends Configuration {
 	
 	private final String winAppHost;
 	private final String winAppPort;
+	private final String winAppUrlPath;
 	private final boolean experimentalDriver;
 	private final String waitForApp;
-	private final Integer implicityWaitTimeout;
+	private final Integer implicitlyWaitTimeout;
 	private final String createSessionTimeout;
 	private final Integer newCommandTimeout;
-	
-	protected WindowsConfiguration(CommandLine commandLine) {
+
+	private WindowsConfiguration(CommandLine commandLine) {
 		super(commandLine);
-		
+
+		instance = this;
+
 		this.winAppHost = this.loadProperty(WINAPP_HOST, WINAPP_HOST_DEFAULT);
 		this.winAppPort = this.loadProperty(WINAPP_PORT, WINAPP_PORT_DEFAULT);
+		this.winAppUrlPath = this.loadProperty(WINAPP_URL_PATH, WINAPP_URL_PATH_DEFAULT);
 		
 		this.experimentalDriver = this.loadProperty(WINAPP_EXPERIMENTAL_DRIVER,
 				WINAPP_EXPERIMENTAL_DRIVER_DEFAULT, Boolean::parseBoolean);
 		this.waitForApp = this.loadProperty(WINAPP_WAIT_FOR_APP, WINAPP_WAIT_FOR_APP_DEFAULT);
-		this.implicityWaitTimeout = this.loadProperty(WINAPP_IMPL_WAIT,
+		this.implicitlyWaitTimeout = this.loadProperty(WINAPP_IMPL_WAIT,
 				WINAPP_IMPL_WAIT_DEFAULT, WindowsConfiguration::nullableParseInt);
 		this.createSessionTimeout = this.loadProperty(WINAPP_CREATE_SESSION_TIMEOUT, WINAPP_CREATE_SESSION_TIMEOUT_DEFAULT);
 		this.newCommandTimeout = this.loadProperty(WINAPP_NEW_COMMAND_TIMEOUT,
@@ -71,8 +86,8 @@ public class WindowsConfiguration extends Configuration {
 		return waitForApp;
 	}
 
-	public Integer getImplicityWaitTimeout() {
-		return implicityWaitTimeout;
+	public Integer getImplicitlyWaitTimeout() {
+		return implicitlyWaitTimeout;
 	}
 
 	public String getCreateSessionTimeout() {
@@ -83,12 +98,27 @@ public class WindowsConfiguration extends Configuration {
 		return newCommandTimeout;
 	}
 
+	public String getWinAppUrlPath() {
+		return winAppUrlPath;
+	}
+
 	private static Integer nullableParseInt(String value) {
 		if (value == null || value.isEmpty()) {
 			return null;
 		}
 		return Integer.parseInt(value);
 	}
-	
-	
+
+	public static void init(CommandLine commandLine)
+	{
+		if (instance != null)
+			throw new RuntimeException("Windows configuration already exists");
+
+		instance = new WindowsConfiguration(commandLine);
+	}
+
+	public static WindowsConfiguration getInstance()
+	{
+		return instance;
+	}
 }

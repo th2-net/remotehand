@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
@@ -14,16 +20,12 @@ import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 
-/**
- * @author anna.bykova.
- */
 public class WebActionsLauncher extends ActionsLauncher
 {
 	private static final Logger logger = LoggerFactory.getLogger(WebActionsLauncher.class);
@@ -59,10 +61,10 @@ public class WebActionsLauncher extends ActionsLauncher
 
 	private void checkWebDriver(WebSessionContext context) throws ScriptExecuteException, RhConfigurationException
 	{
-		WebDriver webDriver = context.getWebDriver();
+		WebDriverWrapper webDriver = context.getWebDriverWrapper();
 		try
 		{
-			webDriver.getCurrentUrl();
+			webDriver.getDriver().getCurrentUrl();
 		}
 		catch (WebDriverException e)
 		{
@@ -71,11 +73,11 @@ public class WebActionsLauncher extends ActionsLauncher
 			if (isBrowserNotReachable(e))
 				updateWebDriver(context);
 			else
-				throw new ScriptExecuteException("Error while checking browser state: " + e.getMessage(), e);
+				throw new ScriptExecuteException("Error while checking browser state", e);
 		}
 	}
 
-	private void closeOldDriver(WebDriver driver, WebSessionContext context)
+	private void closeOldDriver(WebDriverWrapper driver, WebSessionContext context)
 	{
 		WebDriverManager manager = context.getWebDriverManager();
 		manager.closeWebDriver(driver, context.getSessionId());
@@ -85,6 +87,6 @@ public class WebActionsLauncher extends ActionsLauncher
 	{
 		logger.info("Trying to create new driver...");
 		WebDriverManager driverManager = context.getWebDriverManager();
-		context.setWebDriver(driverManager.getWebDriver(context));
+		driverManager.createWebDriver(context);
 	}
 }

@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.sessions;
 
@@ -56,7 +62,7 @@ public abstract class SessionHandler
 	public SessionHandler(String id, IRemoteHandManager manager)
 	{
 		this.id = id;
-		SessionWatcher.getWatcher().addSession(this);
+		SessionWatcher.watchSession(this);
 		this.manager = manager;
 		logger.info("Created session <" + id + ">");
 	}
@@ -67,7 +73,7 @@ public abstract class SessionHandler
 	
 	public void handle(RhRequest request, SessionExchange exchange) throws IOException
 	{
-		SessionWatcher.getWatcher().updateSession(this);
+		SessionWatcher.updateSession(this);
 		if (request instanceof ExecutionRequest)
 			handleExecution((ExecutionRequest)request, exchange);
 		else if (request instanceof FileUploadRequest)
@@ -129,6 +135,11 @@ public abstract class SessionHandler
 		{
 			logError(logger, id, "An error occurred:", e);
 			sendErrorMessage(exchange, "Internal error. " + e.getMessage());
+		}
+		catch (Throwable e)
+		{
+			logError(logger, id, "An unexpected error occurred:", e);
+			sendErrorMessage(exchange, "Internal unexpected error. " + e.getMessage());
 		}
 	}
 	

@@ -1,36 +1,50 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.DriverWrapper;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-public class WindowsDriverWrapper {
+public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
+{
+	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
 	
 	private WindowsDriver<?> driver;
+	private WindowsDriver<?> rootDriver;
 	private URL driverUrl;
 	
 	private WindowsConfiguration windowsConfiguration;
 
 	public WindowsDriverWrapper(URL driverUrl) {
 		this.driverUrl = driverUrl;
-		this.windowsConfiguration = (WindowsConfiguration) Configuration.getInstance();
+		this.windowsConfiguration = WindowsConfiguration.getInstance();
 	}
 
+	@Override
 	public WindowsDriver<?> getDriver() throws ScriptExecuteException {
 		if (driver == null) {
 			throw new ScriptExecuteException("Driver was not created. Driver creating action was not performed");
@@ -52,19 +66,35 @@ public class WindowsDriverWrapper {
 
 	public DesiredCapabilities createCommonCapabilities() {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities.setCapability("platformVersion", "10");
-		capabilities.setCapability("platformName", "Windows");
-		capabilities.setCapability("deviceName", "WindowsPC");
+		capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, "10");
+		capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, "Windows");
+		capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "WindowsPC");
 		return capabilities;
 	}
-	
+
+	public DesiredCapabilities createRootCapabilities() {
+		DesiredCapabilities capabilities = this.createCommonCapabilities();
+		capabilities.setCapability(MobileCapabilityType.APP, "Root");
+		return capabilities;
+	}
+
 	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities) {
-		WindowsDriver<WebElement> driver = new WindowsDriver<>(driverUrl, capabilities);
-		Integer implTimeout = getImplicityWaitTimeout();
-		if (windowsConfiguration.getImplicityWaitTimeout() != null) {
+		return newDriver(capabilities, getImplicitlyWaitTimeout());
+	}
+	
+	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities, Integer implTimeout) {
+		WindowsDriver<WebElement> driver = new WindowsLoggingDriver<>(driverUrl, capabilities);
+		if (implTimeout != null) {
 			driver.manage().timeouts().implicitlyWait(implTimeout, TimeUnit.SECONDS);
 		}
 		return driver;
+	}
+	
+	public WindowsDriver<?> getOrCreateRootDriver() {
+		if (rootDriver == null) {
+			rootDriver = this.newDriver(this.createRootCapabilities());
+		}
+		return rootDriver;
 	}
 
 	public boolean isExperimentalDriver() {
@@ -83,13 +113,24 @@ public class WindowsDriverWrapper {
 		return windowsConfiguration.getNewCommandTimeout();
 	}
 
-	public Integer getImplicityWaitTimeout() {
-		return windowsConfiguration.getImplicityWaitTimeout();
+	public Integer getImplicitlyWaitTimeout() {
+		return windowsConfiguration.getImplicitlyWaitTimeout();
 	}
 	
 	public void close() {
-		WindowsDriver<?> driverNullable = getDriverNullable();
-		if (driverNullable != null)
-			driverNullable.close();
+		if (driver != null) {
+			try {
+				driver.close();
+			} catch (Exception e) {
+				logger.warn("Error while disposing driver", e);
+			}
+		}
+		if (rootDriver != null) {
+			try {
+				rootDriver.close();
+			} catch (Exception e) {
+				logger.warn("Error while disposing ROOT driver", e);
+			}
+		}
 	}
 }

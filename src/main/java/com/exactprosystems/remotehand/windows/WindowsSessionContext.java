@@ -1,16 +1,23 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.sessions.SessionContext;
+import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -21,10 +28,12 @@ public class WindowsSessionContext extends SessionContext {
 	private WindowsDriverWrapper currentDriver;
 	private URL winApiDriverURL;
 	private final Map<String, Object> mvelVars;
+	private final CachedWebElements cachedObjects;
 
 	public WindowsSessionContext(String sessionId) {
 		super(sessionId);
 		this.mvelVars = new HashMap<>();
+		this.cachedObjects = new CachedWebElements();
 	}
 
 	public WindowsDriverWrapper getCurrentDriver() {
@@ -45,5 +54,25 @@ public class WindowsSessionContext extends SessionContext {
 
 	public Map<String, Object> getMvelVars() {
 		return mvelVars;
+	}
+
+	public CachedWebElements getCachedObjects() {
+		return cachedObjects;
+	}
+
+	public static class CachedWebElements {
+		private final Map<String, WebElement> cachedObjects;
+
+		public CachedWebElements() {
+			this.cachedObjects = new HashMap<>();
+		}
+		
+		public void storeWebElement(String id, WebElement webElement) {
+			this.cachedObjects.put(id, webElement);
+		}
+
+		public WebElement getWebElement(String id) {
+			return this.cachedObjects.get(id);
+		}
 	}
 }

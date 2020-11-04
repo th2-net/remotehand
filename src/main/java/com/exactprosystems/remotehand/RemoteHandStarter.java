@@ -1,21 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
+import com.exactprosystems.remotehand.grid.GridRemoteHandManager;
 import com.exactprosystems.remotehand.http.HTTPServerMode;
+import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.sessions.SessionWatcher;
 import com.exactprosystems.remotehand.tcp.TcpClientMode;
+import com.exactprosystems.remotehand.web.WebDriverPoolProvider;
 import com.exactprosystems.remotehand.web.WebRemoteHandManager;
+import com.exactprosystems.remotehand.windows.WindowsDriverPoolProvider;
 import com.exactprosystems.remotehand.windows.WindowsRemoteHandManager;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
@@ -46,7 +56,8 @@ public class RemoteHandStarter
 			DYNAMIC_INPUT_NAME_PARAM = "dynamicInputName",
 			INPUT_NAME_PARAMS = "inputParamsName",
 			CONFIG_FILE_OPTIONS_PARAM = "configFileOption", 
-			WINDOWS_OPTIONS_PARAM = "windowsMode";
+			WINDOWS_OPTIONS_PARAM = "windowsMode",
+			GRID_MODE_OPTIONS_PARAM = "grid";
 	public static final String ENV_VARS_PARAM = "enableEnvVars";
 
 
@@ -62,11 +73,17 @@ public class RemoteHandStarter
 		Options options = createOptions(optionMap);
 		CommandLine line = getCommandLine(args, options);
 
+		if (line.hasOption(optionMap.get(GRID_MODE_OPTIONS_PARAM).getOpt()))
+		{
+			startGridMode(line);
+			return;
+		}
+
 		IRemoteHandManager manager = null;
 		if (line.hasOption(optionMap.get(WINDOWS_OPTIONS_PARAM).getOpt())) {
-			manager = new WindowsRemoteHandManager();
+			manager = new WindowsRemoteHandManager(new WindowsDriverPoolProvider());
 		} else {
-			manager = new WebRemoteHandManager();
+			manager = new WebRemoteHandManager(new WebDriverPoolProvider());
 		}
 		
 		IDriverManager webDriverManager = manager.getWebDriverManager();
@@ -88,8 +105,8 @@ public class RemoteHandStarter
 			closeApp();
 		}
 
-		//In any mode RemoteHand handles requests from ClearTH.
-		//Requests flow should start with "logon" request, for which RemoteHand will assign a sessionID and return it to ClearTH for further reference.
+		//In any mode RemoteHand handles requests from external application.
+		//Requests flow should start with "logon" request, for which RemoteHand will assign a sessionID and return it to the application for further reference.
 
 		if (httpServerMode)
 		{
@@ -103,6 +120,14 @@ public class RemoteHandStarter
 		{
 			startLocalMode(manager, webDriverManager, optionMap, line, input, output);
 		}
+	}
+
+	private static void startGridMode(CommandLine commandLine)
+	{
+		GridRemoteHandManager gridManager = new GridRemoteHandManager();
+		gridManager.createConfigurations(commandLine);
+		HTTPServerMode.init(gridManager.createLogonHandler());
+		Runtime.getRuntime().addShutdownHook(new ShutdownHook(gridManager));
 	}
 
 	private static void startLocalMode(
@@ -120,9 +145,9 @@ public class RemoteHandStarter
 
 		ActionsLauncher launcher = manager.createActionsLauncher(null);
 		ScriptCompiler compiler = manager.createScriptCompiler();
+		webDriverManager.initDriverPool();
 		SessionContext sessionContext = getSessionContext(manager);
 
-		webDriverManager.initDriverPool();
 
 		processAllScriptsFromDirectory(input, output, inputParams, launcher, compiler, sessionContext);
 		if (dynInput != null)
@@ -179,10 +204,10 @@ public class RemoteHandStarter
 
 	private static void startTcpClientMode(IRemoteHandManager manager, IDriverManager webDriverManager, String version)
 	{
-		//In TCP client mode RemoteHand connects to ClearTH, telling that it is ready to serve.
-		//ClearTH sends logon request before sending commands to execute.
+		//In TCP client mode RemoteHand connects to another application, telling that it is ready to serve.
+		//Application sends logon request before sending commands to execute.
 		//Once logon request is received, RemoteHand adds TcpSessionHandler to session pool.
-		//Further requests from ClearTH must contain sessionID. Requests must have the following structure:
+		//Further requests from application must contain sessionID. Requests must have the following structure:
 
 		//int requestType
 		//int totalSize
@@ -201,12 +226,12 @@ public class RemoteHandStarter
 
 	private static void startHttpServerMode(IRemoteHandManager manager, IDriverManager webDriverManager)
 	{
-		//In HTTP server mode RemoteHand waits for requests from ClearTH.
+		//In HTTP server mode RemoteHand waits for requests from external application.
 		//Once logon request is received, RemoteHand adds HttpSessionHandler to HTTP server, binding it to URL equal to sessionID.
-		//ClearTH sends further requests to that URL directly.
+		//The application sends further requests to that URL directly.
 		//This way multiple simultaneous sessions are handled by HTTP server nature.
 
-		if (!HTTPServerMode.init(manager.createLogonHandler()))
+		if (!HTTPServerMode.init((HttpLogonHandler)manager.createLogonHandler()))
 			logger.info("Application stopped with error");
 		else
 			webDriverManager.initDriverPool();
@@ -296,7 +321,7 @@ public class RemoteHandStarter
 	@SuppressWarnings("static-access")
 	private static Map<String, Option> createOptionMap()
 	{
-		Map<String, Option> optionMap = new HashMap<>(7);
+		Map<String, Option> optionMap = new HashMap<>(10);
 
 		Option enableServerMode = OptionBuilder
 				.isRequired(false)
@@ -348,9 +373,15 @@ public class RemoteHandStarter
 
 		Option windowsMode = OptionBuilder
 				.isRequired(false)
-				.withDescription("Windows mode. Works with windows app driver")
+				.withDescription("Windows mode. Works with Windows Application Driver")
 				.create("windowsMode");
 		optionMap.put(WINDOWS_OPTIONS_PARAM, windowsMode);
+
+		Option gridMode = OptionBuilder
+				.isRequired(false)
+				.withDescription("Work in Grid mode using remote Windows Application Driver and remote Web Driver")
+				.create(GRID_MODE_OPTIONS_PARAM);
+		optionMap.put(GRID_MODE_OPTIONS_PARAM, gridMode);
 
 		Option envVarsMode = OptionBuilder
 				.isRequired(false)
@@ -439,7 +470,7 @@ public class RemoteHandStarter
 		if ((watcher = SessionWatcher.getWatcher()) != null)
 			new Thread(watcher).start();
 		else
-			logger.info("Thread watcher is not running");
+			logger.warn("Session watcher thread is not running");
 	}
 	
 	private static void cleanUpAfterFail(ActionsLauncher launcher, ScriptCompiler compiler, SessionContext context)

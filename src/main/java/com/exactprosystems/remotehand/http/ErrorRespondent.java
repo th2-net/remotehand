@@ -1,18 +1,25 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.http;
 
 import com.exactprosystems.clearth.connectivity.data.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.utils.ExceptionUtils;
 
 import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.COMPILE_ERROR;
 import static com.exactprosystems.clearth.connectivity.data.rhdata.RhResponseCode.EXECUTION_ERROR;
@@ -31,6 +38,11 @@ public class ErrorRespondent
 
 	public RhScriptResult error(Exception ex)
 	{
+		return error(ex, ExceptionUtils.getDetailedMessage(ex));
+	}
+
+	public RhScriptResult error(Exception ex, String errorMessage)
+	{
 		RhScriptResult result = new RhScriptResult();
 		if (ex instanceof ScriptCompileException)
 		{
@@ -38,7 +50,7 @@ public class ErrorRespondent
 		}
 		else if (ex instanceof ScriptExecuteException)
 		{
-			ScriptExecuteException see = (ScriptExecuteException) ex; 
+			ScriptExecuteException see = (ScriptExecuteException) ex;
 			result.setCode(EXECUTION_ERROR.getCode());
 			if (see.getScreenshotId() != null)
 				result.addScreenshotId(see.getScreenshotId());
@@ -47,7 +59,9 @@ public class ErrorRespondent
 		{
 			result.setCode(RH_ERROR.getCode());
 		}
-		result.setErrorMessage(ex.getMessage());
+
+		result.setErrorMessage(errorMessage);
+
 		return result;
 	}
 }

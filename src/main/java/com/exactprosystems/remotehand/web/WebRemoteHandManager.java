@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
@@ -15,17 +21,15 @@ import com.exactprosystems.remotehand.http.HttpLogonHandler;
 import com.exactprosystems.remotehand.sessions.LogonHandler;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 import org.apache.commons.cli.CommandLine;
-import org.openqa.selenium.WebDriver;
 
-/**
- * Created by alexey.karpukhin on 2/2/16.
- */
-public class WebRemoteHandManager implements IRemoteHandManager {
+public class WebRemoteHandManager implements IRemoteHandManager
+{
+	protected WebDriverManager webDriverManager;
+	protected static WebConfiguration configuration;
 
-	private WebDriverManager webDriverManager;
-
-	public WebRemoteHandManager () {
-		webDriverManager = new WebDriverManager();
+	public WebRemoteHandManager(DriverPoolProvider<WebDriverWrapper> driverPoolProvider)
+	{
+		webDriverManager = new WebDriverManager(driverPoolProvider);
 	}
 
 	@Override
@@ -35,7 +39,8 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 
 	@Override
 	public Configuration createConfiguration(CommandLine commandLine) {
-		return new WebConfiguration(commandLine);
+		WebConfiguration.init(commandLine);
+		return WebConfiguration.getInstance();
 	}
 
 	@Override
@@ -47,8 +52,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
 		WebSessionContext webSessionContext = new WebSessionContext(sessionId);
-		webSessionContext.setWebDriverManager(webDriverManager);
-		webSessionContext.setWebDriver(webDriverManager.getWebDriver(webSessionContext));
+		webDriverManager.createWebDriver(webSessionContext);
 		return webSessionContext;
 	}
 
@@ -58,7 +62,7 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 		if (sessionContext == null)
 			return;
 		WebSessionContext webSessionContext = (WebSessionContext) sessionContext;
-		WebDriver webDriver = webSessionContext.getWebDriver();
+		WebDriverWrapper webDriver = webSessionContext.getWebDriverWrapper();
 		if (webDriver != null)
 			webDriverManager.closeWebDriver(webDriver, webSessionContext.getSessionId());
 		WebUtils.deleteDownloadDirectory(webSessionContext.getDownloadDir());
@@ -72,5 +76,11 @@ public class WebRemoteHandManager implements IRemoteHandManager {
 	public WebDriverManager getWebDriverManager()
 	{
 		return webDriverManager;
+	}
+
+	@Override
+	public RemoteManagerType getManagerType()
+	{
+		return RemoteManagerType.WEB;
 	}
 }

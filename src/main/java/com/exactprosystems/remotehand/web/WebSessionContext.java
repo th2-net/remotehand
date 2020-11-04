@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
@@ -16,67 +22,68 @@ import com.exactprosystems.remotehand.sessions.SessionContext;
 
 import java.io.File;
 
-/**
- * @author anna.bykova.
- */
 public class WebSessionContext extends SessionContext
 {
 	private WebDriverManager webDriverManager;
-	private WebDriver webDriver;
+	private WebDriverWrapper webDriver;
 	private WebElementsDictionary dictionary;
-	private File downloadDir;
 	private String shutdownScript;
-
+	
 	public WebSessionContext(String sessionId)
 	{
 		super(sessionId);
 	}
-
+	
+	
 	public WebDriverManager getWebDriverManager()
 	{
 		return webDriverManager;
 	}
-
+	
 	public void setWebDriverManager(WebDriverManager webDriverManager)
 	{
 		this.webDriverManager = webDriverManager;
 	}
-
-	public WebDriver getWebDriver()
+	
+	
+	public WebDriverWrapper getWebDriverWrapper()
 	{
 		return webDriver;
 	}
-
-	public void setWebDriver(WebDriver webDriver)
+	
+	public void setWebDriverWrapper(WebDriverWrapper webDriver)
 	{
 		this.webDriver = webDriver;
 	}
-
+	
+	
 	public WebElementsDictionary getDictionary()
 	{
 		return dictionary;
 	}
-
+	
 	public void setDictionary(WebElementsDictionary dictionary)
 	{
 		this.dictionary = dictionary;
 	}
-
+	
+	
+	public WebDriver getWebDriver()
+	{
+		return webDriver.getDriver();
+	}
+	
 	public File getDownloadDir()
 	{
-		return downloadDir;
+		return webDriver.getDownloadDir();
 	}
-
-	public void setDownloadDir(File donwloadDir)
-	{
-		this.downloadDir = donwloadDir;
-	}
-
+	
+	
 	public String getShutdownScript()
 	{
 		return shutdownScript;
 	}
-
+	
 	public void setShutdownScript(String shutdownScript)
 	{
 		this.shutdownScript = shutdownScript;

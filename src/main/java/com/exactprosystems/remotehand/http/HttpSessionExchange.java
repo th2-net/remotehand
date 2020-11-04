@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.http;
 
@@ -14,9 +20,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.exactprosystems.remotehand.sessions.SessionExchange;
 import com.sun.net.httpserver.HttpExchange;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Adapter for HttpExchange to handle HTTP requests
@@ -58,5 +68,28 @@ public class HttpSessionExchange implements SessionExchange
 	public String getRemoteAddress()
 	{
 		return exchange.getRemoteAddress().getAddress().toString();
+	}
+
+	public Map<String, String> getRequestParams()
+	{
+		String query = exchange.getRequestURI().getQuery();
+
+		if (isEmpty(query))
+			return null;
+
+		Map<String, String> params = new HashMap<>();
+		String[] splitQuery =  query.split("&");
+
+		for (String kvPair : splitQuery)
+		{
+			String[] splitPairs = kvPair.split("=");
+
+			if (splitPairs.length != 2)
+				continue;
+
+			params.put(splitPairs[0], splitPairs[1]);
+		}
+
+		return params;
 	}
 }

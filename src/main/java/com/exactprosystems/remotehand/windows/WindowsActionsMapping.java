@@ -1,26 +1,23 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.windows;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
-import com.exactprosystems.remotehand.windows.actions.CheckElement;
-import com.exactprosystems.remotehand.windows.actions.ClickContextMenu;
-import com.exactprosystems.remotehand.windows.actions.GetElementAttribute;
-import com.exactprosystems.remotehand.windows.actions.GetWindow;
-import com.exactprosystems.remotehand.windows.actions.Open;
-import com.exactprosystems.remotehand.windows.actions.Click;
-import com.exactprosystems.remotehand.windows.actions.SwitchActiveWindow;
-import com.exactprosystems.remotehand.windows.actions.SendText;
-import com.exactprosystems.remotehand.windows.actions.ToggleCheckBox;
-import com.exactprosystems.remotehand.windows.actions.Wait;
+import com.exactprosystems.remotehand.windows.actions.*;
 
 public class WindowsActionsMapping {
 
@@ -35,7 +32,12 @@ public class WindowsActionsMapping {
 		ToggleCheckBox,
 		CheckElement,
 		ClickContextMenu,
-		GetWindow;
+		GetWindow,
+		SearchElement,
+		WaitForAttribute,
+		ScrollUsingText,
+		GetDataFromClipboard,
+		TableClick;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -59,9 +61,14 @@ public class WindowsActionsMapping {
 			case ToggleCheckBox:		return new ToggleCheckBox();
 			case ClickContextMenu:		return new ClickContextMenu();
 			case GetWindow:				return new GetWindow();
-			default : 
+			case SearchElement:			return new SearchElement();
+			case WaitForAttribute:		return new WaitForAttribute();
+			case ScrollUsingText:		return new ScrollByText();
+			case GetDataFromClipboard:	return new GetDataFromClipboard();
+			case TableClick:			return new TableClick();
+			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
-	
+
 }

@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2019, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary 
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web.actions;
 
@@ -16,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
@@ -35,9 +43,9 @@ public class Click extends WebAction
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
 	
 	private static final Map<String, CharSequence> MODIFIER_KEYS = new HashMap<String, CharSequence>() {{
-		put(SendKeys.SHIFT, Keys.SHIFT);
-		put(SendKeys.CTRL, Keys.CONTROL);
-		put(SendKeys.ALT, Keys.ALT);
+		put(SendKeysHandler.SHIFT, Keys.SHIFT);
+		put(SendKeysHandler.CTRL, Keys.CONTROL);
+		put(SendKeysHandler.ALT, Keys.ALT);
 	}};
 	
 	@Override
@@ -73,28 +81,7 @@ public class Click extends WebAction
 		if (button == null)
 			button = LEFT;
 		
-		String xOffsetStr, yOffsetStr;
-		int xOffset = 0, yOffset = 0;
-		xOffsetStr = params.get(X_OFFSET);
-		yOffsetStr = params.get(Y_OFFSET);
-		
-		Actions actions = new Actions(webDriver);
-		
-		if ((xOffsetStr != null && !xOffsetStr.isEmpty()) && (yOffsetStr != null && !yOffsetStr.isEmpty()))
-		{
-			try
-			{
-				xOffset = Integer.valueOf(xOffsetStr);
-				yOffset = Integer.valueOf(yOffsetStr);
-			}
-			catch (Exception e)
-			{
-				logError("xoffset or yoffset is not integer value");
-			}
-			actions = actions.moveToElement(element, xOffset, yOffset);
-		}
-		else
-			actions = actions.moveToElement(element);
+		Actions actions = moveToElement(webDriver, element, params.get(X_OFFSET), params.get(Y_OFFSET));
 		logInfo("Moved to element: %s", webLocator);
 		
 		try
@@ -154,6 +141,32 @@ public class Click extends WebAction
 		return true;
 	}
 	
+	private Actions moveToElement(WebDriver webDriver, WebElement element, String xOffsetStr, String yOffsetStr)
+	{
+		Actions actions = new Actions(webDriver);
+		
+		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr))
+		{
+			int xOffset = 0, yOffset = 0;
+			try
+			{
+				xOffset = Integer.parseInt(xOffsetStr);
+				yOffset = Integer.parseInt(yOffsetStr);
+			}
+			catch (NumberFormatException e)
+			{
+				logError("xoffset or yoffset is not integer value");
+			}
+			
+			if (webDriver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) webDriver) > 74)
+			{
+				xOffset -= element.getSize().getWidth() / 2;
+				yOffset -= element.getSize().getHeight() / 2;
+			}
+			return actions.moveToElement(element, xOffset, yOffset);
+		}
+		return actions.moveToElement(element);
+	}
 	
 	private Set<CharSequence> applyModifiers(Actions actions, String modifiers)
 	{
