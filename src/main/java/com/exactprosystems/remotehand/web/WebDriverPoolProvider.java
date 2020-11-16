@@ -204,8 +204,8 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 			prefs.put("profile.default_content_settings.popups", "0");
 			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
 			options.setExperimentalOption("prefs", prefs);
-			
-			options.setExperimentalOption("prefs", prefs);
+
+			options.setExperimentalOption("w3c", cfg.isEnableW3C());
 			
 			if (dc != null)
 			{

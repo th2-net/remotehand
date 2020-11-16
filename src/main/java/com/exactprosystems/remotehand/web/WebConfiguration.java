@@ -83,6 +83,7 @@ public class WebConfiguration extends Configuration {
 	private volatile File downloadsDir;
 	private boolean disableLeavePageAlert;
 	private boolean createDownloadSubDir;
+	private final boolean enableW3C;
 
 	private WebConfiguration(CommandLine commandLine) {
 		this(commandLine, Collections.emptyMap());
@@ -122,6 +123,7 @@ public class WebConfiguration extends Configuration {
 		this.downloadsDir = new File(this.loadProperty("DownloadsDir", "downloads/"));
 		disableLeavePageAlert = this.loadProperty("DisableLeavePageAlert", true, Boolean::parseBoolean);
 		createDownloadSubDir = this.loadProperty("CreateDownloadSubDir", true, Boolean::parseBoolean);
+		enableW3C = loadProperty("EnableW3C", false, Boolean::parseBoolean);
 	}
 
 	@Override
@@ -269,6 +271,11 @@ public class WebConfiguration extends Configuration {
 	public boolean isCreateDownloadSubDir()
 	{
 		return createDownloadSubDir;
+	}
+
+	public boolean isEnableW3C()
+	{
+		return enableW3C;
 	}
 
 	public static void init(CommandLine commandLine)
