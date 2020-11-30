@@ -22,6 +22,7 @@ import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -30,7 +31,6 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +49,7 @@ public class SendText extends WindowsAction {
 		String clearBeforeStr = params.get("clearbefore");
 		String textToSend = params.get(TEXT_PARAM);
 		boolean clearBefore = "y".equals(clearBeforeStr) || "true".equals(clearBeforeStr);
-		
-		
+		List<String> inputCommands = handler.processInputText(textToSend);
 		String directSend = params.get("directsend");
 		WebElement element = null;
 		
@@ -60,10 +59,8 @@ public class SendText extends WindowsAction {
 				throw new ScriptExecuteException("Locator/Matcher should be specified");
 			}
 			element = es.searchElement();
-			element.sendKeys(textToSend);			
+			sendDirectCommand(element, inputCommands);
 		} else {
-			List<String> strings = handler.processInputText(textToSend);
-			
 			Actions actions = new Actions(driverWrapper.getDriver());
 			if (es.isLocatorsAvailable()) {
 				element = es.searchElement();
@@ -75,12 +72,12 @@ public class SendText extends WindowsAction {
 				actions.sendKeys(Keys.CONTROL, "a", Keys.CONTROL, Keys.BACK_SPACE);
 			}
 
-			for (String str : strings) {
-				if (handler.needSpecialSend(str)) {
-					handler.sendSpecialKey(actions, str, (element instanceof RemoteWebElement ?
+			for (String inputCommand : inputCommands) {
+				if (handler.needSpecialSend(inputCommand)) {
+					handler.sendSpecialKey(actions, inputCommand, (element instanceof RemoteWebElement ?
 							((RemoteWebElement) element).getId() : ""));
 				} else {
-					handler.doSendKeys(actions, str);
+					handler.doSendKeys(actions, inputCommand);
 				}
 			}
 		}
@@ -97,5 +94,20 @@ public class SendText extends WindowsAction {
 	@Override
 	protected String[] mandatoryParams() {
 		return new String[] { TEXT_PARAM };
+	}
+
+
+	private void sendDirectCommand(WebElement element, List<String> inputCommands) {
+		for (String inputCommand : inputCommands) {
+			if (handler.needSpecialSend(inputCommand)) {
+				if (inputCommand.contains("+"))
+					throw new NotImplementedException("Combined keys are not supported");
+				CharSequence specialCommand = SendKeysHandler.KEYS.get(inputCommand.substring(1));
+				if (StringUtils.isNotEmpty(specialCommand))
+					element.sendKeys(specialCommand);
+			} else {
+				element.sendKeys(inputCommand);
+			}
+		}
 	}
 }
