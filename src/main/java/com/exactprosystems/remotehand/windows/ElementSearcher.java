@@ -121,7 +121,6 @@ public class ElementSearcher {
 				By by = parseBy(pair.getKey(), matcher.getKey());
 				logger.trace("Searching by {} = {}", pair.getKey(), matcher.getKey());
 				we = findWebElement(we == null ? driver : we, by, matcher.getValue());
-				System.out.println(we);
 			}
 		}
 		
