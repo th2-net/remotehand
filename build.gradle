@@ -24,6 +24,7 @@ application {
 }
 
 repositories {
+    mavenCentral()
     maven {
         name 'Bintray'
         url 'https://dl.bintray.com/exactpro/th2'
