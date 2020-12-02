@@ -29,11 +29,13 @@ public class WindowsSessionContext extends SessionContext {
 	private URL winApiDriverURL;
 	private final Map<String, Object> mvelVars;
 	private final CachedWebElements cachedObjects;
+	private final WindowsManager windowsManager;
 
-	public WindowsSessionContext(String sessionId) {
+	public WindowsSessionContext(String sessionId, WindowsManager windowsManager) {
 		super(sessionId);
 		this.mvelVars = new HashMap<>();
 		this.cachedObjects = new CachedWebElements();
+		this.windowsManager = windowsManager;
 	}
 
 	public WindowsDriverWrapper getCurrentDriver() {
@@ -58,6 +60,11 @@ public class WindowsSessionContext extends SessionContext {
 
 	public CachedWebElements getCachedObjects() {
 		return cachedObjects;
+	}
+
+	public WindowsManager getWindowsManager()
+	{
+		return windowsManager;
 	}
 
 	public static class CachedWebElements {

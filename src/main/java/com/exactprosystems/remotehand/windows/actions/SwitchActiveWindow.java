@@ -19,18 +19,24 @@ package com.exactprosystems.remotehand.windows.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
+import com.exactprosystems.remotehand.windows.WindowsManager;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
+import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static java.lang.String.format;
 
 public class SwitchActiveWindow extends WindowsAction {
 
 	private static final String WINDOW_NAME_PARAM = "windowname";
+	private static final String HANDLE_ATTRIBUTE = "NativeWindowHandle";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
@@ -44,24 +50,39 @@ public class SwitchActiveWindow extends WindowsAction {
 			return null;
 		}
 
-		String currentHandle = driver.getWindowHandle();
-		Set<String> handles = new LinkedHashSet<>(driver.getWindowHandles());
+		WindowsDriver<?> root = driverWrapper.getOrCreateRootDriver();
+		Set<String> allWindowHandles = findWindowsByName(root, targetWindowName);
 
-		this.logger.debug("Current handle: {}", currentHandle);
-		this.logger.debug("Handles: {}", handles);
-
-		handles.remove(currentHandle);
-
-		for (String handle : handles) {
-			driver.switchTo().window(handle);
-			String title = driver.getTitle();
-			this.logger.debug("Window {} title {}", handle, title);
-			if (targetWindowName.equals(title)) {
-				return null;
-			}
+		WindowsManager windowsManager = windowsSessionContext.getWindowsManager();
+		String windowHandle = windowsManager.findWindowForSession(targetWindowName, 
+				windowsSessionContext.getSessionId(), allWindowHandles);
+		driverWrapper.changeDriverForNewMainWindow(windowHandle);
+		
+		return null;
+	}
+	
+	private Set<String> findWindowsByName(WindowsDriver<?> root, String name) throws ScriptExecuteException
+	{
+		List<?> windows = root.findElementsByName(name);
+		if ((windows == null) || windows.isEmpty())
+			throw new ScriptExecuteException(format("There are no windows '%s' visible from Root session.", name));
+		
+		logger.debug("Listing windows '{}':", name);
+		Set<String> handles = new HashSet<>();
+		for (Object w : windows)
+		{
+			WebElement window = (WebElement) w;
+			String handle = window.getAttribute(HANDLE_ATTRIBUTE);
+			String handleHex = nativeWindowHandleToHex(handle);
+			handles.add(handleHex);
+			logger.debug("{}={}, hex={}", HANDLE_ATTRIBUTE, handle, handleHex);
 		}
-
-		throw new ScriptExecuteException("Cannot switch to specified window '" + targetWindowName + "'");
+		return handles;
+	}
+	
+	private String nativeWindowHandleToHex(String handle)
+	{
+		return "0x00" + Integer.toHexString(Integer.parseInt(handle)).toUpperCase();
 	}
 
 	@Override

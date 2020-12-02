@@ -28,6 +28,7 @@ import java.util.Map;
 
 public class WindowsRemoteHandManager implements IRemoteHandManager {
 	private final DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider;
+	private final WindowsManager windowsManager = new WindowsManager();
 
 	public WindowsRemoteHandManager(DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider)
 	{
@@ -60,7 +61,7 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 	@Override
 	public SessionContext createSessionContext(String sessionId) throws RhConfigurationException
 	{
-		WindowsSessionContext windowsSessionContext = new WindowsSessionContext(sessionId);
+		WindowsSessionContext windowsSessionContext = new WindowsSessionContext(sessionId, windowsManager);
 		WindowsDriverWrapper driverWrapper = (WindowsDriverWrapper)driverPoolProvider.createDriverWrapper(windowsSessionContext);
 		windowsSessionContext.setWinApiDriverURL(driverWrapper.getDriverUrl());
 		windowsSessionContext.setCurrentDriver(driverWrapper);
@@ -75,10 +76,12 @@ public class WindowsRemoteHandManager implements IRemoteHandManager {
 	@Override
 	public void close(SessionContext sessionContext) {
 		WindowsSessionContext windowsSessionContext = (WindowsSessionContext) sessionContext;
+		String sessionId = sessionContext.getSessionId(); 
 		if (windowsSessionContext.getCurrentDriver() != null) {
 			windowsSessionContext.getCurrentDriver().close();
-			driverPoolProvider.closeDriver(sessionContext.getSessionId(), null);
+			driverPoolProvider.closeDriver(sessionId, null);
 		}
+		windowsManager.removeSession(sessionId);
 	}
 
 	@Override

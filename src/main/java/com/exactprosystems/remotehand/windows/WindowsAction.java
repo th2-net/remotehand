@@ -30,7 +30,7 @@ import java.util.Map;
 
 public abstract class WindowsAction extends Action {
 
-	private WindowsSessionContext windowsSessionContext;
+	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
 	private Map<String, String> params = null;
 	private int lineNumber;

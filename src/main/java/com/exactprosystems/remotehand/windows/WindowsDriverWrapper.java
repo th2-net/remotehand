@@ -16,7 +16,6 @@
 
 package com.exactprosystems.remotehand.windows;
 
-import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.DriverWrapper;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import io.appium.java_client.remote.MobileCapabilityType;
@@ -32,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 {
 	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
+	
+	private static final String APP_TOP_LEVEL_WINDOW_CAPABILITY = "appTopLevelWindow";
 	
 	private WindowsDriver<?> driver;
 	private WindowsDriver<?> rootDriver;
@@ -95,6 +96,21 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 			rootDriver = this.newDriver(this.createRootCapabilities());
 		}
 		return rootDriver;
+	}
+	
+	public WindowsDriver<?> changeDriverForNewMainWindow(String windowHandle)
+	{
+		DesiredCapabilities dc = createCommonCapabilities();
+		dc.setCapability(APP_TOP_LEVEL_WINDOW_CAPABILITY, windowHandle);
+
+		WindowsDriver<?> oldDriver = driver;
+		driver = newDriver(dc);
+		
+		logger.debug("Driver has been changed to catch new top-level window '{}'.", windowHandle);
+		
+		oldDriver.close();
+		
+		return driver;
 	}
 
 	public boolean isExperimentalDriver() {
