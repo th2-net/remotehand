@@ -39,7 +39,7 @@ public class WindowsConfiguration extends Configuration {
 	private static final String WINAPP_HOST_DEFAULT = "localhost";
 	private static final String WINAPP_PORT_DEFAULT = "4723";
 	private static final String WINAPP_URL_PATH_DEFAULT = "";
-	private static final boolean WINAPP_EXPERIMENTAL_DRIVER_DEFAULT = true;
+	private static final boolean WINAPP_EXPERIMENTAL_DRIVER_DEFAULT = false;
 	private static final String WINAPP_WAIT_FOR_APP_DEFAULT = "20";
 	private static final Integer WINAPP_IMPL_WAIT_DEFAULT = 5;
 	private static final String WINAPP_CREATE_SESSION_TIMEOUT_DEFAULT = null;
