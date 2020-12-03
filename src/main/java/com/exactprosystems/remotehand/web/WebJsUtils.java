@@ -12,6 +12,7 @@ package com.exactprosystems.remotehand.web;
 
 import java.util.Collection;
 
+import com.exactprosystems.remotehand.ScriptExecuteException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -22,26 +23,30 @@ public class WebJsUtils
 	private static final Logger logger = LoggerFactory.getLogger(WebJsUtils.class);
 
 
-	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands)
+	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands) throws ScriptExecuteException
 	{
-		for (String script : commands)
+		if (!(webDriver instanceof JavascriptExecutor))
+			throw new ScriptExecuteException("Web driver is not JavaScript executor: JS commands cannot be executed");
+		
+		JavascriptExecutor jsExecutor = (JavascriptExecutor) webDriver;
+		for (String command : commands)
 		{
-			executeJsCommand(webDriver, script);
+			executeJsCommand(jsExecutor, command);
 		}
 	}
 
-	public static void executeJsCommand(WebDriver webDriver, String javaScript)
+	private static void executeJsCommand(JavascriptExecutor jsExecutor, String javaScript) throws ScriptExecuteException
 	{
 		try
 		{
-			if (webDriver instanceof JavascriptExecutor)
-				((JavascriptExecutor) webDriver).executeScript(javaScript);
-			else
-				logger.error("Web driver is not Javascript executor. Javascript cannot be executed");
+			logger.info("Executing JS command: {}", javaScript);
+			Object res = jsExecutor.executeScript(javaScript);
+			if (res != null)
+				logger.info("Result of JS command: {} = {}", javaScript, res);
 		}
 		catch (Exception e)
 		{
-			logger.error("Framework Error: Unable to Execute Java Script: " + javaScript + "with error: ", e);
+			throw new ScriptExecuteException("JS command cannot be executed: " + javaScript, e);
 		}
 	}
 }
