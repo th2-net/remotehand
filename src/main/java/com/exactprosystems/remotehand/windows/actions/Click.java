@@ -21,6 +21,7 @@ import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -33,7 +34,8 @@ public class Click extends WindowsAction {
 	private static final Logger loggerInstance = LoggerFactory.getLogger(Click.class);
 
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
-			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
+			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers", ATTACHED_BORDER = "attachedborder",
+			LEFT_TOP = "left_top", RIGHT_TOP = "right_top", LEFT_BOTTOM = "left_bottom", RIGHT_BOTTOM = "right_bottom";
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
@@ -51,13 +53,38 @@ public class Click extends WindowsAction {
 		yOffsetStr = params.get(Y_OFFSET);
 
 		Actions actions = new Actions(driverWrapper.getDriver());
+		
+		String fromBorder = params.get(ATTACHED_BORDER);
+		if (fromBorder != null && !fromBorder.isEmpty()) {
+			Dimension rect = element.getSize();
+			switch (fromBorder) {
+				case RIGHT_TOP:
+					xOffset = rect.getWidth();
+					yOffset = 0;
+					break;
+				case RIGHT_BOTTOM:
+					xOffset = rect.getWidth();
+					yOffset = rect.getHeight();
+					break;
+				case LEFT_BOTTOM:
+					xOffset = 0;
+					yOffset = rect.getHeight();
+					break;
+				case LEFT_TOP:
+					xOffset = 0;
+					yOffset = 0;
+					break;
+				default:
+					throw new ScriptExecuteException("Unrecognized option: attachedBorder: " + fromBorder);
+			}
+		}
 
 		if ((xOffsetStr != null && !xOffsetStr.isEmpty()) && (yOffsetStr != null && !yOffsetStr.isEmpty()))
 		{
 			try
 			{
-				xOffset = Integer.parseInt(xOffsetStr);
-				yOffset = Integer.parseInt(yOffsetStr);
+				xOffset += Integer.parseInt(xOffsetStr);
+				yOffset += Integer.parseInt(yOffsetStr);
 			}
 			catch (Exception e)
 			{
