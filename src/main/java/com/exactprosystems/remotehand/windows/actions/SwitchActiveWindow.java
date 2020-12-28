@@ -35,7 +35,8 @@ import static java.lang.String.format;
 
 public class SwitchActiveWindow extends WindowsAction {
 
-	private static final String WINDOW_NAME_PARAM = "windowname";
+	private static final String WINDOW_NAME_PARAM = "windowname",
+			ACCESSIBILITY_ID_PARAM = "accessibilityid";
 	private static final String HANDLE_ATTRIBUTE = "NativeWindowHandle";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
@@ -43,31 +44,40 @@ public class SwitchActiveWindow extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		String targetWindowName = params.get(WINDOW_NAME_PARAM);
+		String targetWindowMatcher = params.get(WINDOW_NAME_PARAM);
+		boolean byName;
+		if (targetWindowMatcher == null)
+		{
+			targetWindowMatcher = params.get(ACCESSIBILITY_ID_PARAM);
+			byName = false;
+		}
+		else
+			byName = true;
+		
 		WindowsDriver<?> driver = driverWrapper.getDriver();
-		if (targetWindowName.equals(driver.getTitle())) {
+		if (byName && targetWindowMatcher.equals(driver.getTitle())) {
 			this.logger.debug("Current window has same title that expected");
 			return null;
 		}
 
 		WindowsDriver<?> root = driverWrapper.getOrCreateRootDriver();
-		Set<String> allWindowHandles = findWindowsByName(root, targetWindowName);
+		Set<String> allWindowHandles = findWindows(root, targetWindowMatcher, byName);
 
 		WindowsManager windowsManager = windowsSessionContext.getWindowsManager();
-		String windowHandle = windowsManager.findWindowForSession(targetWindowName, 
+		String windowHandle = windowsManager.findWindowForSession(targetWindowMatcher, 
 				windowsSessionContext.getSessionId(), allWindowHandles);
 		driverWrapper.changeDriverForNewMainWindow(windowHandle);
 		
 		return null;
 	}
 	
-	private Set<String> findWindowsByName(WindowsDriver<?> root, String name) throws ScriptExecuteException
+	private Set<String> findWindows(WindowsDriver<?> root, String matcher, boolean byName) throws ScriptExecuteException
 	{
-		List<?> windows = root.findElementsByName(name);
+		List<?> windows = byName ? root.findElementsByName(matcher) : root.findElementsByAccessibilityId(matcher);
 		if ((windows == null) || windows.isEmpty())
-			throw new ScriptExecuteException(format("There are no windows '%s' visible from Root session.", name));
+			throw new ScriptExecuteException(format("There are no windows '%s' visible from Root session.", matcher));
 		
-		logger.debug("Listing windows '{}':", name);
+		logger.debug("Listing windows '{}':", matcher);
 		Set<String> handles = new HashSet<>();
 		for (Object w : windows)
 		{
