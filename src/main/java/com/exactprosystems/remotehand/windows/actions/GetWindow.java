@@ -31,20 +31,29 @@ import java.util.Map;
 
 public class GetWindow extends WindowsAction {
 
-	private static final String WINDOW_NAME_PARAM = "windowname";
+	private static final String WINDOW_NAME_PARAM = "windowname",
+			ACCESSIBILITY_ID_PARAM = "accessibilityid";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		String targetWindowName = params.get(WINDOW_NAME_PARAM);
+		String targetWindowMatcher = params.get(WINDOW_NAME_PARAM);
+		boolean byName;
+		if (targetWindowMatcher == null)
+		{
+			targetWindowMatcher = params.get(ACCESSIBILITY_ID_PARAM);
+			byName = false;
+		}
+		else
+			byName = true;
 
 		WindowsDriver<?> driver1 = driverWrapper.getOrCreateRootDriver();
-		List<? extends WebElement> elements = driver1.findElementsByName(targetWindowName);
+		List<? extends WebElement> elements = byName ? driver1.findElementsByName(targetWindowMatcher) : driver1.findElementsByAccessibilityId(targetWindowMatcher);
 		if (elements.size() == 1) {
 			String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
-			logger.debug("Handle str for window : {} {}", targetWindowName, handleString);
+			logger.debug("Handle str for window : {} {}", targetWindowMatcher, handleString);
 			int handleInt = Integer.parseInt(handleString);
 			String handleHex = Integer.toHexString(handleInt);
 
@@ -79,7 +88,7 @@ public class GetWindow extends WindowsAction {
 			}
 			return null;
 		} else {
-			String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowName);
+			String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowMatcher);
 			logger.error(errorText);
 			throw new ScriptExecuteException(errorText);
 		}
