@@ -72,7 +72,7 @@ task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     from ("${projectDir}") {
         include "config.ini"
         include "log4j.properties"
-        include "Readme.txt"
+        include "README.md"
     }
     into ("lib/") {
         from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
