@@ -207,7 +207,8 @@ public class SendKeysHandler {
 		return Keys.chord(getKeysArrayByLabel(label));
 	}
 
-	public static CharSequence[] getKeysArrayByLabel(String label) {
+	public CharSequence[] getKeysArrayByLabel(String label)
+	{
 		String[] src = label.split("\\+");
 		CharSequence[] res = new CharSequence[src.length];
 		for (int i = 0; i < src.length; i++)

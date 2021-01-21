@@ -102,7 +102,7 @@ public class SendText extends WindowsAction {
 			if (handler.needSpecialSend(inputCommand)) {
 				String command = inputCommand.substring(1);
 				if (inputCommand.contains("+")) {
-					CharSequence[] commands = SendKeysHandler.getKeysArrayByLabel(command);
+					CharSequence[] commands = handler.getKeysArrayByLabel(command);
 					element.sendKeys(Keys.chord(commands));
 				} else {
 					CharSequence specialCommand = SendKeysHandler.KEYS.get(inputCommand.substring(1));
