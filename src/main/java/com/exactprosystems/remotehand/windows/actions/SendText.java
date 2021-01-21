@@ -100,11 +100,15 @@ public class SendText extends WindowsAction {
 	private void sendDirectCommand(WebElement element, List<String> inputCommands) {
 		for (String inputCommand : inputCommands) {
 			if (handler.needSpecialSend(inputCommand)) {
-				if (inputCommand.contains("+"))
-					throw new NotImplementedException("Combined keys are not supported");
-				CharSequence specialCommand = SendKeysHandler.KEYS.get(inputCommand.substring(1));
-				if (StringUtils.isNotEmpty(specialCommand))
-					element.sendKeys(specialCommand);
+				String command = inputCommand.substring(1);
+				if (inputCommand.contains("+")) {
+					CharSequence[] commands = handler.getKeysArrayByLabel(command);
+					element.sendKeys(Keys.chord(commands));
+				} else {
+					CharSequence specialCommand = SendKeysHandler.KEYS.get(inputCommand.substring(1));
+					if (StringUtils.isNotEmpty(specialCommand))
+						element.sendKeys(specialCommand);
+				}
 			} else {
 				element.sendKeys(inputCommand);
 			}
