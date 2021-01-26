@@ -138,15 +138,31 @@ public class ElementSearcher {
 				() -> driver.manage().timeouts().implicitlyWait(implicitlyWaitTimeout, TimeUnit.SECONDS));
 	}
 
+	public WebElement searchElementWithWait() throws ScriptExecuteException {
+		return searchElementWithWait(WindowsConfiguration.getInstance().getImplicitlyWaitTimeout());
+	}
+
+	public WebElement searchElementWithWait(Pair<String,  Pair<String, String>> keys) throws ScriptExecuteException {
+		return searchElementWithWait(keys, WindowsConfiguration.getInstance().getImplicitlyWaitTimeout());
+	}
+
 	public WebElement searchElementWithWait(int implicitTimeout) throws ScriptExecuteException {
 		return searchElementWithWait(DEFAULT_KEYS, implicitTimeout);
 	}
 
 	public WebElement searchElementWithWait(Pair<String,  Pair<String, String>> keys, int implicitTimeout) throws ScriptExecuteException {
 		Integer implicitlyWaitTimeout = WindowsConfiguration.getInstance().getImplicitlyWaitTimeout();
-		return searchElement(keys,
-				() -> driver.manage().timeouts().implicitlyWait(implicitTimeout, TimeUnit.SECONDS),
-				() -> driver.manage().timeouts().implicitlyWait(implicitlyWaitTimeout, TimeUnit.SECONDS));
+
+		Runnable beforeSearch, afterSearch;
+		if (implicitlyWaitTimeout.equals(implicitTimeout)) {
+			beforeSearch = null;
+			afterSearch = null;
+		} else {
+			beforeSearch = () -> driver.manage().timeouts().implicitlyWait(implicitTimeout, TimeUnit.SECONDS);
+			afterSearch = () -> driver.manage().timeouts().implicitlyWait(implicitlyWaitTimeout, TimeUnit.SECONDS);
+		}
+
+		return searchElement(keys, beforeSearch, afterSearch);
 	}
 
 	public WebElement searchElement(Pair<String, Pair<String, String>> keys, Runnable beforeSearch, Runnable afterSearch) throws ScriptExecuteException {
