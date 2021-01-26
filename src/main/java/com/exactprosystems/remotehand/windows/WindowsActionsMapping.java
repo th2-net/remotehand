@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ public class WindowsActionsMapping {
 		WaitForAttribute,
 		ScrollUsingText,
 		GetDataFromClipboard,
-		TableClick;
+		TableClick,
+		WaitForElement;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -66,6 +67,7 @@ public class WindowsActionsMapping {
 			case ScrollUsingText:		return new ScrollByText();
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
 			case TableClick:			return new TableClick();
+			case WaitForElement:		return new WaitForElement();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
