@@ -150,14 +150,16 @@ public class ElementSearcher {
 	}
 
 	public WebElement searchElement(Pair<String, Pair<String, String>> keys, Runnable beforeSearch, Runnable afterSearch) throws ScriptExecuteException {
-		beforeSearch.run();
+		if (beforeSearch != null)
+			beforeSearch.run();
 		try {
 			return searchElement(keys);
 		} catch (NoSuchElementException e) {
 			logger.trace("Element not found");
 			return null;
 		} finally {
-			afterSearch.run();
+			if (afterSearch != null)
+				afterSearch.run();
 		}
 	}
 
