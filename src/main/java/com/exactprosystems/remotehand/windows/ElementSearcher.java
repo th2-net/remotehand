@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,21 +127,40 @@ public class ElementSearcher {
 		return we;
 	}
 
-	public WebElement searchElementWithoutWait(int implicitTimeout) throws ScriptExecuteException {
-		return searchElementWithoutWait(DEFAULT_KEYS, implicitTimeout);
+	public WebElement searchElementWithoutWait() throws ScriptExecuteException {
+		return searchElementWithoutWait(DEFAULT_KEYS);
 	}
 
-	public WebElement searchElementWithoutWait(Pair<String,  Pair<String, String>> keys, int implicitTimeout) throws ScriptExecuteException {
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+	public WebElement searchElementWithoutWait(Pair<String, Pair<String, String>> keys) throws ScriptExecuteException {
+		Integer implicitlyWaitTimeout = WindowsConfiguration.getInstance().getImplicitlyWaitTimeout();
+		return searchElement(keys,
+				() -> driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS),
+				() -> driver.manage().timeouts().implicitlyWait(implicitlyWaitTimeout, TimeUnit.SECONDS));
+	}
+
+	public WebElement searchElementWithWait(int implicitTimeout) throws ScriptExecuteException {
+		return searchElementWithWait(DEFAULT_KEYS, implicitTimeout);
+	}
+
+	public WebElement searchElementWithWait(Pair<String,  Pair<String, String>> keys, int implicitTimeout) throws ScriptExecuteException {
+		Integer implicitlyWaitTimeout = WindowsConfiguration.getInstance().getImplicitlyWaitTimeout();
+		return searchElement(keys,
+				() -> driver.manage().timeouts().implicitlyWait(implicitTimeout, TimeUnit.SECONDS),
+				() -> driver.manage().timeouts().implicitlyWait(implicitlyWaitTimeout, TimeUnit.SECONDS));
+	}
+
+	public WebElement searchElement(Pair<String, Pair<String, String>> keys, Runnable beforeSearch, Runnable afterSearch) throws ScriptExecuteException {
+		beforeSearch.run();
 		try {
 			return searchElement(keys);
 		} catch (NoSuchElementException e) {
 			logger.trace("Element not found");
 			return null;
 		} finally {
-			driver.manage().timeouts().implicitlyWait(implicitTimeout, TimeUnit.SECONDS);	
+			afterSearch.run();
 		}
 	}
+
 
 	private <T extends SearchContext> WebElement findWebElement(T element, By by, Integer matcherIndex) {
 		return matcherIndex == null ? element.findElement(by) : element.findElements(by).get(matcherIndex);

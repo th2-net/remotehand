@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class CheckElement extends WindowsAction {
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
 		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
-		WebElement element = es.searchElementWithoutWait(driverWrapper.getImplicitlyWaitTimeout());
+		WebElement element = es.searchElementWithoutWait();
 
 		String attributeName = params.get("attributename");
 		if (attributeName != null && element != null) {
