@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@ package com.exactprosystems.remotehand.windows;
 import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.utils.ExceptionUtils;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
+import io.appium.java_client.windows.WindowsDriver;
 import org.mvel2.MVEL;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Map;
 
 public abstract class WindowsAction extends Action {
-
+	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
 	private Map<String, String> params = null;
@@ -95,8 +97,13 @@ public abstract class WindowsAction extends Action {
 					windowsSessionContext.getMvelVars().put(id, result);
 					logger.trace("Action result saved to id: {}", id);
 				}
-			} catch (NoSuchElementException e) {
-				throw new ScriptExecuteException(String.format("Action '%s' cannot be executed", getActionName()), e);
+			} catch (WebDriverException e) {
+				WindowsDriver<?> driver = windowsSessionContext.getCurrentDriver().getDriver();
+				String baseMessage = tryExtractErrorMessage(e);
+				String errMsg = baseMessage + ExceptionUtils.EOL + driver.getCapabilities() + ExceptionUtils.EOL +
+						"Driver " + WebDriverException.SESSION_ID + ": " + driver.getSessionId();
+
+				throw new WindowsScriptExecuteException(errMsg, e);
 			}
 		} else {
 			this.logger.info("Action was not executed due condition. And will be skipped");
@@ -118,6 +125,16 @@ public abstract class WindowsAction extends Action {
 			return str;
 		}
 	}
-	
-	
+
+	private static String tryExtractErrorMessage(WebDriverException e) {
+		String[] splitExceptionMessages = e.getMessage().split("\n");
+		if (splitExceptionMessages.length == 0)
+			throw e;
+
+		String baseExceptionMessage = splitExceptionMessages[0];
+		int endMessage = baseExceptionMessage.indexOf(END_EXCEPTION_MESSAGE);
+		return endMessage == -1
+				? baseExceptionMessage
+				: baseExceptionMessage.substring(0, endMessage);
+	}
 }

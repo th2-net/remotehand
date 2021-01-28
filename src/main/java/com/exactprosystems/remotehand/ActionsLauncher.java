@@ -22,6 +22,7 @@ import com.exactprosystems.remotehand.sessions.SessionContext;
 import com.exactprosystems.remotehand.utils.ExceptionUtils;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 
+import com.exactprosystems.remotehand.windows.WindowsScriptExecuteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +64,14 @@ public class ActionsLauncher
 				if (parent != null && parent.isClosing())
 					return null;
 			}
-			catch (Exception e)
-			{
-				RhUtils.logError(logger, sessionId, "Error while executing actions", e);
+			catch (Exception e) {
+				Exception printableException = e;
+				if (e instanceof WindowsScriptExecuteException) {
+					WindowsScriptExecuteException windowsScriptExecuteException = (WindowsScriptExecuteException) e;
+					printableException = windowsScriptExecuteException.hasDriverException()
+							? windowsScriptExecuteException.getDriverException() : e;
+				}
+				RhUtils.logError(logger, sessionId, "Error while executing actions", printableException);
 				return ErrorRespondent.getRespondent().error(e, buildErrorMessage(action, e));
 			}
 		}
@@ -89,8 +95,7 @@ public class ActionsLauncher
 	
 	protected void beforeActions(SessionContext context) throws ScriptExecuteException, RhConfigurationException { }
 
-
-	private String buildErrorMessage(Action action, Throwable e) {
+	protected String buildErrorMessage(Action action, Throwable e) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("An error occurred while executing action '").append(action.getActionName()).append("'");
 		if (action instanceof WindowsAction)
