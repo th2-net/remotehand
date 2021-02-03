@@ -19,10 +19,10 @@ package com.exactprosystems.remotehand.windows.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.utils.SendKeysHandler;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
+import com.exactprosystems.remotehand.windows.SearchParams;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -49,8 +49,8 @@ public class ScrollByText extends WindowsAction {
 			return null;
 		}
 		
-		WebElement textControl = searcher.searchElement(new ImmutablePair<>("textlocator",
-				new ImmutablePair<>("textmatcher", "textmatcherindex")));
+		WebElement textControl = searcher.searchElement(new SearchParams.HeaderKeys("textlocator",
+				"textmatcher", "textmatcherindex"));
 		String textControlId = (textControl instanceof RemoteWebElement ? ((RemoteWebElement) textControl).getId() : "");
 		String text = params.get("texttosend");
 		String maxItStr = params.get("maxiterations");

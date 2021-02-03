@@ -21,8 +21,6 @@ import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebEle
 import com.exactprosystems.remotehand.windows.locator.ByAccessibilityId;
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -44,8 +42,8 @@ public class ElementSearcher {
 	private final WindowsDriver<?> driver;
 	private final CachedWebElements webElements;
 	
-	private static final Pair<String,  Pair<String, String>> DEFAULT_KEYS
-			= new ImmutablePair<>("locator", new ImmutablePair<>("matcher", "matcherindex"));
+	private static final SearchParams.HeaderKeys DEFAULT_KEYS = new SearchParams.HeaderKeys("locator",
+			"matcher", "matcherindex");
 
 	public ElementSearcher(Map<String, String> record, WindowsDriver<?> driver, CachedWebElements webElements) {
 		this.record = record;
@@ -53,22 +51,20 @@ public class ElementSearcher {
 		this.webElements = webElements;
 	}
 
-	private List<Pair<String, Pair<String, Integer>>> processFrom(Pair<String,  Pair<String, String>> keys) {
+	private List<SearchParams> processFrom(SearchParams.HeaderKeys keys) {
 		
 		int ind = 1;
 		String locator, matcher;
-		Integer matcherIndex;
-		List<Pair<String, Pair<String, Integer>>> l = new ArrayList<>();
+		List<SearchParams> l = new ArrayList<>();
 		do {
 			String indexSuffix = ind == 1 ? "" : String.valueOf(ind);
-			locator = record.get(keys.getKey() + indexSuffix);
-			Pair<String, String> matcherPair = keys.getValue();
-			matcher = record.get(matcherPair.getKey() + indexSuffix);
-			String matcherIndexStr = record.get(matcherPair.getValue() + indexSuffix);
-			matcherIndex = StringUtils.isEmpty(matcherIndexStr) ? null : Integer.parseInt(matcherIndexStr);
+			locator = record.get(keys.locator + indexSuffix);
+			matcher = record.get(keys.matcher + indexSuffix);
+			String matcherIndexStr = record.get(keys.index + indexSuffix);
+			Integer matcherIndex = StringUtils.isEmpty(matcherIndexStr) ? null : Integer.parseInt(matcherIndexStr);
 			ind++;
 			if (StringUtils.isNotEmpty(locator) && StringUtils.isNotEmpty(matcher)) {
-				l.add(new ImmutablePair<>(locator, new ImmutablePair<>(matcher, matcherIndex)));
+				l.add(new SearchParams(locator, matcher, matcherIndex));
 			}
 			
 		} while (locator != null && matcher != null);
@@ -88,8 +84,8 @@ public class ElementSearcher {
 		throw new IllegalArgumentException("unknown using methods");
 	}
 	
-	public boolean isLocatorsAvailable(Pair<String,  Pair<String, String>> keys) {
-		return this.record.get(keys.getKey()) != null && this.record.get(keys.getValue().getKey()) != null;
+	public boolean isLocatorsAvailable(SearchParams.HeaderKeys keys) {
+		return this.record.get(keys.locator) != null && this.record.get(keys.matcher) != null;
 	}
 
 	public boolean isLocatorsAvailable() {
@@ -100,27 +96,25 @@ public class ElementSearcher {
 		return searchElement(DEFAULT_KEYS);
 	}
 	
-	public WebElement searchElement(Pair<String,  Pair<String, String>> keys) throws ScriptExecuteException {
-		List<Pair<String, Pair<String, Integer>>> pairs = this.processFrom(keys);
+	public WebElement searchElement(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
+		List<SearchParams> pairs = this.processFrom(keys);
 
 		WebElement we = null;
-		for (Pair<String, Pair<String, Integer>> pair : pairs) {
-
-			Pair<String, Integer> matcher = pair.getValue();
-			if ("cachedId".equals(pair.getKey())) {
-				logger.trace("Get element from cache by {} = {}", pair.getKey(), matcher.getKey());
-				we = webElements.getWebElement(matcher.getKey());
+		for (SearchParams pair : pairs) {
+			if ("cachedId".equals(pair.locator)) {
+				logger.trace("Get element from cache by {} = {}", pair.locator, pair.matcher);
+				we = webElements.getWebElement(pair.matcher);
 				if (we == null) {
-					throw new ScriptExecuteException("Saved elements with rh-id " + matcher.getKey() + " is not found");
+					throw new ScriptExecuteException("Saved elements with rh-id " + pair.matcher + " is not found");
 				}
 				if (logger.isDebugEnabled()) {
-					logger.debug("Found rh-id {} win_id {}", matcher.getKey(),
+					logger.debug("Found rh-id {} win_id {}", pair.matcher,
 							we instanceof RemoteWebElement ? ((RemoteWebElement) we).getId() : "");
 				}
 			} else {
-				By by = parseBy(pair.getKey(), matcher.getKey());
-				logger.trace("Searching by {} = {}", pair.getKey(), matcher.getKey());
-				we = findWebElement(we == null ? driver : we, by, matcher.getValue());
+				By by = parseBy(pair.locator, pair.matcher);
+				logger.trace("Searching by {} = {}", pair.locator, pair.matcher);
+				we = findWebElement(we == null ? driver : we, by, pair.parsedIndex);
 			}
 		}
 		
@@ -131,7 +125,7 @@ public class ElementSearcher {
 		return searchElementWithoutWait(DEFAULT_KEYS);
 	}
 
-	public WebElement searchElementWithoutWait(Pair<String, Pair<String, String>> keys) throws ScriptExecuteException {
+	public WebElement searchElementWithoutWait(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
 		Integer implicitlyWaitTimeout = WindowsConfiguration.getInstance().getImplicitlyWaitTimeout();
 		return searchElement(keys,
 				() -> driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS),
@@ -142,7 +136,7 @@ public class ElementSearcher {
 		return searchElementWithWait(WindowsConfiguration.getInstance().getImplicitlyWaitTimeout());
 	}
 
-	public WebElement searchElementWithWait(Pair<String,  Pair<String, String>> keys) throws ScriptExecuteException {
+	public WebElement searchElementWithWait(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
 		return searchElementWithWait(keys, WindowsConfiguration.getInstance().getImplicitlyWaitTimeout());
 	}
 
@@ -150,7 +144,7 @@ public class ElementSearcher {
 		return searchElementWithWait(DEFAULT_KEYS, implicitTimeout);
 	}
 
-	public WebElement searchElementWithWait(Pair<String,  Pair<String, String>> keys, int implicitTimeout) throws ScriptExecuteException {
+	public WebElement searchElementWithWait(SearchParams.HeaderKeys keys, int implicitTimeout) throws ScriptExecuteException {
 		Integer implicitlyWaitTimeout = WindowsConfiguration.getInstance().getImplicitlyWaitTimeout();
 
 		Runnable beforeSearch, afterSearch;
@@ -165,7 +159,7 @@ public class ElementSearcher {
 		return searchElement(keys, beforeSearch, afterSearch);
 	}
 
-	public WebElement searchElement(Pair<String, Pair<String, String>> keys, Runnable beforeSearch, Runnable afterSearch) throws ScriptExecuteException {
+	public WebElement searchElement(SearchParams.HeaderKeys keys, Runnable beforeSearch, Runnable afterSearch) throws ScriptExecuteException {
 		if (beforeSearch != null)
 			beforeSearch.run();
 		try {
