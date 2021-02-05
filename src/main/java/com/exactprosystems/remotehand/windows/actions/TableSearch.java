@@ -16,6 +16,7 @@
 
 package com.exactprosystems.remotehand.windows.actions;
 
+import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
@@ -108,7 +109,7 @@ public class TableSearch extends WindowsAction
 		rowElementValueFormat = params.getOrDefault(ROW_ELEMENT_VALUE_FORMAT, DEFAULT_ELEMENT_VALUE_FORMAT);
 		targetColumnName = params.get(TARGET_COLUMN);
 		String filters = params.get(FILTER);
-		filtersMap = getFilters(filters);
+		filtersMap = RhUtils.buildFilters(filters);
 	}
 
 	protected WebElement findRow(WebElement table, int index) throws ScriptExecuteException {
@@ -134,22 +135,6 @@ public class TableSearch extends WindowsAction
 	private void setTimeOut(WindowsDriverWrapper driverWrapper, int seconds) throws ScriptExecuteException {
 		driverWrapper.getDriver().manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
 	}
-
-	private static Map<String, String> getFilters(String filters) {
-		Map<String, String> result = new HashMap<>();
-
-		String[] splitFilters = filters.split(";");
-		for (String splitFilter : splitFilters) {
-			String[] kvPair = splitFilter.split("=");
-			if (kvPair.length != 2)
-				continue;
-
-			result.put(kvPair[0], kvPair[1]);
-		}
-
-		return result;
-	}
-
 
 	@Override
 	protected Logger getLoggerInstance()

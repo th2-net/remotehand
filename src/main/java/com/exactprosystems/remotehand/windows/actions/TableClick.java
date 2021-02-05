@@ -16,6 +16,7 @@
 
 package com.exactprosystems.remotehand.windows.actions;
 
+import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
@@ -56,7 +57,7 @@ public class TableClick extends WindowsAction {
 			ElementSearcher elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
 			WebElement table = elementSearcher.searchElement();
 			String filters = params.get(FILTER);
-			Map<String, String> filtersMap = getFilters(filters);
+			Map<String, String> filtersMap = RhUtils.buildFilters(filters);
 			setTimeOut(driverWrapper, 0);
 
 			int i = 1;
@@ -129,21 +130,5 @@ public class TableClick extends WindowsAction {
 
 	private void setTimeOut(WindowsDriverWrapper driverWrapper, int seconds) throws ScriptExecuteException {
 		driverWrapper.getDriver().manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
-	}
-
-
-	private static Map<String, String> getFilters(String filters) {
-		Map<String, String> result = new HashMap<>();
-
-		String[] splitFilters = filters.split(";");
-		for (String splitFilter : splitFilters) {
-			String[] kvPair = splitFilter.split("=");
-			if (kvPair.length != 2)
-				continue;
-
-			result.put(kvPair[0], kvPair[1]);
-		}
-
-		return result;
 	}
 }
