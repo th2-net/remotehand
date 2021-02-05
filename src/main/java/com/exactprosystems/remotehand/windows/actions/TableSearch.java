@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,9 @@ import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,46 +34,57 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
 
-/**
- * @deprecated Use {@link TableSearch} and {@link Click} instead.
- */
-@Deprecated
-public class TableClick extends WindowsAction {
-	private static final Logger logInstance = LoggerFactory.getLogger(TableClick.class);
+public class TableSearch extends WindowsAction
+{
+	private static final Logger loggerInstance = LoggerFactory.getLogger(TableSearch.class);
 	private static final String FILTER = "filter";
 	private static final String TARGET_COLUMN = "column";
 	private static final String INDEX = "index";
-	private static final String ROW_FORMAT = "Row %s";
-	private static final String ROW_ELEMENT_FORMAT = "%s row %s";
-	private static final String COLUMN_VALUE = "Value.Value";
-	
+	private static final String FIRST_ROW_INDEX = "firstrowindex";
+	private static final String DEFAULT_FIRST_ROW_NUMBER = "0";
+	private static final String ROW_NAME_FORMAT = "rowNameFormat";
+	private static final String DEFAULT_ROW_NAME_FORMAT = "Row %s";
+	private static final String ROW_ELEMENT_NAME_FORMAT = "rowelementnameformat";
+	private static final String DEFAULT_ROW_ELEMENT_NAME_FORMAT = "%s row %s";
+	private static final String ROW_ELEMENT_VALUE_FORMAT = "rowelementvalueformat";
+	private static final String DEFAULT_ELEMENT_VALUE_FORMAT = "Value.Value";
+
+	private String rowNameFormat;
+	private String rowElementNameFormat;
+	private String rowElementValueFormat;
+	private String targetColumnName;
+	private int columnIndex;
+	private int firstRowIndex;
+	private Map<String, String> filtersMap;
+
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
-					  WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
+			WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException
+	{
 		try {
+			handleInputParams(params);
 			ElementSearcher elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
 			WebElement table = elementSearcher.searchElement();
-			String filters = params.get(FILTER);
-			Map<String, String> filtersMap = getFilters(filters);
 			setTimeOut(driverWrapper, 0);
 
-			int i = 1;
 			WebElement row;
 			boolean rowFound = false;
+			int i = firstRowIndex;
 			while (!rowFound) {
-				row = this.findRow(table, i);
-				
+				row = findRow(table, i);
+
 				for (Map.Entry<String, String> kvFilter : filtersMap.entrySet()) {
-					WebElement rowElement = row.findElement(By.name(format(ROW_ELEMENT_FORMAT, kvFilter.getKey(), i - 1)));
-					String attribute = rowElement.getAttribute(COLUMN_VALUE);
+					String rowName = format(rowElementNameFormat, kvFilter.getKey(), i);
+					WebElement rowElement = row.findElement(By.name(rowName));
+					String attribute = rowElement.getAttribute(rowElementValueFormat);
 					rowFound = attribute.equals(kvFilter.getValue());
 					if (!rowFound)
 						break;
 				}
 
 				if (rowFound) {
-					WebElement targetColumn = getTargetColumn(row, params, i);
-					clickToColumn(driverWrapper.getDriver(), targetColumn);
+					WebElement targetColumn = getTargetColumn(row, i);
+					cachedElements.storeWebElement(getId(), targetColumn);
 				}
 
 				i++;
@@ -87,24 +96,31 @@ public class TableClick extends WindowsAction {
 		return null;
 	}
 	
+	private void handleInputParams(Map<String, String> params) throws ScriptExecuteException
+	{
+		if (getId() == null) {
+			throw new ScriptExecuteException("Id is not specified");
+		}
+		firstRowIndex = Integer.parseInt(params.getOrDefault(FIRST_ROW_INDEX, DEFAULT_FIRST_ROW_NUMBER));
+		columnIndex = Integer.parseInt(params.getOrDefault(INDEX, "0"));
+		rowNameFormat = params.getOrDefault(ROW_NAME_FORMAT, DEFAULT_ROW_NAME_FORMAT);
+		rowElementNameFormat = params.getOrDefault(ROW_ELEMENT_NAME_FORMAT, DEFAULT_ROW_ELEMENT_NAME_FORMAT);
+		rowElementValueFormat = params.getOrDefault(ROW_ELEMENT_VALUE_FORMAT, DEFAULT_ELEMENT_VALUE_FORMAT);
+		targetColumnName = params.get(TARGET_COLUMN);
+		String filters = params.get(FILTER);
+		filtersMap = getFilters(filters);
+	}
+
 	protected WebElement findRow(WebElement table, int index) throws ScriptExecuteException {
 		try {
-			return table.findElement(By.name(format(ROW_FORMAT, index)));
+			return table.findElement(By.name(format(rowNameFormat, index)));
 		} catch (NoSuchElementException e) {
-			logger.error("Row with num " + index + " is not found", e);
-			throw new ScriptExecuteException("Row with index " + index + " is not found");
+			throw new ScriptExecuteException("Row with index " + index + " is not found", e);
 		}
 	}
 
-	@Override
-	protected Logger getLoggerInstance() {
-		return logInstance;
-	}
-
-
-	private WebElement getTargetColumn(WebElement row, Map<String, String> params, int rowIndex) throws ScriptExecuteException {
-		int columnIndex = getColumnIndex(params);
-		By columnLocator = By.name(format(ROW_ELEMENT_FORMAT, params.get(TARGET_COLUMN), rowIndex - 1));
+	private WebElement getTargetColumn(WebElement row, int rowIndex) throws ScriptExecuteException {
+		By columnLocator = By.name(format(rowElementNameFormat, targetColumnName, rowIndex));
 		if (columnIndex > 0) {
 			List<WebElement> elements = row.findElements(columnLocator);
 			if (columnIndex > elements.size())
@@ -115,22 +131,9 @@ public class TableClick extends WindowsAction {
 		}
 	}
 
-	private void clickToColumn(WindowsDriver<?> driver, WebElement targetColumn) {
-		Actions actions = new Actions(driver);
-		actions.moveToElement(targetColumn);
-		actions.click();
-		actions.perform();
-	}
-
-	private int getColumnIndex(Map<String, String> params) {
-		String index = params.get(INDEX);
-		return index == null ? 0 : Integer.parseInt(index);
-	}
-
 	private void setTimeOut(WindowsDriverWrapper driverWrapper, int seconds) throws ScriptExecuteException {
 		driverWrapper.getDriver().manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
 	}
-
 
 	private static Map<String, String> getFilters(String filters) {
 		Map<String, String> result = new HashMap<>();
@@ -145,5 +148,12 @@ public class TableClick extends WindowsAction {
 		}
 
 		return result;
+	}
+
+
+	@Override
+	protected Logger getLoggerInstance()
+	{
+		return loggerInstance;
 	}
 }
