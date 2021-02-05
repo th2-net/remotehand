@@ -47,11 +47,11 @@ public class SwitchActiveWindow extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		// Action is best usage for login windows, where login window run under the same process that 
+		// Action is best usage for login windows, where login window runs under the same process that 
 		// main application. Action is able to catch required window even if there are many windows are opened
 		// satisfying chosen criteria.
 		// --------------------------------------------------------------------------------------
-		// If login window is closes, driver can throw NoSuchWindowException (Currently selected window has been closed)
+		// If login window is closed, driver can throw NoSuchWindowException (Currently selected window has been closed)
 		// so we catch it and continue searching
 		
 		
