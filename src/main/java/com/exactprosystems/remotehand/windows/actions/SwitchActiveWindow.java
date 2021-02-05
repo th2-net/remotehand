@@ -19,10 +19,10 @@ package com.exactprosystems.remotehand.windows.actions;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
-import com.exactprosystems.remotehand.windows.WindowsManager;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +47,14 @@ public class SwitchActiveWindow extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
+		// Action is best usage for login windows, where login window run under the same process that 
+		// main application. Action is able to catch required window even if there are many windows are opened
+		// satisfying chosen criteria.
+		// --------------------------------------------------------------------------------------
+		// If login window is closes, driver can throw NoSuchWindowException (Currently selected window has been closed)
+		// so we catch it and continue searching
+		
+		
 		String maxTimeoutStr = params.get(MAX_TIMEOUT_PARAM);
 		int maxTimeout = (StringUtils.isNotEmpty(maxTimeoutStr)) ? Integer.parseInt(maxTimeoutStr) : 0;
 		
@@ -68,14 +76,20 @@ public class SwitchActiveWindow extends WindowsAction {
 				this.logger.debug("Current window has same title that expected");
 				return null;
 			}
-
-			String currentHandle = driver.getWindowHandle();
+			
+			String currentHandle;
+			try {
+				currentHandle = driver.getWindowHandle();
+			} catch (NoSuchWindowException e) {
+				currentHandle = null;
+			}
 			Set<String> handles = new LinkedHashSet<>(driver.getWindowHandles());
 
 			this.logger.debug("Current handle: {}", currentHandle);
 			this.logger.debug("Handles: {}", handles);
 
-			handles.remove(currentHandle);
+			if (currentHandle != null)
+				handles.remove(currentHandle);
 
 			for (String handle : handles) {
 				driver.switchTo().window(handle);
@@ -94,11 +108,16 @@ public class SwitchActiveWindow extends WindowsAction {
 	}
 	
 	private boolean isCurrentWindowExpected(WindowsDriver<?> root, String matcher, boolean byName) {
-		if (byName) {
-			return matcher.equals(root.getTitle());
-		} else {
-			List<?> elementsByAccessibilityId = root.findElementsByAccessibilityId(matcher);
-			return elementsByAccessibilityId != null && !elementsByAccessibilityId.isEmpty();
+		try {
+			if (byName) {
+				return matcher.equals(root.getTitle());
+			} else {
+				List<?> elementsByAccessibilityId = root.findElementsByAccessibilityId(matcher);
+				return elementsByAccessibilityId != null && !elementsByAccessibilityId.isEmpty();
+			}
+		} catch (NoSuchWindowException e) {
+			logger.debug("Window was closed");
+			return false;
 		}
 	}
 	
