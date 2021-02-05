@@ -39,7 +39,7 @@ public class SwitchActiveWindow extends WindowsAction {
 
 	private static final String WINDOW_NAME_PARAM = "windowname",
 			ACCESSIBILITY_ID_PARAM = "accessibilityid",
-			MAX_TIMEOUT_PARAM = "maxTimeout";
+			MAX_TIMEOUT_PARAM = "maxtimeout";
 	private static final String HANDLE_ATTRIBUTE = "NativeWindowHandle";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
@@ -98,7 +98,7 @@ public class SwitchActiveWindow extends WindowsAction {
 			return matcher.equals(root.getTitle());
 		} else {
 			List<?> elementsByAccessibilityId = root.findElementsByAccessibilityId(matcher);
-			return !matcher.isEmpty();
+			return elementsByAccessibilityId != null && !elementsByAccessibilityId.isEmpty();
 		}
 	}
 	
