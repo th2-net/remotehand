@@ -71,37 +71,49 @@ public class SwitchActiveWindow extends WindowsAction {
 		WindowsDriver<?> driver = driverWrapper.getDriver();
 		
 		long startTime = System.currentTimeMillis();
-		do {
-			if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
-				this.logger.debug("Current window has same title that expected");
-				return null;
-			}
+		boolean firstIt = true;
+		try {
 			
-			String currentHandle;
-			try {
-				currentHandle = driver.getWindowHandle();
-			} catch (NoSuchWindowException e) {
-				currentHandle = null;
-			}
-			Set<String> handles = new LinkedHashSet<>(driver.getWindowHandles());
+			do {
+				if (!firstIt) {
+					Thread.sleep(1000);
+				}
 
-			this.logger.debug("Current handle: {}", currentHandle);
-			this.logger.debug("Handles: {}", handles);
-
-			if (currentHandle != null)
-				handles.remove(currentHandle);
-
-			for (String handle : handles) {
-				driver.switchTo().window(handle);
-				String title = driver.getTitle();
-				this.logger.debug("Window {} title {}", handle, title);
 				if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
-					this.logger.debug("Window found");
+					this.logger.debug("Current window has same title that expected");
 					return null;
 				}
-			}
+
+				String currentHandle;
+				try {
+					currentHandle = driver.getWindowHandle();
+				} catch (NoSuchWindowException e) {
+					currentHandle = null;
+				}
+				Set<String> handles = new LinkedHashSet<>(driver.getWindowHandles());
+
+				this.logger.debug("Current handle: {}", currentHandle);
+				this.logger.debug("Handles: {}", handles);
+
+				if (currentHandle != null)
+					handles.remove(currentHandle);
+
+				for (String handle : handles) {
+					driver.switchTo().window(handle);
+					String title = driver.getTitle();
+					this.logger.debug("Window {} title {}", handle, title);
+					if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
+						this.logger.debug("Window found");
+						return null;
+					}
+				}
+
+				firstIt = false;
+			} while (maxTimeout >= 0 && (startTime + maxTimeout) >= System.currentTimeMillis());
 			
-		} while (maxTimeout >= 0 && (startTime + maxTimeout) >= System.currentTimeMillis());
+		} catch (InterruptedException e) {
+			logger.warn("Interrupted");
+		}
 
 		throw new ScriptExecuteException("Cannot switch to specified window by " + 
 				(byName ? "name" : "accessibilityId") + " '" + targetWindowMatcher + "'");
