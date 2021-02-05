@@ -38,6 +38,7 @@ public class WindowsActionsMapping {
 		ScrollUsingText,
 		GetDataFromClipboard,
 		TableClick,
+		MaximizeMainWindow,
 		WaitForElement;
 	}
 
@@ -56,6 +57,7 @@ public class WindowsActionsMapping {
 			case Click :				return new Click();
 			case SendText :				return new SendText();
 			case GetActiveWindow :		return new SwitchActiveWindow();
+			case MaximizeMainWindow :	return new MaximizeMainWindow();
 			case GetElementAttribute:	return new GetElementAttribute();
 			case Wait:					return new Wait();
 			case CheckElement:			return new CheckElement();
