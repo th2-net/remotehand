@@ -79,9 +79,13 @@ public class SwitchActiveWindow extends WindowsAction {
 					Thread.sleep(1000);
 				}
 
-				if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
-					this.logger.debug("Current window has same title that expected");
-					return null;
+				try {
+					if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
+						this.logger.debug("Current window has same title that expected");
+						return null;
+					}
+				} catch (NoSuchWindowException e) {
+					logger.debug("Current window was closed");
 				}
 
 				String currentHandle;
@@ -99,12 +103,17 @@ public class SwitchActiveWindow extends WindowsAction {
 					handles.remove(currentHandle);
 
 				for (String handle : handles) {
-					driver.switchTo().window(handle);
-					String title = driver.getTitle();
-					this.logger.debug("Window {} title {}", handle, title);
-					if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
-						this.logger.debug("Window found");
-						return null;
+					String title = null;
+					try {
+						driver.switchTo().window(handle);
+						title = driver.getTitle();
+						this.logger.debug("Window {} title {}", handle, title);
+						if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
+							this.logger.debug("Window found");
+							return null;
+						}
+					} catch (NoSuchWindowException e) {
+						logger.debug("Window handle: {} title: {} was closed", handle, title);
 					}
 				}
 
@@ -120,41 +129,12 @@ public class SwitchActiveWindow extends WindowsAction {
 	}
 	
 	private boolean isCurrentWindowExpected(WindowsDriver<?> root, String matcher, boolean byName) {
-		try {
-			if (byName) {
-				return matcher.equals(root.getTitle());
-			} else {
-				List<?> elementsByAccessibilityId = root.findElementsByAccessibilityId(matcher);
-				return elementsByAccessibilityId != null && !elementsByAccessibilityId.isEmpty();
-			}
-		} catch (NoSuchWindowException e) {
-			logger.debug("Window was closed");
-			return false;
+		if (byName) {
+			return matcher.equals(root.getTitle());
+		} else {
+			List<?> elementsByAccessibilityId = root.findElementsByAccessibilityId(matcher);
+			return elementsByAccessibilityId != null && !elementsByAccessibilityId.isEmpty();
 		}
-	}
-	
-	private Set<String> findWindows(WindowsDriver<?> root, String matcher, boolean byName) throws ScriptExecuteException
-	{
-		List<?> windows = byName ? root.findElementsByName(matcher) : root.findElementsByAccessibilityId(matcher);
-		if ((windows == null) || windows.isEmpty())
-			throw new ScriptExecuteException(format("There are no windows '%s' visible from Root session.", matcher));
-		
-		logger.debug("Listing windows '{}':", matcher);
-		Set<String> handles = new HashSet<>();
-		for (Object w : windows)
-		{
-			WebElement window = (WebElement) w;
-			String handle = window.getAttribute(HANDLE_ATTRIBUTE);
-			String handleHex = nativeWindowHandleToHex(handle);
-			handles.add(handleHex);
-			logger.debug("{}={}, hex={}", HANDLE_ATTRIBUTE, handle, handleHex);
-		}
-		return handles;
-	}
-	
-	private String nativeWindowHandleToHex(String handle)
-	{
-		return "0x00" + Integer.toHexString(Integer.parseInt(handle)).toUpperCase();
 	}
 
 	@Override
@@ -162,8 +142,4 @@ public class SwitchActiveWindow extends WindowsAction {
 		return loggerInstance;
 	}
 
-	@Override
-	protected String[] mandatoryParams() {
-		return new String[] { WINDOW_NAME_PARAM };
-	}
 }
