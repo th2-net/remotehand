@@ -38,6 +38,7 @@ public class WindowsActionsMapping {
 		ScrollUsingText,
 		GetDataFromClipboard,
 		TableClick,
+		TableSearch,
 		WaitForElement;
 	}
 
@@ -67,6 +68,7 @@ public class WindowsActionsMapping {
 			case ScrollUsingText:		return new ScrollByText();
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
 			case TableClick:			return new TableClick();
+			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
