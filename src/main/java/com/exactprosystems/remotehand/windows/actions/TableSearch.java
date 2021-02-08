@@ -28,7 +28,6 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +42,7 @@ public class TableSearch extends WindowsAction
 	private static final String INDEX = "index";
 	private static final String FIRST_ROW_INDEX = "firstrowindex";
 	private static final String DEFAULT_FIRST_ROW_NUMBER = "0";
-	private static final String ROW_NAME_FORMAT = "rowNameFormat";
+	private static final String ROW_NAME_FORMAT = "rownameformat";
 	private static final String DEFAULT_ROW_NAME_FORMAT = "Row %s";
 	private static final String ROW_ELEMENT_NAME_FORMAT = "rowelementnameformat";
 	private static final String DEFAULT_ROW_ELEMENT_NAME_FORMAT = "%s row %s";
@@ -70,9 +69,9 @@ public class TableSearch extends WindowsAction
 
 			WebElement row;
 			boolean rowFound = false;
-			int i = firstRowIndex;
+			int i = 0;
 			while (!rowFound) {
-				row = findRow(table, i);
+				row = findRow(table, i + firstRowIndex);
 
 				for (Map.Entry<String, String> kvFilter : filtersMap.entrySet()) {
 					String rowName = format(rowElementNameFormat, kvFilter.getKey(), i);
