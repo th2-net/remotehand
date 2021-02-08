@@ -47,9 +47,9 @@ public class SwitchActiveWindow extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		// Action is best usage for login windows, where login window runs under the same process that 
-		// main application. Action is able to catch required window even if there are many windows are opened
-		// satisfying chosen criteria.
+		// Action is useful for login windows, where login window belongs to the same process as
+		// main application. Action is able to catch required window even if there are multiple windows opened
+		// that satisfy chosen criteria.
 		// --------------------------------------------------------------------------------------
 		// If login window is closed, driver can throw NoSuchWindowException (Currently selected window has been closed)
 		// so we catch it and continue searching
@@ -79,21 +79,19 @@ public class SwitchActiveWindow extends WindowsAction {
 					Thread.sleep(1000);
 				}
 
-				try {
-					if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
-						this.logger.debug("Current window has same title that expected");
-						return null;
-					}
-				} catch (NoSuchWindowException e) {
-					logger.debug("Current window was closed");
-				}
-
 				String currentHandle;
 				try {
+					if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {
+						this.logger.debug("Current window has the same title as expected one");
+						return null;
+					}
+
 					currentHandle = driver.getWindowHandle();
 				} catch (NoSuchWindowException e) {
+					logger.debug("Current window was closed");
 					currentHandle = null;
 				}
+				
 				Set<String> handles = new LinkedHashSet<>(driver.getWindowHandles());
 
 				this.logger.debug("Current handle: {}", currentHandle);
@@ -121,7 +119,7 @@ public class SwitchActiveWindow extends WindowsAction {
 			} while (maxTimeout >= 0 && (startTime + maxTimeout) >= System.currentTimeMillis());
 			
 		} catch (InterruptedException e) {
-			logger.warn("Interrupted");
+			logger.warn("Interrupted", e);
 		}
 
 		throw new ScriptExecuteException("Cannot switch to specified window by " + 
