@@ -23,7 +23,7 @@ import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +40,10 @@ public class ClickContextMenu extends WindowsAction {
 		
 		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement element = es.searchElement();
-		
-		element.click();
+
+		Actions actions = new Actions(driver);
+		actions.click(element);
+		actions.perform();
 		
 		return null;
 	}

@@ -21,6 +21,7 @@ import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,5 +70,20 @@ public class RhUtils
 		String msg = e.getMessage();
 		return ((e instanceof NoSuchWindowException) && contains(msg, "target window already closed"))
 				|| contains(msg, "not reachable");
+	}
+
+	public static Map<String, String> buildFilters(String filters) {
+		Map<String, String> result = new HashMap<>();
+
+		String[] splitFilters = filters.split(";");
+		for (String splitFilter : splitFilters) {
+			String[] kvPair = splitFilter.split("=");
+			if (kvPair.length != 2)
+				continue;
+
+			result.put(kvPair[0], kvPair[1]);
+		}
+
+		return result;
 	}
 }

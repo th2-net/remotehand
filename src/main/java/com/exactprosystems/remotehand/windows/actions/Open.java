@@ -20,6 +20,7 @@ import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.remote.MobileCapabilityType;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class Open extends WindowsAction {
 		
 		String workDir = params.get("workdir");
 		String execFile = params.get("execfile");
+		String appArgs = params.get("appargs");
 
 		Path workDirPath = Paths.get(workDir).normalize();
 		Path exeFilePath = workDirPath.resolve(execFile).normalize();
@@ -61,6 +63,9 @@ public class Open extends WindowsAction {
 		DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
 		capabilities.setCapability(MobileCapabilityType.APP, exeFilePath.toString().replace('/', '\\'));
 		capabilities.setCapability("appWorkingDir", workDirPath.toString().replace('/', '\\'));
+		if (StringUtils.isNotBlank(appArgs)) {
+			capabilities.setCapability("appArguments", appArgs);
+		}
 
 		capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
 		if (driverWrapper.getWaitForApp() != null) {
