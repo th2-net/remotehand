@@ -83,6 +83,8 @@ public class SendKeysHandler {
 		put("add", Keys.ADD);
 		put("pageup", Keys.PAGE_UP);
 		put("pagedown", Keys.PAGE_DOWN);
+		put("command", Keys.COMMAND);
+		put("windows", Keys.COMMAND);
 	}};
 
 	public List<String> processInputText(String text)
