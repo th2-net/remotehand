@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.exactprosystems.remotehand.web.WebJsUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -23,14 +24,55 @@ import org.springframework.util.StringUtils;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 
-import static com.exactprosystems.remotehand.web.WebJsUtils.executeJsCommands;
-
 public class ExecuteJS extends WebAction
 {
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteJS.class);
-	private static final String JS_COMMANDS = "commands";
-	private static final String NOTHING_TO_EXECUTE_MESSAGE = "Nothing to execute";
+	protected static final String JS_COMMANDS = "commands";
+	protected static final String NOTHING_TO_EXECUTE_MESSAGE = "Nothing to execute";
 	protected static final String DEFAULT_DELIMITER = ";";
+
+	@Override
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
+	{
+		executeJsCommands(webDriver, splitCommands(getJsScript(params)), getJsArguments(webDriver, webLocator, params));
+		return null;
+	}
+
+	protected List<String> splitCommands(String jsScript) throws ScriptExecuteException
+	{
+		String[] splitScripts = jsScript.split(DEFAULT_DELIMITER);
+
+		List<String> commands = new ArrayList<>();
+		for (String splitScript : splitScripts)
+		{
+			if (splitScript.isEmpty())
+				continue;
+			commands.add(splitScript + DEFAULT_DELIMITER);
+		}
+
+		if (commands.isEmpty())
+			throw new ScriptExecuteException(NOTHING_TO_EXECUTE_MESSAGE);
+		return commands;
+	}
+
+	protected String getJsScript(Map<String, String> params) throws ScriptExecuteException
+	{
+		String jsScript = params.get(JS_COMMANDS);
+		if (StringUtils.isEmpty(jsScript))
+			throw new ScriptExecuteException(NOTHING_TO_EXECUTE_MESSAGE);
+		return jsScript;
+	}
+
+	protected void executeJsCommands(WebDriver webDriver, List<String> commands, Object... args)
+			throws ScriptExecuteException
+	{
+		WebJsUtils.executeJsCommands(webDriver, commands, args);
+	}
+
+	protected Object[] getJsArguments(WebDriver webDriver, By webLocator, Map<String, String> params)
+	{
+		return null;
+	}
 
 
 	@Override
@@ -46,43 +88,8 @@ public class ExecuteJS extends WebAction
 	}
 
 	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
-		List<String> commands = getCommands(params);
-		if (commands.isEmpty())
-			throw new ScriptExecuteException(NOTHING_TO_EXECUTE_MESSAGE);
-
-		executeJsCommands(webDriver, commands);
-
-		return null;
-	}
-
-
-	@Override
 	protected Logger getLogger()
 	{
 		return logger;
-	}
-
-
-	private List<String> getCommands(Map<String, String> params) throws ScriptExecuteException
-	{
-		String jsScripts = params.get(JS_COMMANDS);
-
-		if (StringUtils.isEmpty(jsScripts))
-			throw new ScriptExecuteException(NOTHING_TO_EXECUTE_MESSAGE);
-
-		String[] splitScripts = jsScripts.split(DEFAULT_DELIMITER);
-
-		List<String> result = new ArrayList<>(splitScripts.length);
-		for (String splitScript : splitScripts)
-		{
-			if (splitScript.isEmpty())
-				continue;
-
-			result.add(splitScript + DEFAULT_DELIMITER);
-		}
-
-		return result;
 	}
 }

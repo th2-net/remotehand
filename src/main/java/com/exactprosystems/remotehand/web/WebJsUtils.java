@@ -23,7 +23,8 @@ public class WebJsUtils
 	private static final Logger logger = LoggerFactory.getLogger(WebJsUtils.class);
 
 
-	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands) throws ScriptExecuteException
+	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands, Object... args)
+			throws ScriptExecuteException
 	{
 		if (!(webDriver instanceof JavascriptExecutor))
 			throw new ScriptExecuteException("Web driver is not JavaScript executor: JS commands cannot be executed");
@@ -31,16 +32,17 @@ public class WebJsUtils
 		JavascriptExecutor jsExecutor = (JavascriptExecutor) webDriver;
 		for (String command : commands)
 		{
-			executeJsCommand(jsExecutor, command);
+			executeJsCommand(jsExecutor, command, args);
 		}
 	}
 
-	private static void executeJsCommand(JavascriptExecutor jsExecutor, String javaScript) throws ScriptExecuteException
+	private static void executeJsCommand(JavascriptExecutor jsExecutor, String javaScript, Object... args)
+			throws ScriptExecuteException
 	{
 		try
 		{
 			logger.info("Executing JS command: {}", javaScript);
-			Object res = jsExecutor.executeScript(javaScript);
+			Object res = jsExecutor.executeScript(javaScript, args);
 			if (res != null)
 				logger.info("Result of JS command: {} = {}", javaScript, res);
 		}
