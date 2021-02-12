@@ -41,13 +41,14 @@ public class TableSearch extends WindowsAction
 	private static final String TARGET_COLUMN = "column";
 	private static final String INDEX = "index";
 	private static final String FIRST_ROW_INDEX = "firstrowindex";
-	private static final String DEFAULT_FIRST_ROW_NUMBER = "0";
+	private static final String DEFAULT_FIRST_INDEX_NUMBER = "0";
 	private static final String ROW_NAME_FORMAT = "rownameformat";
 	private static final String DEFAULT_ROW_NAME_FORMAT = "Row %s";
 	private static final String ROW_ELEMENT_NAME_FORMAT = "rowelementnameformat";
 	private static final String DEFAULT_ROW_ELEMENT_NAME_FORMAT = "%s row %s";
 	private static final String ROW_ELEMENT_VALUE_FORMAT = "rowelementvalueformat";
 	private static final String DEFAULT_ELEMENT_VALUE_FORMAT = "Value.Value";
+	private static final String SAVE_RESULT = "saveresult";
 
 	private String rowNameFormat;
 	private String rowElementNameFormat;
@@ -55,6 +56,7 @@ public class TableSearch extends WindowsAction
 	private String targetColumnName;
 	private int columnIndex;
 	private int firstRowIndex;
+	private boolean saveResult;
 	private Map<String, String> filtersMap;
 
 	@Override
@@ -77,54 +79,56 @@ public class TableSearch extends WindowsAction
 					String rowName = format(rowElementNameFormat, kvFilter.getKey(), i);
 					WebElement rowElement = row.findElement(By.name(rowName));
 					String attribute = rowElement.getAttribute(rowElementValueFormat);
-					rowFound = attribute.equals(kvFilter.getValue());
+					rowFound = kvFilter.getValue().equals(attribute);
 					if (!rowFound)
 						break;
 				}
 
-				if (rowFound) {
+				if (saveResult && rowFound) {
 					WebElement targetColumn = getTargetColumn(row, i);
 					cachedElements.storeWebElement(getId(), targetColumn);
 				}
 
 				i++;
 			}
+		} catch (NoSuchElementException e) {
+			logger.warn("Column cannot be found", e);
+			return "not found";
 		} finally {
 			setTimeOut(driverWrapper, driverWrapper.getImplicitlyWaitTimeout());
 		}
 
-		return null;
+		return "found";
 	}
-	
+
 	private void handleInputParams(Map<String, String> params) throws ScriptExecuteException
 	{
 		if (getId() == null) {
 			throw new ScriptExecuteException("Id is not specified");
 		}
-		firstRowIndex = Integer.parseInt(params.getOrDefault(FIRST_ROW_INDEX, DEFAULT_FIRST_ROW_NUMBER));
-		columnIndex = Integer.parseInt(params.getOrDefault(INDEX, "0"));
+		firstRowIndex = Integer.parseInt(params.getOrDefault(FIRST_ROW_INDEX, DEFAULT_FIRST_INDEX_NUMBER));
+		columnIndex = Integer.parseInt(params.getOrDefault(INDEX, DEFAULT_FIRST_INDEX_NUMBER));
 		rowNameFormat = params.getOrDefault(ROW_NAME_FORMAT, DEFAULT_ROW_NAME_FORMAT);
 		rowElementNameFormat = params.getOrDefault(ROW_ELEMENT_NAME_FORMAT, DEFAULT_ROW_ELEMENT_NAME_FORMAT);
 		rowElementValueFormat = params.getOrDefault(ROW_ELEMENT_VALUE_FORMAT, DEFAULT_ELEMENT_VALUE_FORMAT);
 		targetColumnName = params.get(TARGET_COLUMN);
-		String filters = params.get(FILTER);
-		filtersMap = RhUtils.buildFilters(filters);
+		saveResult = Boolean.parseBoolean(params.getOrDefault(SAVE_RESULT, "true"));
+		filtersMap = RhUtils.buildFilters(params.get(FILTER));
+		if (filtersMap.isEmpty())
+			throw new ScriptExecuteException("Filter map cannot be empty");
 	}
 
-	protected WebElement findRow(WebElement table, int index) throws ScriptExecuteException {
-		try {
-			return table.findElement(By.name(format(rowNameFormat, index)));
-		} catch (NoSuchElementException e) {
-			throw new ScriptExecuteException("Row with index " + index + " is not found", e);
-		}
+	protected WebElement findRow(WebElement table, int index) {
+		return table.findElement(By.name(format(rowNameFormat, index)));
 	}
 
-	private WebElement getTargetColumn(WebElement row, int rowIndex) throws ScriptExecuteException {
+	private WebElement getTargetColumn(WebElement row, int rowIndex) {
 		By columnLocator = By.name(format(rowElementNameFormat, targetColumnName, rowIndex));
 		if (columnIndex > 0) {
 			List<WebElement> elements = row.findElements(columnLocator);
 			if (columnIndex > elements.size())
-				throw new ScriptExecuteException("Cannot find column with index " + columnIndex);
+				throw new NoSuchElementException("Cannot find column with index " + columnIndex
+						+ ", column index is greater than the total column range");
 			return elements.get(columnIndex);
 		} else {
 			return row.findElement(columnLocator);
