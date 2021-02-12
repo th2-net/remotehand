@@ -22,6 +22,7 @@ import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -112,7 +113,8 @@ public class TableSearch extends WindowsAction
 		rowElementNameFormat = params.getOrDefault(ROW_ELEMENT_NAME_FORMAT, DEFAULT_ROW_ELEMENT_NAME_FORMAT);
 		rowElementValueFormat = params.getOrDefault(ROW_ELEMENT_VALUE_FORMAT, DEFAULT_ELEMENT_VALUE_FORMAT);
 		targetColumnName = params.get(TARGET_COLUMN);
-		saveResult = Boolean.parseBoolean(params.getOrDefault(SAVE_RESULT, "true"));
+		String tmp = params.get(SAVE_RESULT);
+		saveResult = StringUtils.isEmpty(tmp) || Boolean.parseBoolean(tmp);
 		filtersMap = RhUtils.buildFilters(params.get(FILTER));
 		if (filtersMap.isEmpty())
 			throw new ScriptExecuteException("Filter map cannot be empty");
