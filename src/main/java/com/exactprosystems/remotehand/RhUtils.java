@@ -16,11 +16,13 @@
 
 package com.exactprosystems.remotehand;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +75,8 @@ public class RhUtils
 	}
 
 	public static Map<String, String> buildFilters(String filters) {
+		if (StringUtils.isEmpty(filters))
+			return Collections.emptyMap();
 		Map<String, String> result = new HashMap<>();
 
 		String[] splitFilters = filters.split(";");

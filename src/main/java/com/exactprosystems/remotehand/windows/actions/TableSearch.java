@@ -113,8 +113,7 @@ public class TableSearch extends WindowsAction
 		rowElementNameFormat = params.getOrDefault(ROW_ELEMENT_NAME_FORMAT, DEFAULT_ROW_ELEMENT_NAME_FORMAT);
 		rowElementValueFormat = params.getOrDefault(ROW_ELEMENT_VALUE_FORMAT, DEFAULT_ELEMENT_VALUE_FORMAT);
 		targetColumnName = params.get(TARGET_COLUMN);
-		String tmp = params.get(SAVE_RESULT);
-		saveResult = StringUtils.isEmpty(tmp) || Boolean.parseBoolean(tmp);
+		saveResult = RhUtils.getBooleanOrDefault(params, SAVE_RESULT, true);
 		filtersMap = RhUtils.buildFilters(params.get(FILTER));
 		if (filtersMap.isEmpty())
 			throw new ScriptExecuteException("Filter map cannot be empty");
