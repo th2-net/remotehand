@@ -77,7 +77,7 @@ public class ExecuteJS extends WebAction
 
 	protected Object[] getJsArguments(WebDriver webDriver, By webLocator, Map<String, String> params)
 	{
-		return null;
+		return new Object[0];
 	}
 
 

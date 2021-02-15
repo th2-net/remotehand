@@ -16,6 +16,7 @@
  
 package com.exactprosystems.remotehand.web.actions;
 
+import com.exactprosystems.remotehand.ScriptExecuteException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -32,9 +33,10 @@ public class ExecuteJsOnElement extends ExecuteJS
 	protected static final String ARGUMENT = "arguments[0]";
 
 	@Override
-	protected String getJsScript(Map<String, String> params)
+	protected String getJsScript(Map<String, String> params) throws ScriptExecuteException
 	{
-		return params.get(JS_COMMANDS).replace(ELEMENT_PARAM, ARGUMENT);
+		String jsCommands = super.getJsScript(params);
+		return jsCommands.replace(ELEMENT_PARAM, ARGUMENT);
 	}
 
 	@Override
