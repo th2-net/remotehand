@@ -46,6 +46,9 @@ public class ExecuteJS extends WebAction
 
 	protected List<String> splitCommands(String jsScript) throws ScriptExecuteException
 	{
+		if (jsScript == null)
+			return null;
+		
 		String[] splitScripts = jsScript.split(DEFAULT_DELIMITER);
 
 		List<String> commands = new ArrayList<>();
@@ -72,6 +75,12 @@ public class ExecuteJS extends WebAction
 	protected void executeJsCommands(WebDriver webDriver, List<String> commands, Object... args)
 			throws ScriptExecuteException
 	{
+		if (commands == null) {
+			throw new ScriptExecuteException("Commands to execute are not presented");
+		}
+		if (args == null) {
+			throw new ScriptExecuteException("JS arguments should be presented");
+		}
 		WebJsUtils.executeJsCommands(webDriver, commands, args);
 	}
 
