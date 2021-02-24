@@ -26,8 +26,11 @@ public abstract class Action {
 
 	public void beforeExecute() {}
 
-	public String getActionName()
-	{
+	public String getActionName() {
 		return this.getClass().getSimpleName();
+	}
+
+	public ActionOutputType getOutputType() {
+		return ActionOutputType.TEXT;
 	}
 }

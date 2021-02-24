@@ -17,7 +17,7 @@
 package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.web.ActionOutputType;
+import com.exactprosystems.remotehand.ActionOutputType;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

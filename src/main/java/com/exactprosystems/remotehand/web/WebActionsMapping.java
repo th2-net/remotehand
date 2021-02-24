@@ -65,6 +65,7 @@ public class WebActionsMapping
 		DurationStart,
 		GetDuration,
 		GetElementScreenshot,
+		TakeElementScreenshotSnapshot,
 		WaitForChanges,
 		GetElementInnerHtml,
 		AcceptAlert,
@@ -121,6 +122,8 @@ public class WebActionsMapping
 		case DurationStart:        return new DurationStart();
 		case GetDuration:          return new GetDuration();
 		case GetElementScreenshot: return new GetElementScreenshot();
+		case TakeElementScreenshotSnapshot: 
+			                       return new TakeElementScreenshotSnapshot();
 		case WaitForChanges:       return new WaitForChanges();
 		case GetElementInnerHtml:  return new GetElementInnerHtml();
 		case AcceptAlert:          return new AcceptAlert();

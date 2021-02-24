@@ -40,7 +40,8 @@ public class WindowsActionsMapping {
 		TableClick,
 		MaximizeMainWindow,
 		TableSearch,
-		WaitForElement;
+		WaitForElement,
+		GetScreenshot
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -72,6 +73,7 @@ public class WindowsActionsMapping {
 			case TableClick:			return new TableClick();
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
+			case GetScreenshot:			return new GetScreenshot();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}

@@ -16,7 +16,6 @@
 
 package com.exactprosystems.remotehand.web;
 
-import com.exactprosystems.remotehand.rhdata.RhScriptResult;
 import com.exactprosystems.remotehand.*;
 import com.exactprosystems.remotehand.sessions.SessionContext;
 
@@ -40,23 +39,6 @@ public class WebActionsLauncher extends ActionsLauncher
 	{
 		super.beforeActions(context);
 		checkWebDriver((WebSessionContext) context);
-	}
-
-	@Override
-	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult)
-	{
-		WebAction webAction = (WebAction) action;
-		switch (webAction.getOutputType())
-		{
-			case SCREENSHOT:
-				scriptResult.addScreenshotId(actionResult);
-				break;
-			case ENCODED_DATA:
-				scriptResult.addToEncodedOutput(actionResult);
-				break;
-			default:
-				scriptResult.addToTextOutput(actionResult);
-		}
 	}
 
 	private void checkWebDriver(WebSessionContext context) throws ScriptExecuteException, RhConfigurationException

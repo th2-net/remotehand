@@ -16,11 +16,16 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import com.exactprosystems.remotehand.utils.ScreenshotRegionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,14 +65,22 @@ public class WaitForChanges extends WebAction
 				checkMillis = getIntegerParam(params, PARAM_CHECKMILLIS);
 		String id = params.get(PARAM_SCREENSHOTID);
 		
-		byte[] initialState = (byte[])context.getContextData().get(GetElementScreenshot.buildScreenshotId(id));
-		if (initialState == null)
+		Path screenPath = (Path)context.getContextData().get(TakeElementScreenshotSnapshot.buildScreenshotId(id));
+		if (screenPath == null)
 			throw new ScriptExecuteException("No screenshot stored for ID='"+id+"'");
+
+		byte[] initialState;
+		try {
+			initialState = Files.readAllBytes(screenPath);
+		} catch (Exception e) {
+			throw new ScriptExecuteException("Error retrieving saved screenshot for ID='"+id+"'");
+		}
 		
-		long endTime = System.currentTimeMillis()+seconds;
+		long endTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds);
 		do
 		{
-			byte[] currentState = takeElementScreenshot(webDriver, webLocator);
+			WebElement element = findElement(webDriver, webLocator);
+			byte[] currentState = ScreenshotRegionUtils.takeElementScreenshot(webDriver, element);
 			if (!compareStates(initialState, currentState))
 				return null;
 			

@@ -82,10 +82,18 @@ public class ActionsLauncher
 
 		return result;
 	}
-	
-	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult)
-	{
-		scriptResult.addToTextOutput(actionResult);
+
+	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult) {
+		switch (action.getOutputType()) {
+			case SCREENSHOT:
+				scriptResult.addScreenshotId(actionResult);
+				break;
+			case ENCODED_DATA:
+				scriptResult.addToEncodedOutput(actionResult);
+				break;
+			default:
+				scriptResult.addToTextOutput(actionResult);
+		}
 	}
 	
 	protected String getSessionId()
