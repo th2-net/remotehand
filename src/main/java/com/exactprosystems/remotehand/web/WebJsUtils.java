@@ -1,12 +1,18 @@
-/******************************************************************************
- * Copyright (c) 2009-2020, Exactpro Systems LLC
- * www.exactpro.com
- * Build Software to Test Software
+/*
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
- * All rights reserved.
- * This is unpublished, licensed software, confidential and proprietary
- * information which is the property of Exactpro Systems LLC or its licensors.
- ******************************************************************************/
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.exactprosystems.remotehand.web;
 
@@ -23,7 +29,8 @@ public class WebJsUtils
 	private static final Logger logger = LoggerFactory.getLogger(WebJsUtils.class);
 
 
-	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands) throws ScriptExecuteException
+	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands, Object... args)
+			throws ScriptExecuteException
 	{
 		if (!(webDriver instanceof JavascriptExecutor))
 			throw new ScriptExecuteException("Web driver is not JavaScript executor: JS commands cannot be executed");
@@ -31,16 +38,17 @@ public class WebJsUtils
 		JavascriptExecutor jsExecutor = (JavascriptExecutor) webDriver;
 		for (String command : commands)
 		{
-			executeJsCommand(jsExecutor, command);
+			executeJsCommand(jsExecutor, command, args);
 		}
 	}
 
-	private static void executeJsCommand(JavascriptExecutor jsExecutor, String javaScript) throws ScriptExecuteException
+	private static void executeJsCommand(JavascriptExecutor jsExecutor, String javaScript, Object... args)
+			throws ScriptExecuteException
 	{
 		try
 		{
 			logger.info("Executing JS command: {}", javaScript);
-			Object res = jsExecutor.executeScript(javaScript);
+			Object res = jsExecutor.executeScript(javaScript, args);
 			if (res != null)
 				logger.info("Result of JS command: {} = {}", javaScript, res);
 		}
