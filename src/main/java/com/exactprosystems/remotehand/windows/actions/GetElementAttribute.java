@@ -21,6 +21,7 @@ import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,13 @@ public class GetElementAttribute extends WindowsAction {
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
 		WebElement element = es.searchElement();
-		
+
 		String attributeName = params.get("attributename");
-		return element.getAttribute(attributeName);
+		String result = element.getAttribute(attributeName);
+
+		return result == null ? StringUtils.EMPTY : result;
 	}
-	
+
 	@Override
 	public Logger getLoggerInstance() {
 		return logger;
