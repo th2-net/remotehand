@@ -37,7 +37,6 @@ public class WindowsActionsMapping {
 		WaitForAttribute,
 		ScrollUsingText,
 		GetDataFromClipboard,
-		TableClick,
 		MaximizeMainWindow,
 		TableSearch,
 		WaitForElement,
@@ -70,7 +69,6 @@ public class WindowsActionsMapping {
 			case WaitForAttribute:		return new WaitForAttribute();
 			case ScrollUsingText:		return new ScrollByText();
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
-			case TableClick:			return new TableClick();
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
 			case GetScreenshot:			return new GetScreenshot();
