@@ -535,8 +535,8 @@ If element is found and the image is available, "true" is printed in output. Els
 GetElementScreenshot,5,locator,matcher,screen1
 ```
 
-Takes a screenshot of *element* and saves it into the disk.\
-`name` is optional and will be shown in output filename.
+Takes a screenshot of the *element* and saves it to the disk.\
+`name` is optional and will be used as a part of screenshot filename.
 
 
 ### GetScreenshot
@@ -545,8 +545,8 @@ Takes a screenshot of *element* and saves it into the disk.\
 GetScreenshot,screen1
 ```
 
-Takes a screenshot of *whole application* and saves it into the disk.\
-`name` is optional and will be shown in output filename.
+Takes a screenshot ofthe  *whole application* and saves it to the disk.\
+`name` is optional and will be used as a part of screenshot filename.
 
 ## Notes
 
