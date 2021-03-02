@@ -476,15 +476,15 @@ Name parameter is used in action result. Example of result:
 Duration Period1: 20275
 ```
 
-### GetElementScreenshot
+### StoreElementState
 ```
 #action,#wait,#locator,#matcher,#id
-GetElementScreenshot,5,locator,matcher,screen_id
+StoreElementState,5,locator,matcher,screen_id
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher> and takes its screenshot, storing it under <id>. Element is found using <locator>.
-
-Streenshot is stored for furhter verification for changes via WaitForChanges action.
+Optionally waits `wait` seconds for element specified by `matcher` and takes its screenshot, storing it under `id`.
+Element is found using `locator`.\
+Screenshot is stored for further verification for changes via WaitForChanges action.
 
 
 ### WaitForChanges
@@ -493,11 +493,9 @@ Streenshot is stored for furhter verification for changes via WaitForChanges act
 WaitForChanges,20,50,locator,matcher,screen_id
 ```
 
-Waits <seconds> for changes in element specified by <matcher> and found by using <locator>. 
-
-Changes are found by comparing element screenshot with the one stored under <id>.
-
-Check for changes is performed (i.e. new screenshot is taken) every <checkmillis> milliseconds.
+Waits `seconds` for changes in element specified by `matcher` and found by using `locator`.\
+Changes are found by comparing element screenshot with the one stored under `id`.\
+Check for changes is performed (i.e. new screenshot is taken) every `checkmillis` milliseconds.
 
 
 ### AcceptAlert
@@ -506,7 +504,7 @@ Check for changes is performed (i.e. new screenshot is taken) every <checkmillis
 AcceptAlert,5
 ```
 
-Waits <wait> seconds for alert dialog to appear and accepts it, i.e. presses OK button.
+Waits `wait` seconds for alert dialog to appear and accepts it, i.e. presses OK button.
 
 
 ### DismissAlert
@@ -515,7 +513,7 @@ Waits <wait> seconds for alert dialog to appear and accepts it, i.e. presses OK 
 DismissAlert,5
 ```
 
-Waits <wait> seconds for alert dialog to appeat and dismisses it, i.e. presses Cancel button.
+Waits `wait` seconds for alert dialog to appeat and dismisses it, i.e. presses Cancel button.
 
 
 ### CheckImageAvailability
@@ -526,10 +524,29 @@ CheckImageAvailability,5,locator,matcher
 
 This action checks that the specified image is available on page. 
 
-Optionally waits <wait> seconds for <img src="img_source"...> element specified by <matcher> and <locator>. 
+Optionally waits `wait` seconds for <img src="img_source"...> element specified by <matcher> and <locator>. 
 
 If element is found and the image is available, "true" is printed in output. Else "false" is printed.
 
+
+### GetElementScreenshot
+```
+#action,#wait,#locator,#matcher,#name
+GetElementScreenshot,5,locator,matcher,screen1
+```
+
+Takes a screenshot of *element* and saves it into the disk.\
+`name` is optional and will be shown in output filename.
+
+
+### GetScreenshot
+```
+#action,#name
+GetScreenshot,screen1
+```
+
+Takes a screenshot of *whole application* and saves it into the disk.\
+`name` is optional and will be shown in output filename.
 
 ## Notes
 
