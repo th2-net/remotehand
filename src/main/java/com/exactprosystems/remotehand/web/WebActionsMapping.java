@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ public class WebActionsMapping
 		DurationStart,
 		GetDuration,
 		GetElementScreenshot,
+		StoreElementState,
 		WaitForChanges,
 		GetElementInnerHtml,
 		AcceptAlert,
@@ -122,6 +123,7 @@ public class WebActionsMapping
 		case DurationStart:        return new DurationStart();
 		case GetDuration:          return new GetDuration();
 		case GetElementScreenshot: return new GetElementScreenshot();
+		case StoreElementState:    return new StoreElementState();
 		case WaitForChanges:       return new WaitForChanges();
 		case GetElementInnerHtml:  return new GetElementInnerHtml();
 		case AcceptAlert:          return new AcceptAlert();

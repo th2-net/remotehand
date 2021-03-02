@@ -20,6 +20,7 @@ import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.utils.ExceptionUtils;
+import com.exactprosystems.remotehand.utils.ScreenshotUtils;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import io.appium.java_client.windows.WindowsDriver;
@@ -97,13 +98,15 @@ public abstract class WindowsAction extends Action {
 					windowsSessionContext.getMvelVars().put(id, result);
 					logger.trace("Action result saved to id: {}", id);
 				}
+			} catch (ScriptExecuteException e) {
+				throw addScreenshot(e);
 			} catch (WebDriverException e) {
 				WindowsDriver<?> driver = windowsSessionContext.getCurrentDriver().getDriver();
 				String baseMessage = tryExtractErrorMessage(e);
 				String errMsg = baseMessage + ExceptionUtils.EOL + driver.getCapabilities() + ExceptionUtils.EOL +
 						"Driver " + WebDriverException.SESSION_ID + ": " + driver.getSessionId();
 
-				throw new WindowsScriptExecuteException(errMsg, e);
+				throw addScreenshot(new WindowsScriptExecuteException(errMsg, e));
 			}
 		} else {
 			this.logger.info("Action was not executed due condition. And will be skipped");
@@ -124,6 +127,24 @@ public abstract class WindowsAction extends Action {
 		} else {
 			return str;
 		}
+	}
+
+	protected String takeScreenshot(String name) throws ScriptExecuteException
+	{
+		WindowsDriver<?> webDriver = windowsSessionContext.getCurrentDriver().getDriver();
+		return ScreenshotUtils.takeAndSaveScreenshot(name, webDriver);
+	}
+
+	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
+	{
+		String screenshotId = null;
+		try {
+			screenshotId = takeScreenshot(null);
+		} catch (ScriptExecuteException e) {
+			logger.error("Could not create screenshot", e);
+		}
+		see.setScreenshotId(screenshotId);
+		return see;
 	}
 
 	private static String tryExtractErrorMessage(WebDriverException e) {

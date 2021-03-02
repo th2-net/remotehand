@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,10 +82,18 @@ public class ActionsLauncher
 
 		return result;
 	}
-	
-	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult)
-	{
-		scriptResult.addToTextOutput(actionResult);
+
+	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult) {
+		switch (action.getOutputType()) {
+			case SCREENSHOT:
+				scriptResult.addScreenshotId(actionResult);
+				break;
+			case ENCODED_DATA:
+				scriptResult.addToEncodedOutput(actionResult);
+				break;
+			default:
+				scriptResult.addToTextOutput(actionResult);
+		}
 	}
 	
 	protected String getSessionId()

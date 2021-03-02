@@ -39,7 +39,8 @@ public class WindowsActionsMapping {
 		GetDataFromClipboard,
 		MaximizeMainWindow,
 		TableSearch,
-		WaitForElement;
+		WaitForElement,
+		GetScreenshot
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -70,6 +71,7 @@ public class WindowsActionsMapping {
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
+			case GetScreenshot:			return new GetScreenshot();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}

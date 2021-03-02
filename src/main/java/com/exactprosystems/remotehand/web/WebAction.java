@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,26 @@
 package com.exactprosystems.remotehand.web;
 
 import com.exactprosystems.remotehand.Action;
-import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.utils.ScreenshotUtils;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
-import com.jhlabs.image.PosterizeFilter;
-import org.apache.commons.io.FileUtils;
+
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,9 +46,6 @@ import static com.exactprosystems.remotehand.RhUtils.isBrowserNotReachable;
 public abstract class WebAction extends Action
 {
 	protected static final String PARAM_WAIT = "wait", PARAM_NOTFOUNDFAIL = "notfoundfail";
-	
-	protected static final String SCREENSHOT_EXTENSION = ".png";
-	protected static final DateTimeFormatter SCREENSHOT_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 	
 	protected String[] mandatoryParams;
 
@@ -102,11 +96,6 @@ public abstract class WebAction extends Action
 	public boolean isCanSwitchPage()
 	{
 		return false;
-	}
-	
-	public ActionOutputType getOutputType()
-	{
-		return ActionOutputType.TEXT;
 	}
 	
 	public boolean isElementMandatory()
@@ -207,7 +196,13 @@ public abstract class WebAction extends Action
 	
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
 	{
-		see.setScreenshotId(takeScreenshotIfError());
+		String screenshotId = null;
+		try {
+			screenshotId = takeAndSaveScreenshot(null);
+		} catch (ScriptExecuteException e) {
+			logError("Could not create screenshot", e);
+		}
+		see.setScreenshotId(screenshotId);
 		return see;
 	}
 
@@ -254,170 +249,19 @@ public abstract class WebAction extends Action
 		else 
 			logWarn("Cannot scroll %s.", webLocator);
 	}
-	
-	protected String takeScreenshot(String name) throws ScriptExecuteException
+
+	protected String takeAndSaveScreenshot(String name) throws ScriptExecuteException
 	{
 		WebDriver webDriver = context.getWebDriver();
 		if (!(webDriver instanceof TakesScreenshot))
 			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
-		TakesScreenshot takesScreenshot = (TakesScreenshot) webDriver;
+		return ScreenshotUtils.takeAndSaveScreenshot(name, (TakesScreenshot) webDriver);
+	}
 		
-		Path storageDirPath = Paths.get(WebConfiguration.SCREENSHOTS_DIR_NAME);
-		createScreenshotsDirIfNeeded(storageDirPath);
-		try
-		{
-			File tmpFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
-			// Use "posterization" method to reduce screenshot file's size
-			BufferedImage sourceImage = ImageIO.read(tmpFile),
-					filteredImage = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-			PosterizeFilter posterizeFilter = new PosterizeFilter();
-			posterizeFilter.setNumLevels(10);
-			posterizeFilter.filter(sourceImage, filteredImage);
-			ImageIO.write(filteredImage, "png", tmpFile);
-			
-			String fileName = createScreenshotFileName(name);
-			saveScreenshot(tmpFile, storageDirPath.resolve(fileName));
-			return fileName;
-		}
-		catch (WebDriverException wde)
-		{
-			throw new ScriptExecuteException("Unable to create screenshot: " + wde.getMessage(), wde);
-		}
-		catch (IOException e)
-		{
-			throw new ScriptExecuteException("Couldn't apply 'posterization' effect for made screenshot", e);
-		}
-		catch (RuntimeException e)
-		{
-			String msg = "Unexpected error while trying to create screenshot";
-			logError(msg, e);
-			throw new ScriptExecuteException(msg, e);
-		}
-	}
-	
-	private void createScreenshotsDirIfNeeded(Path relativeDirPath) throws ScriptExecuteException
-	{
-		if (Files.notExists(relativeDirPath))
-		{
-			try
-			{
-				Files.createDirectory(relativeDirPath);
-			}
-			catch (IOException e)
-			{
-				throw new ScriptExecuteException("Unable to create directory to store screenshots.", e);
-			}
-		}
-	}
-	
-	private String createScreenshotFileName(String name)
-	{
-		return SCREENSHOT_TIMESTAMP_FORMAT.format(LocalDateTime.now()) + "_" + (name != null ? name : "screenshot") + SCREENSHOT_EXTENSION;
-	}
-	
-	private void saveScreenshot(File tmpFile, Path targetPath) throws ScriptExecuteException
-	{
-		try
-		{
-			FileUtils.copyFile(tmpFile, targetPath.toFile());
-			logInfo("Screenshot %s has been successfully saved.", targetPath);
-		}
-		catch (IOException e)
-		{
-			throw new ScriptExecuteException(String.format("Unable to copy screenshot file '%s' to the storage directory '%s'.",
-					tmpFile, WebConfiguration.SCREENSHOTS_DIR_NAME), e);
-		}
-	}
-	
-	private String takeScreenshotIfError()
-	{
-		try
-		{
-			return takeScreenshot(null);
-		}
-		catch (ScriptExecuteException e)
-		{
-			logError("Could not create screenshot", e);
-			return null;
-		}
-	}
-	
-	
-	private BufferedImage bytesToImage(byte[] bytes) throws IOException
-	{
-		try (InputStream is = new ByteArrayInputStream(bytes))
-		{
-			return ImageIO.read(is);
-		}
-	}
-	
-	private byte[] imageToBytes(BufferedImage image) throws IOException
-	{
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		try
-		{
-			ImageIO.write(image, "jpg", os);
-		}
-		finally
-		{
-			os.close();
-		}
-		return os.toByteArray();
-	}
-	
-	private int getElementScreenshotSize(int elementPos, int elementSize, int screenSize) throws ScriptExecuteException
-	{
-		if (elementPos > screenSize)
-			throw new ScriptExecuteException("Element position ("+elementPos+") is outside of screen ("+screenSize+")");
-		
-		if (elementPos+elementSize <= screenSize)
-			return elementSize;
-		else
-			return screenSize-elementPos;
-	}
-	
-	protected byte[] takeElementScreenshot(WebDriver webDriver, WebElement element) throws ScriptExecuteException
-	{
-		TakesScreenshot takesScreenshot = (TakesScreenshot)webDriver;
-		try
-		{
-			BufferedImage fullscreen = bytesToImage(takesScreenshot.getScreenshotAs(OutputType.BYTES));
-			
-			Point p = element.getLocation();
-			Dimension size = element.getSize();
-			int width = getElementScreenshotSize(p.getX(), size.getWidth(), fullscreen.getWidth()),
-					height = getElementScreenshotSize(p.getY(), size.getHeight(), fullscreen.getHeight());
-			BufferedImage elementImage = fullscreen.getSubimage(p.getX(), p.getY(), 
-					width, height);
-			return imageToBytes(elementImage);
-		}
-		catch (WebDriverException wde)
-		{
-			throw new ScriptExecuteException("Unable to create screenshot of element: " + wde.getMessage(), wde);
-		}
-		catch (IOException e)
-		{
-			throw new ScriptExecuteException("Error while processing screenshot of element", e);
-		}
-		catch (RuntimeException e)
-		{
-			String msg = "Unexpected error while trying to create screenshot of element";
-			logError(msg, e);
-			throw new ScriptExecuteException(msg, e);
-		}
-	}
-	
-	protected byte[] takeElementScreenshot(WebDriver webDriver, By webLocator) throws ScriptExecuteException
-	{
-		WebElement element = findElement(webDriver, webLocator);
-		return takeElementScreenshot(webDriver, element);
-	}
-	
-	
 	protected int getChromeDriverVersion(ChromeDriver chromeDriver)
 	{
-		Map<String, String> chromeCap = (Map<String, String>) chromeDriver.getCapabilities().getCapability("chrome");
-		String ver = chromeCap.get("chromedriverVersion");
+		Map<?, ?> chromeCap = (Map<?, ?>) chromeDriver.getCapabilities().getCapability("chrome");
+		String ver = (String) chromeCap.get("chromedriverVersion");
 		Matcher m = Pattern.compile("^\\d*").matcher(ver);
 		if (m.find())
 			return Integer.parseInt(m.group());
