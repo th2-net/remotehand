@@ -37,7 +37,7 @@ public class GetElementScreenshot extends WebAction {
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement element = findElement(webDriver, webLocator);
-		return ScreenshotUtils.takeScreenshot(params.get(NAME_PARAM), element);
+		return ScreenshotUtils.takeAndSaveScreenshot(params.get(NAME_PARAM), element);
 	}
 
 	@Override

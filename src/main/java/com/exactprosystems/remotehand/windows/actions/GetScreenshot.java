@@ -44,7 +44,7 @@ public class GetScreenshot extends WindowsAction {
 		if (element == null) {
 			screenshotId = this.takeScreenshot(screenshotName);
 		} else {
-			screenshotId = ScreenshotUtils.takeScreenshot(screenshotName, element);
+			screenshotId = ScreenshotUtils.takeAndSaveScreenshot(screenshotName, element);
 		}
 		return screenshotId;
 	}

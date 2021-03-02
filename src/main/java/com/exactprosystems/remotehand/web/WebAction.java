@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ public abstract class WebAction extends Action
 	{
 		String screenshotId = null;
 		try {
-			screenshotId = takeScreenshot(null);
+			screenshotId = takeAndSaveScreenshot(null);
 		} catch (ScriptExecuteException e) {
 			logError("Could not create screenshot", e);
 		}
@@ -250,12 +250,12 @@ public abstract class WebAction extends Action
 			logWarn("Cannot scroll %s.", webLocator);
 	}
 
-	protected String takeScreenshot(String name) throws ScriptExecuteException
+	protected String takeAndSaveScreenshot(String name) throws ScriptExecuteException
 	{
 		WebDriver webDriver = context.getWebDriver();
 		if (!(webDriver instanceof TakesScreenshot))
 			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
-		return ScreenshotUtils.takeScreenshot(name, (TakesScreenshot) webDriver);
+		return ScreenshotUtils.takeAndSaveScreenshot(name, (TakesScreenshot) webDriver);
 	}
 		
 	protected int getChromeDriverVersion(ChromeDriver chromeDriver)

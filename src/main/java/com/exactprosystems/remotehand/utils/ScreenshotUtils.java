@@ -43,7 +43,7 @@ public class ScreenshotUtils {
 	protected static final DateTimeFormatter SCREENSHOT_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 	
 
-	public static String takeScreenshot(String name, TakesScreenshot takesScreenshot) throws ScriptExecuteException {
+	public static String takeAndSaveScreenshot(String name, TakesScreenshot takesScreenshot) throws ScriptExecuteException {
 		Path storageDirPath = Paths.get(WebConfiguration.SCREENSHOTS_DIR_NAME);
 		createScreenshotsDirIfNeeded(storageDirPath);
 		try {
@@ -60,7 +60,7 @@ public class ScreenshotUtils {
 			
 			return fileName;
 		} catch (WebDriverException wde) {
-			throw new ScriptExecuteException("Unable to create screenshot: " + wde.getMessage(), wde);
+			throw new ScriptExecuteException("Unable to create screenshot", wde);
 		} catch (IOException e) {
 			throw new ScriptExecuteException("Couldn't apply 'posterization' effect for made screenshot", e);
 		} catch (RuntimeException e) {

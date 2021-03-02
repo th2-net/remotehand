@@ -131,10 +131,8 @@ public abstract class WindowsAction extends Action {
 
 	protected String takeScreenshot(String name) throws ScriptExecuteException
 	{
-		WindowsDriver<?> webDriver = windowsSessionContext.getCurrentDriver().getDriverNullable();
-		if (webDriver == null)
-			throw new ScriptExecuteException("Driver is not created.");
-		return ScreenshotUtils.takeScreenshot(name, webDriver);
+		WindowsDriver<?> webDriver = windowsSessionContext.getCurrentDriver().getDriver();
+		return ScreenshotUtils.takeAndSaveScreenshot(name, webDriver);
 	}
 
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
