@@ -34,9 +34,9 @@ import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 
-public class TakeElementScreenshotSnapshot extends WebAction
+public class StoreElementState extends WebAction
 {
-	private static final Logger logger = LoggerFactory.getLogger(TakeElementScreenshotSnapshot.class);
+	private static final Logger logger = LoggerFactory.getLogger(StoreElementState.class);
 	
 	private static final String PARAM_ID = "id";
 	

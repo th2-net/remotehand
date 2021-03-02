@@ -65,7 +65,7 @@ public class WaitForChanges extends WebAction
 				checkMillis = getIntegerParam(params, PARAM_CHECKMILLIS);
 		String id = params.get(PARAM_SCREENSHOTID);
 		
-		Path screenPath = (Path)context.getContextData().get(TakeElementScreenshotSnapshot.buildScreenshotId(id));
+		Path screenPath = (Path)context.getContextData().get(StoreElementState.buildScreenshotId(id));
 		if (screenPath == null)
 			throw new ScriptExecuteException("No screenshot stored for ID='"+id+"'");
 
