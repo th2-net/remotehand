@@ -545,7 +545,7 @@ Takes a screenshot of the *element* and saves it to the disk.\
 GetScreenshot,screen1
 ```
 
-Takes a screenshot ofthe  *whole application* and saves it to the disk.\
+Takes a screenshot of the *whole application* and saves it to the disk.\
 `name` is optional and will be used as a part of screenshot filename.
 
 ## Notes
