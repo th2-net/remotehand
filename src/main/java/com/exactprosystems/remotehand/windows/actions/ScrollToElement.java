@@ -46,7 +46,7 @@ public class ScrollToElement extends WindowsAction {
 	public static String MAX_ITERATION_PARAM = "maxiterations"; // Max iterations
 	
 	public static String CLICK_OFFSET_X_PARAM = "clickoffsetx"; //Click Offset X
-	public static String CLICK_OFFSET_Y_PARAM = "clockoffsety"; //Click Offset Y
+	public static String CLICK_OFFSET_Y_PARAM = "clickoffsety"; //Click Offset Y
 	public static String TEXT_VALUE_PARAM = "textvalue"; // Text Value
 
 	private ElementSearcher elementSearcher;
