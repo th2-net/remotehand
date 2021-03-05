@@ -29,7 +29,7 @@ public class ExecuteJsOnElement extends ExecuteJS
 {
 	private static final Logger logger = LoggerFactory.getLogger(ExecuteJsOnElement.class);
 
-	protected static final String ELEMENT_PARAM = "%Element%";
+	protected static final String ELEMENT_PARAM = "#Element#";
 	protected static final String ARGUMENT = "arguments[0]";
 
 	@Override
