@@ -34,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class WindowsAction extends Action {
-	private static Pattern ELEMENT_EXTRACTOR_PATTERN = null; 
+	private static volatile Pattern ELEMENT_EXTRACTOR_PATTERN = null; 
 	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
@@ -164,7 +164,7 @@ public abstract class WindowsAction extends Action {
 
 		Pattern pattern = getElementExtractorPattern();
 		Matcher matcher = pattern.matcher(exceptionMessage);
-		if (matcher.find() && endMessage > -1)
+		if (endMessage > -1 && matcher.find())
 			message += " " + matcher.group(0);
 
 		return message;
