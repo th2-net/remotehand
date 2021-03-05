@@ -36,11 +36,13 @@ public class WindowsActionsMapping {
 		SearchElement,
 		WaitForAttribute,
 		ScrollUsingText,
+		ScrollToElement,
 		GetDataFromClipboard,
 		TableClick,
 		MaximizeMainWindow,
 		TableSearch,
-		WaitForElement;
+		WaitForElement,
+		DragAndDropElement;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -68,10 +70,12 @@ public class WindowsActionsMapping {
 			case SearchElement:			return new SearchElement();
 			case WaitForAttribute:		return new WaitForAttribute();
 			case ScrollUsingText:		return new ScrollByText();
+			case ScrollToElement:		return new ScrollToElement();
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
 			case TableClick:			return new TableClick();
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
+			case DragAndDropElement:	return new DragAndDropElement();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}

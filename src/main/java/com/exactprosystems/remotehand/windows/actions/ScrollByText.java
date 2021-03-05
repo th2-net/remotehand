@@ -49,8 +49,7 @@ public class ScrollByText extends WindowsAction {
 			return null;
 		}
 		
-		WebElement textControl = searcher.searchElement(new SearchParams.HeaderKeys("textlocator",
-				"textmatcher", "textmatcherindex"));
+		WebElement textControl = searcher.searchElement(new SearchParams.HeaderKeys("text"));
 		String textControlId = (textControl instanceof RemoteWebElement ? ((RemoteWebElement) textControl).getId() : "");
 		String text = params.get("texttosend");
 		String maxItStr = params.get("maxiterations");

@@ -39,17 +39,14 @@ public class DragAndDropElement extends WindowsAction {
 	public static final String FROM_OFFSET_Y = "fromoffsety";
 	public static final String TO_OFFSET_X = "tooffsetx";
 	public static final String TO_OFFSET_Y = "tooffsety";
-	public static final String TO_LOCATOR = "tolocator";
-	public static final String TO_MATCHER = "tomatcher";
-	public static final String TO_MATCHER_INDEX = "tomatcherindex";
+	public static final String TO_PREFIX = "to";
 	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
 
 		ElementSearcher searcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
 		WebElement fromElement = searcher.searchElement();
-		WebElement toElement = searcher.searchElement(new SearchParams.HeaderKeys(TO_LOCATOR,
-				TO_MATCHER, TO_MATCHER_INDEX));
+		WebElement toElement = searcher.searchElement(new SearchParams.HeaderKeys(TO_PREFIX));
 
 		ElementOffsetUtils.ElementOffsets fromOffsets = ElementOffsetUtils.calculateOffset(
 				new ElementOffsetParams(fromElement, params.get(FROM_OFFSET_X), params.get(FROM_OFFSET_Y)));

@@ -43,6 +43,19 @@ public class RhUtils
 		else 
 			return YES.contains(value.toLowerCase());
 	}
+
+	public static int getIntegerOrDefault(Map<String, String> params, String name, int defaultValue) throws ScriptExecuteException {
+		String value = params.get(name);
+		if (value == null || value.isEmpty()) {
+			return defaultValue;
+		} else {
+			try {
+				return Integer.parseInt(value);
+			} catch (Exception e) {
+				throw new ScriptExecuteException("Incorrect parameter: " + name + ". Number is required");
+			}
+		}
+	}
 	
 	public static void logError(Logger logger, String sessionId, String msg)
 	{
