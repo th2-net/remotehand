@@ -201,7 +201,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 					options.setBinary(binaryParam);
 			}
 			
-			Map<String, Object> prefs = new HashMap<>(2);
+			Map<String, Object> prefs = new HashMap<>(3);
 			prefs.put("profile.default_content_settings.popups", "0");
 			prefs.put("profile.content_settings.exceptions.clipboard", createClipboardSettingsChrome(cfg.isReadClipboardPermissions()));
 			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
@@ -222,11 +222,11 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 		}
 	}
 	
-	private Map<String, Object> createClipboardSettingsChrome(boolean enabled) {
+	public static Map<String, Object> createClipboardSettingsChrome(boolean enabled) {
 		Map<String,Object> map = new HashMap<>();
-		map.put("last_modified",String.valueOf(System.currentTimeMillis()));
+		map.put("last_modified", String.valueOf(System.currentTimeMillis()));
 		//0 - default, 1 - enable, 2 - disable
-		map.put("setting", enabled ? 1: 2);
+		map.put("setting", enabled ? 1 : 2);
 		return Collections.singletonMap("[*.],*", map);
 	}
 	
