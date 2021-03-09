@@ -59,7 +59,8 @@ public class WebConfiguration extends Configuration {
 	public static final String PARAM_PROFILE = "Profile";
 	public static final String PARAM_BINARY = "Binary";
 	public static final String PARAM_DEFAULT_LOCATOR = "DefaultLocator";
-	
+	public static final String PARAM_READ_CLIPBOARD_PERMISSIONS = "ReadClipboardAccess";
+
 	public static final String BROWSER_LOGGING_LEVEL = "BrowserLoggingLevel";
 	public static final String CLIENT_LOGGING_LEVEL = "ClientLoggingLevel";
 	public static final String DRIVER_LOGGING_LEVEL = "DriverLoggingLevel";
@@ -83,6 +84,7 @@ public class WebConfiguration extends Configuration {
 	private volatile File downloadsDir;
 	private boolean disableLeavePageAlert;
 	private boolean createDownloadSubDir;
+	private boolean readClipboardPermissions;
 	private final boolean enableW3C;
 
 	private WebConfiguration(CommandLine commandLine) {
@@ -109,6 +111,7 @@ public class WebConfiguration extends Configuration {
 		firefoxDriverFileName = this.loadProperty(PARAM_FIREFOXDRIVERPATH, DEF_FIREFOXDRIVER_PATH);
 		binary = this.loadProperty(PARAM_BINARY, "");
 		defaultLocator = this.loadProperty(PARAM_DEFAULT_LOCATOR, DEF_LOCATOR);
+		readClipboardPermissions = this.loadProperty(PARAM_READ_CLIPBOARD_PERMISSIONS, false, Boolean::parseBoolean);
 		
 		browserLoggingLevel = loadLogLevel(BROWSER_LOGGING_LEVEL);
 		clientLoggingLevel = loadLogLevel(CLIENT_LOGGING_LEVEL);
@@ -254,7 +257,11 @@ public class WebConfiguration extends Configuration {
 	{
 		return performanceLoggingLevel;
 	}
-	
+
+	public boolean isReadClipboardPermissions() {
+		return readClipboardPermissions;
+	}
+
 	public boolean isDriverLoggingEnabled()
 	{
 		return browserLoggingLevel != Level.OFF

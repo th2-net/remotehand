@@ -16,7 +16,9 @@
 
 package com.exactprosystems.remotehand.web;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -29,20 +31,25 @@ public class WebJsUtils
 	private static final Logger logger = LoggerFactory.getLogger(WebJsUtils.class);
 
 
-	public static void executeJsCommands(WebDriver webDriver, Collection<String> commands, Object... args)
+	public static List<Object> executeJsCommands(WebDriver webDriver, Collection<String> commands, Object... args)
 			throws ScriptExecuteException
 	{
 		if (!(webDriver instanceof JavascriptExecutor))
 			throw new ScriptExecuteException("Web driver is not JavaScript executor: JS commands cannot be executed");
 		
 		JavascriptExecutor jsExecutor = (JavascriptExecutor) webDriver;
+		List<Object> jsResults = new ArrayList<>();
 		for (String command : commands)
 		{
-			executeJsCommand(jsExecutor, command, args);
+			Object result = executeJsCommand(jsExecutor, command, args);
+			if (result != null) {
+				jsResults.add(result);
+			}
 		}
+		return jsResults;
 	}
 
-	private static void executeJsCommand(JavascriptExecutor jsExecutor, String javaScript, Object... args)
+	private static Object executeJsCommand(JavascriptExecutor jsExecutor, String javaScript, Object... args)
 			throws ScriptExecuteException
 	{
 		try
@@ -51,6 +58,7 @@ public class WebJsUtils
 			Object res = jsExecutor.executeScript(javaScript, args);
 			if (res != null)
 				logger.info("Result of JS command: {} = {}", javaScript, res);
+			return res;
 		}
 		catch (Exception e)
 		{
