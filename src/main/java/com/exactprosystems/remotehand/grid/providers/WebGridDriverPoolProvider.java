@@ -89,6 +89,8 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 	{
 		ChromeOptions chromeOptions = new ChromeOptions();
 		chromeOptions.addArguments("--no-sandbox");
+		chromeOptions.addArguments("--ignore-ssl-errors=yes");
+		chromeOptions.addArguments("--ignore-certificate-errors");
 
 		Map<String, Object> prefs = new HashMap<>(1);
 		prefs.put("profile.content_settings.exceptions.clipboard", 
