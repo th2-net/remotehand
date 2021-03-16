@@ -79,7 +79,7 @@ public class TableSearch extends WindowsAction
 				for (Map.Entry<String, String> kvFilter : filtersMap.entrySet()) {
 					String rowName = format(rowElementNameFormat, kvFilter.getKey(), i);
 					WebElement rowElement = row.findElement(By.name(rowName));
-					String attribute = rowElement.getAttribute(rowElementValueFormat);
+					String attribute = StringUtils.defaultString(rowElement.getAttribute(rowElementValueFormat), StringUtils.EMPTY);
 					rowFound = kvFilter.getValue().equals(attribute);
 					if (!rowFound)
 						break;
