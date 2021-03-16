@@ -21,11 +21,7 @@ import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.contains;
@@ -81,7 +77,7 @@ public class RhUtils
 
 		String[] splitFilters = filters.split(";");
 		for (String splitFilter : splitFilters) {
-			String[] kvPair = splitFilter.split("=");
+			String[] kvPair = splitFilter.split("=", -1);
 			if (kvPair.length != 2)
 				continue;
 
