@@ -30,8 +30,11 @@ import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class WindowsAction extends Action {
+	private static volatile Pattern ELEMENT_EXTRACTOR_PATTERN = null; 
 	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
@@ -148,14 +151,29 @@ public abstract class WindowsAction extends Action {
 	}
 
 	private static String tryExtractErrorMessage(WebDriverException e) {
-		String[] splitExceptionMessages = e.getMessage().split("\n");
+		String exceptionMessage = e.getMessage();
+		String[] splitExceptionMessages = exceptionMessage.split("\n");
 		if (splitExceptionMessages.length == 0)
 			throw e;
 
 		String baseExceptionMessage = splitExceptionMessages[0];
 		int endMessage = baseExceptionMessage.indexOf(END_EXCEPTION_MESSAGE);
-		return endMessage == -1
+		String message = endMessage == -1
 				? baseExceptionMessage
 				: baseExceptionMessage.substring(0, endMessage);
+
+		Pattern pattern = getElementExtractorPattern();
+		Matcher matcher = pattern.matcher(exceptionMessage);
+		if (endMessage > -1 && matcher.find())
+			message += " " + matcher.group(0);
+
+		return message;
+	}
+
+	private static Pattern getElementExtractorPattern() {
+		if (ELEMENT_EXTRACTOR_PATTERN == null)
+			ELEMENT_EXTRACTOR_PATTERN = Pattern.compile("Element info: \\{[a-zA-Z0-9, =]*}");
+
+		return ELEMENT_EXTRACTOR_PATTERN;
 	}
 }
