@@ -190,9 +190,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 				options.setHeadless(true);
 				options.addArguments("window-size=1920x1080");
 			}
-			options.addArguments("--no-sandbox");
-			options.addArguments("--ignore-ssl-errors=yes");
-			options.addArguments("--ignore-certificate-errors");
+			options.addArguments("--no-sandbox", "--ignore-ssl-errors=yes", "--ignore-certificate-errors");
 			String binaryParam = cfg.getBinary();
 			if (binaryParam != null && !binaryParam.isEmpty())
 			{
