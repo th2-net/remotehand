@@ -18,8 +18,11 @@ package com.exactprosystems.remotehand.grid.providers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
+import com.exactprosystems.remotehand.web.WebConfiguration;
+import com.exactprosystems.remotehand.web.WebDriverPoolProvider;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -68,7 +71,8 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 	protected WebDriverWrapper createDriver(SessionContext context) throws RhConfigurationException
 	{
 		String driverUrl = sessionTargetUrls.get(context.getSessionId());
-		ChromeOptions chromeOptions = buildChromeOptions();
+		WebConfiguration cfg = WebConfiguration.getInstance();
+		ChromeOptions chromeOptions = buildChromeOptions(cfg);
 		try
 		{
 			RemoteWebDriver driver = new RemoteWebDriver(new URL(driverUrl + "/wd/hub/"), chromeOptions);
@@ -81,10 +85,15 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 	}
 
 
-	private ChromeOptions buildChromeOptions()
+	private ChromeOptions buildChromeOptions(WebConfiguration cfg)
 	{
 		ChromeOptions chromeOptions = new ChromeOptions();
-		chromeOptions.addArguments("--no-sandbox");
+		chromeOptions.addArguments("--no-sandbox", "--ignore-ssl-errors=yes", "--ignore-certificate-errors");
+
+		Map<String, Object> prefs = new HashMap<>(1);
+		prefs.put("profile.content_settings.exceptions.clipboard", 
+				WebDriverPoolProvider.createClipboardSettingsChrome(cfg.isReadClipboardPermissions()));
+		chromeOptions.setExperimentalOption("prefs", prefs);
 		
 		return chromeOptions;
 	}

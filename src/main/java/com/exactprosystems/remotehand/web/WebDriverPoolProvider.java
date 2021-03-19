@@ -17,6 +17,7 @@
 package com.exactprosystems.remotehand.web;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -189,9 +190,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 				options.setHeadless(true);
 				options.addArguments("window-size=1920x1080");
 			}
-			options.addArguments("--no-sandbox");
-			options.addArguments("--ignore-ssl-errors=yes");
-			options.addArguments("--ignore-certificate-errors");
+			options.addArguments("--no-sandbox", "--ignore-ssl-errors=yes", "--ignore-certificate-errors");
 			String binaryParam = cfg.getBinary();
 			if (binaryParam != null && !binaryParam.isEmpty())
 			{
@@ -200,8 +199,9 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 					options.setBinary(binaryParam);
 			}
 			
-			Map<String, String> prefs = new HashMap<>(2);
+			Map<String, Object> prefs = new HashMap<>(3);
 			prefs.put("profile.default_content_settings.popups", "0");
+			prefs.put("profile.content_settings.exceptions.clipboard", createClipboardSettingsChrome(cfg.isReadClipboardPermissions()));
 			prefs.put("download.default_directory", downloadDir.getAbsolutePath());
 			options.setExperimentalOption("prefs", prefs);
 
@@ -218,6 +218,14 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 		{
 			throw new RhConfigurationException("Could not create Chrome driver", e);
 		}
+	}
+	
+	public static Map<String, Object> createClipboardSettingsChrome(boolean enabled) {
+		Map<String,Object> map = new HashMap<>();
+		map.put("last_modified", String.valueOf(System.currentTimeMillis()));
+		//0 - default, 1 - enable, 2 - disable
+		map.put("setting", enabled ? 1 : 2);
+		return Collections.singletonMap("[*.],*", map);
 	}
 	
 	private FirefoxDriver createFirefoxDriver(WebConfiguration cfg, DesiredCapabilities dc, File downloadDir, boolean headlessMode) throws RhConfigurationException

@@ -19,6 +19,7 @@ package com.exactprosystems.remotehand.web.actions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.exactprosystems.remotehand.web.WebJsUtils;
 import org.openqa.selenium.By;
@@ -40,8 +41,13 @@ public class ExecuteJS extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
-		executeJsCommands(webDriver, splitCommands(getJsScript(params)), getJsArguments(webDriver, webLocator, params));
-		return null;
+		List<Object> jsResults = executeJsCommands(webDriver, splitCommands(getJsScript(params)), getJsArguments(webDriver, webLocator, params));
+		if (jsResults == null || jsResults.isEmpty()) {
+			return null;
+		} else {
+			return jsResults.stream().map(String::valueOf).collect(Collectors.joining(";"));
+		}
+		
 	}
 
 	protected List<String> splitCommands(String jsScript) throws ScriptExecuteException
@@ -72,7 +78,7 @@ public class ExecuteJS extends WebAction
 		return jsScript;
 	}
 
-	protected void executeJsCommands(WebDriver webDriver, List<String> commands, Object... args)
+	protected List<Object> executeJsCommands(WebDriver webDriver, List<String> commands, Object... args)
 			throws ScriptExecuteException
 	{
 		if (commands == null) {
@@ -81,7 +87,7 @@ public class ExecuteJS extends WebAction
 		if (args == null) {
 			throw new ScriptExecuteException("JS arguments should be presented");
 		}
-		WebJsUtils.executeJsCommands(webDriver, commands, args);
+		return WebJsUtils.executeJsCommands(webDriver, commands, args);
 	}
 
 	protected Object[] getJsArguments(WebDriver webDriver, By webLocator, Map<String, String> params)
