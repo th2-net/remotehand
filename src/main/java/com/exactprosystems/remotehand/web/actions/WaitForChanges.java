@@ -16,21 +16,20 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.exactprosystems.remotehand.ScriptCompileException;
+import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.exactprosystems.remotehand.ScriptCompileException;
-import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.web.WebAction;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class WaitForChanges extends WebAction
 {
@@ -79,7 +78,7 @@ public class WaitForChanges extends WebAction
 		do
 		{
 			WebElement element = findElement(webDriver, webLocator);
-			byte[] currentState = screenSaver.takeElementScreenshot(webDriver, element);
+			byte[] currentState = screenWriter.takeElementScreenshot(webDriver, element);
 			if (!compareStates(initialState, currentState))
 				return null;
 			

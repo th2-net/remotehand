@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.exactprosystems.remotehand.screensaver;
+package com.exactprosystems.remotehand.screenwriter;
 
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebConfiguration;
@@ -32,8 +32,8 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public abstract class ScreenSaver<T> {
-	private static final Logger logger = LoggerFactory.getLogger(ScreenSaver.class);
+public abstract class ScreenWriter<T> {
+	private static final Logger logger = LoggerFactory.getLogger(ScreenWriter.class);
 
 	protected String screenshotExtension;
 	protected static final DateTimeFormatter SCREENSHOT_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");

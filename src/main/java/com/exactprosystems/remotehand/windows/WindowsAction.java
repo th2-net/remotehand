@@ -132,7 +132,7 @@ public abstract class WindowsAction extends Action {
 	}
 
 	protected String takeScreenshot(String name) throws ScriptExecuteException {
-		return screenSaver.takeAndSaveScreenshot(name, windowsSessionContext.getCurrentDriver().getDriver());
+		return screenWriter.takeAndSaveScreenshot(name, windowsSessionContext.getCurrentDriver().getDriver());
 	}
 
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)

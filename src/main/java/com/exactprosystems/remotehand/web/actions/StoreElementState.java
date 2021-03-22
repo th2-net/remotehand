@@ -16,20 +16,18 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
-
 import com.exactprosystems.remotehand.Configuration;
+import com.exactprosystems.remotehand.ScriptCompileException;
+import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.exactprosystems.remotehand.ScriptCompileException;
-import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.web.WebAction;
+import java.nio.file.Path;
+import java.util.Map;
 
 public class StoreElementState extends WebAction
 {
@@ -61,7 +59,7 @@ public class StoreElementState extends WebAction
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement element = findElement(webDriver, webLocator);
-		String fileName = screenSaver.takeAndSaveElementScreenshot(screenshotName, webDriver, element);
+		String fileName = screenWriter.takeAndSaveElementScreenshot(screenshotName, webDriver, element);
 		Path screenshotPath = Configuration.SCREENSHOTS_DIR_PATH.resolve(fileName).toAbsolutePath();
 		context.getContextData().put(buildScreenshotId(params.get(PARAM_ID)), screenshotPath);
 

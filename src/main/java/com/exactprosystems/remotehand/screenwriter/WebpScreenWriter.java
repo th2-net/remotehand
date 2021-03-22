@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.exactprosystems.remotehand.screensaver;
+package com.exactprosystems.remotehand.screenwriter;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.sun.jna.Native;
@@ -28,8 +28,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class WebpScreenSaver extends ScreenSaver<byte[]> {
-	private static final Logger logger = LoggerFactory.getLogger(WebpScreenSaver.class);
+public class WebpScreenWriter extends ScreenWriter<byte[]> {
+	private static final Logger logger = LoggerFactory.getLogger(WebpScreenWriter.class);
 
 	private final float qualityFactor;
 	private final boolean losslessCompression;
@@ -38,7 +38,7 @@ public class WebpScreenSaver extends ScreenSaver<byte[]> {
 		loadLibrary();
 	}
 
-	public WebpScreenSaver(float qualityFactor, boolean losslessCompression) {
+	public WebpScreenWriter(float qualityFactor, boolean losslessCompression) {
 		screenshotExtension = "webp";
 		this.qualityFactor = qualityFactor;
 		this.losslessCompression = losslessCompression;

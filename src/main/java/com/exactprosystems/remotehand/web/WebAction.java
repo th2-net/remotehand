@@ -247,7 +247,7 @@ public abstract class WebAction extends Action
 		WebDriver webDriver = context.getWebDriver();
 		if (!(webDriver instanceof TakesScreenshot))
 			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
-		return screenSaver.takeAndSaveScreenshot(name, (TakesScreenshot) webDriver);
+		return screenWriter.takeAndSaveScreenshot(name, (TakesScreenshot) webDriver);
 	}
 
 	protected int getChromeDriverVersion(ChromeDriver chromeDriver)

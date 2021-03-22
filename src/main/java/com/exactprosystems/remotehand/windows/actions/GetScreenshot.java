@@ -41,7 +41,7 @@ public class GetScreenshot extends WindowsAction {
 		WebElement element = es.searchElement();
 		return element == null
 				? this.takeScreenshot(screenshotName)
-				: screenSaver.takeAndSaveScreenshot(screenshotName, element);
+				: screenWriter.takeAndSaveScreenshot(screenshotName, element);
 	}
 
 	@Override

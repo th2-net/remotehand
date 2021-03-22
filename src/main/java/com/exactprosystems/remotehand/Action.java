@@ -17,13 +17,13 @@
 package com.exactprosystems.remotehand;
 
 
-import com.exactprosystems.remotehand.screensaver.ScreenSaver;
+import com.exactprosystems.remotehand.screenwriter.ScreenWriter;
 
 /**
  * Created by alexey.karpukhin on 2/1/16.
  */
 public abstract class Action {
-	protected ScreenSaver<?> screenSaver = Configuration.getInstance().getDefaultScreenSaver();
+	protected ScreenWriter<?> screenWriter = Configuration.getInstance().getDefaultScreenWriter();
 
 	public abstract String execute() throws ScriptExecuteException;
 

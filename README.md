@@ -77,7 +77,7 @@ java -jar remotehand.jar -input <script file> -output <file for script output> -
 ```
 
 ## WebP image encoding
-[Here](https://github.com/th2-net/remotehand/blob/master/www/WebpLibrary.MD) you can see how to use webp library to encoding images.
+[Here](https://github.com/th2-net/remotehand/blob/master/www/WebpLibrary.MD) you can see how to use webp library to encode images.
 
 ## A word about Selenium drivers
 

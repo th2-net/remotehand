@@ -16,9 +16,9 @@
 
 package com.exactprosystems.remotehand;
 
-import com.exactprosystems.remotehand.screensaver.DefaultScreenSaver;
-import com.exactprosystems.remotehand.screensaver.ScreenSaver;
-import com.exactprosystems.remotehand.screensaver.WebpScreenSaver;
+import com.exactprosystems.remotehand.screenwriter.DefaultScreenWriter;
+import com.exactprosystems.remotehand.screenwriter.ScreenWriter;
+import com.exactprosystems.remotehand.screenwriter.WebpScreenWriter;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public abstract class Configuration
 	private volatile int driverPoolSize;
 	private volatile int sendKeysMaxRetries;
 	private volatile File fileStorage;
-	private volatile ScreenSaver<?> defaultScreenSaver;
+	private volatile ScreenWriter<?> defaultScreenWriter;
 	
 	protected boolean acceptEnvVars;
 	protected String webpLibraryPath;
@@ -147,16 +147,16 @@ public abstract class Configuration
 		this.webpLibraryPath = this.loadProperty(PARAM_WEBP_LIBRARY_PATH, DEF_WEBP_LIBRARY_PATH);
 		this.webpQualityFactor = this.loadProperty(PARAM_WEBP_QUALITY_FACTOR, DEF_WEBP_QUALITY_FACTOR, Float::parseFloat);
 		this.losslessCompression = this.loadProperty(PARAM_WEBP_LOSSLESS_COMPRESSION, Boolean.TRUE, Boolean::parseBoolean);
-		this.defaultScreenSaver = createDefaultScreenSaver();
+		this.defaultScreenWriter = createDefaultScreenWriter();
 	}
 
-	protected ScreenSaver<?> createDefaultScreenSaver() {
+	protected ScreenWriter<?> createDefaultScreenWriter() {
 		if (useWebpImageEncoder) {
-			WebpScreenSaver webpScreenSaver = new WebpScreenSaver(webpQualityFactor, losslessCompression);
-			logger.info("Enabled webp image encoder. Encoder version: {}", Integer.toHexString(webpScreenSaver.getEncoderVersion()));
-			return webpScreenSaver;
+			WebpScreenWriter webpScreenWriter = new WebpScreenWriter(webpQualityFactor, losslessCompression);
+			logger.info("Enabled webp image encoder. Encoder version: {}", Integer.toHexString(webpScreenWriter.getEncoderVersion()));
+			return webpScreenWriter;
 		} else {
-			return new DefaultScreenSaver();
+			return new DefaultScreenWriter();
 		}
 	}
 
@@ -305,7 +305,7 @@ public abstract class Configuration
 		return webpQualityFactor;
 	}
 
-	public ScreenSaver<?> getDefaultScreenSaver() {
-		return defaultScreenSaver;
+	public ScreenWriter<?> getDefaultScreenWriter() {
+		return defaultScreenWriter;
 	}
 }

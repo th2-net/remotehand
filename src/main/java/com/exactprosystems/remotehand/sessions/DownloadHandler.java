@@ -16,11 +16,11 @@
 
 package com.exactprosystems.remotehand.sessions;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.web.WebConfiguration;
+
+import java.io.File;
+import java.io.IOException;
 
 public class DownloadHandler
 {
@@ -41,7 +41,7 @@ public class DownloadHandler
 	
 	private void sendScreenshot(SessionExchange exchange, String fileId) throws IOException {
 		File file = WebConfiguration.SCREENSHOTS_DIR_PATH.resolve(fileId).toFile();
-		sendFile(exchange, file, "image/" + Configuration.getInstance().getDefaultScreenSaver().getScreenshotExtension(),
+		sendFile(exchange, file, "image/" + Configuration.getInstance().getDefaultScreenWriter().getScreenshotExtension(),
 				fileId, fileId);
 	}
 

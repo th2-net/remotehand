@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.exactprosystems.remotehand.screensaver;
+package com.exactprosystems.remotehand.screenwriter;
 
 import com.exactprosystems.remotehand.Configuration;
 import com.jhlabs.image.PosterizeFilter;
@@ -25,9 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class DefaultScreenSaver extends ScreenSaver<BufferedImage> {
+public class DefaultScreenWriter extends ScreenWriter<BufferedImage> {
 
-	public DefaultScreenSaver() {
+	public DefaultScreenWriter() {
 		screenshotExtension = "png";
 	}
 
