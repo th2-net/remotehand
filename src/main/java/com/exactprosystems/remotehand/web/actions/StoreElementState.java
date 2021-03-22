@@ -16,14 +16,11 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import com.exactprosystems.remotehand.utils.ScreenshotRegionUtils;
-import com.exactprosystems.remotehand.web.WebConfiguration;
+import com.exactprosystems.remotehand.Configuration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,7 +36,10 @@ public class StoreElementState extends WebAction
 	private static final Logger logger = LoggerFactory.getLogger(StoreElementState.class);
 	
 	private static final String PARAM_ID = "id";
-	
+
+	protected String screenshotName = "takeScreenshotAction";
+
+
 	@Override
 	public boolean isNeedLocator()
 	{
@@ -59,17 +59,12 @@ public class StoreElementState extends WebAction
 	}
 	
 	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement element = findElement(webDriver, webLocator);
-		byte[] screen = ScreenshotRegionUtils.takeElementScreenshot(webDriver, element);
-		Path fileName = Paths.get(WebConfiguration.SCREENSHOTS_DIR_NAME, "takeScreenshotAction" + System.currentTimeMillis() + ".jpeg");
-		try {
-			Files.write(fileName, screen);
-		} catch (IOException e) {
-			throw new ScriptExecuteException("Cannot store file", e);
-		}
-		context.getContextData().put(buildScreenshotId(params.get(PARAM_ID)), fileName);
+		String fileName = screenSaver.takeAndSaveElementScreenshot(screenshotName, webDriver, element);
+		Path screenshotPath = Configuration.SCREENSHOTS_DIR_PATH.resolve(fileName).toAbsolutePath();
+		context.getContextData().put(buildScreenshotId(params.get(PARAM_ID)), screenshotPath);
+
 		return null;
 	}
 	

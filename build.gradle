@@ -48,6 +48,7 @@ dependencies {
     
     compile 'io.appium:java-client:7.3.0'
     compile "org.mvel:mvel2:2.4.7.Final"
+    compile group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
 }
 
 jar {

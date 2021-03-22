@@ -39,10 +39,10 @@ public class DownloadHandler
 			exchange.sendResponse(SessionHandler.CODE_BAD, String.format(UNKNOWN_FILE_TYPE, fileType));
 	}
 	
-	private void sendScreenshot(SessionExchange exchange, String fileId) throws IOException
-	{
-		File file = new File(WebConfiguration.SCREENSHOTS_DIR_NAME, fileId);
-		sendFile(exchange, file, "image/png", fileId, fileId);
+	private void sendScreenshot(SessionExchange exchange, String fileId) throws IOException {
+		File file = WebConfiguration.SCREENSHOTS_DIR_PATH.resolve(fileId).toFile();
+		sendFile(exchange, file, "image/" + Configuration.getInstance().getDefaultScreenSaver().getScreenshotExtension(),
+				fileId, fileId);
 	}
 
 	private void sendFile(SessionExchange exchange, String fileLocation) throws IOException

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.exactprosystems.remotehand.utils.ScreenshotRegionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -80,7 +79,7 @@ public class WaitForChanges extends WebAction
 		do
 		{
 			WebElement element = findElement(webDriver, webLocator);
-			byte[] currentState = ScreenshotRegionUtils.takeElementScreenshot(webDriver, element);
+			byte[] currentState = screenSaver.takeElementScreenshot(webDriver, element);
 			if (!compareStates(initialState, currentState))
 				return null;
 			

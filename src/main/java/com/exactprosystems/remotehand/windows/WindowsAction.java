@@ -20,7 +20,6 @@ import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.utils.ExceptionUtils;
-import com.exactprosystems.remotehand.utils.ScreenshotUtils;
 import com.exactprosystems.remotehand.web.WebScriptCompiler;
 import com.exactprosystems.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import io.appium.java_client.windows.WindowsDriver;
@@ -132,10 +131,8 @@ public abstract class WindowsAction extends Action {
 		}
 	}
 
-	protected String takeScreenshot(String name) throws ScriptExecuteException
-	{
-		WindowsDriver<?> webDriver = windowsSessionContext.getCurrentDriver().getDriver();
-		return ScreenshotUtils.takeAndSaveScreenshot(name, webDriver);
+	protected String takeScreenshot(String name) throws ScriptExecuteException {
+		return screenSaver.takeAndSaveScreenshot(name, windowsSessionContext.getCurrentDriver().getDriver());
 	}
 
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
