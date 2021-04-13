@@ -19,6 +19,8 @@ package com.exactprosystems.remotehand.web.actions;
 import com.exactprosystems.remotehand.Configuration;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.screenwriter.DefaultScreenWriter;
+import com.exactprosystems.remotehand.screenwriter.ScreenWriter;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -29,11 +31,10 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class StoreElementState extends WebAction
-{
+public class StoreElementState extends WebAction {
 	private static final Logger logger = LoggerFactory.getLogger(StoreElementState.class);
-	
 	private static final String PARAM_ID = "id";
+	private static final ScreenWriter<?> screenWriter = new DefaultScreenWriter();
 
 	protected String screenshotName = "takeScreenshotAction";
 
