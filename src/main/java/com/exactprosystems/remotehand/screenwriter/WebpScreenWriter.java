@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -95,12 +97,15 @@ public class WebpScreenWriter extends ScreenWriter<byte[]> {
 	protected byte[] getRGBAData(BufferedImage bufferedImage) {
 		byte[] result = new byte[bufferedImage.getWidth() * bufferedImage.getHeight() * 4];
 		int offset = 0;
+		ColorModel colorModel = bufferedImage.getColorModel();
+		WritableRaster raster = bufferedImage.getRaster();
 		for (int i = 0; i < bufferedImage.getHeight(); i++) {
 			for (int j = 0; j < bufferedImage.getWidth(); j++) {
-				result[offset++] = (byte) ((bufferedImage.getRGB(j, i) >> 16) & 0xff);
-				result[offset++] = (byte) ((bufferedImage.getRGB(j, i) >> 8) & 0xff);
-				result[offset++] = (byte) (bufferedImage.getRGB(j, i) & 0xff);
-				result[offset++] = (byte) ((bufferedImage.getRGB(j, i) >> 24) & 0xff);
+				Object dataElements = raster.getDataElements(j, i, null);
+				result[offset++] = (byte) (colorModel.getRed(dataElements) & 0xff); // get the red pixel component as a byte 
+				result[offset++] = (byte) (colorModel.getGreen(dataElements) & 0xff); // get the green pixel component as a byte
+				result[offset++] = (byte) (colorModel.getBlue(dataElements) & 0xff); // get the blue pixel component as a byte
+				result[offset++] = (byte) (colorModel.getAlpha(dataElements) & 0xff); // get the alpha pixel component as a byte
 			}
 		}
 
@@ -110,11 +115,14 @@ public class WebpScreenWriter extends ScreenWriter<byte[]> {
 	protected byte[] getRGBData(BufferedImage bufferedImage) {
 		byte[] result = new byte[bufferedImage.getWidth() * bufferedImage.getHeight() * 3];
 		int offset = 0;
+		ColorModel colorModel = bufferedImage.getColorModel();
+		WritableRaster raster = bufferedImage.getRaster();
 		for (int i = 0; i < bufferedImage.getHeight(); i++) {
 			for (int j = 0; j < bufferedImage.getWidth(); j++) {
-				result[offset++] = (byte) ((bufferedImage.getRGB(j, i) >> 16) & 0xff);
-				result[offset++] = (byte) ((bufferedImage.getRGB(j, i) >> 8) & 0xff);
-				result[offset++] = (byte) (bufferedImage.getRGB(j, i) & 0xff);
+				Object dataElements = raster.getDataElements(j, i, null);
+				result[offset++] = (byte) (colorModel.getRed(dataElements) & 0xff); // get the red pixel component as a byte 
+				result[offset++] = (byte) (colorModel.getGreen(dataElements) & 0xff); // get the green pixel component as a byte
+				result[offset++] = (byte) (colorModel.getBlue(dataElements) & 0xff); // get the blue pixel component as a byte
 			}
 		}
 
@@ -132,7 +140,7 @@ public class WebpScreenWriter extends ScreenWriter<byte[]> {
 	private static void loadLibrary() {
 		File library = new File(Configuration.getInstance().getWebpLibraryPath());
 		if (!library.exists()) {
-			logger.error("WebP librarys cannot be initialized");
+			logger.error("WebP library cannot be initialized");
 			throw new RuntimeException("WebP library is not exist");
 		}
 		Native.register(library.getAbsolutePath());

@@ -18,6 +18,8 @@ package com.exactprosystems.remotehand.web.actions;
 
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
+import com.exactprosystems.remotehand.screenwriter.DefaultScreenWriter;
+import com.exactprosystems.remotehand.screenwriter.ScreenWriter;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -31,13 +33,14 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class WaitForChanges extends WebAction
-{
+public class WaitForChanges extends WebAction {
 	private static final Logger logger = LoggerFactory.getLogger(WaitForChanges.class);
 	private static final String PARAM_SECONDS = "seconds",
 			PARAM_SCREENSHOTID = "screenshotid",
 			PARAM_CHECKMILLIS = "checkmillis";
-	
+	private static final ScreenWriter<?> screenWriter = new DefaultScreenWriter();
+
+
 	@Override
 	public boolean isNeedLocator()
 	{
