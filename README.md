@@ -76,6 +76,8 @@ Alternative configuration file can be specified in optional -config parameter li
 java -jar remotehand.jar -input <script file> -output <file for script output> -config <path to config>
 ```
 
+## WebP image encoding
+[Here](https://github.com/th2-net/remotehand/blob/master/www/WebpLibrary.MD) you can see how to use webp library to encode images.
 
 ## A word about Selenium drivers
 

@@ -16,13 +16,11 @@
 
 package com.exactprosystems.remotehand.web.actions;
 
-import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.utils.ScreenshotUtils;
 import com.exactprosystems.remotehand.ActionOutputType;
+import com.exactprosystems.remotehand.ScriptExecuteException;
 import com.exactprosystems.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +34,7 @@ public class GetElementScreenshot extends WebAction {
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
-		WebElement element = findElement(webDriver, webLocator);
-		return ScreenshotUtils.takeAndSaveScreenshot(params.get(NAME_PARAM), element);
+		return screenWriter.takeAndSaveScreenshot(params.get(NAME_PARAM), findElement(webDriver, webLocator));
 	}
 
 	@Override

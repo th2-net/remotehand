@@ -18,7 +18,6 @@ package com.exactprosystems.remotehand.windows.actions;
 
 import com.exactprosystems.remotehand.ActionOutputType;
 import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.utils.ScreenshotUtils;
 import com.exactprosystems.remotehand.windows.ElementSearcher;
 import com.exactprosystems.remotehand.windows.WindowsAction;
 import com.exactprosystems.remotehand.windows.WindowsDriverWrapper;
@@ -40,13 +39,9 @@ public class GetScreenshot extends WindowsAction {
 		String screenshotName = params.get(NAME_PARAM);
 		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
 		WebElement element = es.searchElement();
-		String screenshotId;
-		if (element == null) {
-			screenshotId = this.takeScreenshot(screenshotName);
-		} else {
-			screenshotId = ScreenshotUtils.takeAndSaveScreenshot(screenshotName, element);
-		}
-		return screenshotId;
+		return element == null
+				? this.takeScreenshot(screenshotName)
+				: screenWriter.takeAndSaveScreenshot(screenshotName, element);
 	}
 
 	@Override

@@ -20,17 +20,9 @@ import com.exactprosystems.remotehand.Action;
 import com.exactprosystems.remotehand.RhUtils;
 import com.exactprosystems.remotehand.ScriptCompileException;
 import com.exactprosystems.remotehand.ScriptExecuteException;
-import com.exactprosystems.remotehand.utils.ScreenshotUtils;
 import com.exactprosystems.remotehand.web.webelements.WebLocator;
-
 import org.apache.commons.lang3.StringUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Locatable;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -255,9 +247,9 @@ public abstract class WebAction extends Action
 		WebDriver webDriver = context.getWebDriver();
 		if (!(webDriver instanceof TakesScreenshot))
 			throw new ScriptExecuteException("Current driver doesn't support taking screenshots.");
-		return ScreenshotUtils.takeAndSaveScreenshot(name, (TakesScreenshot) webDriver);
+		return screenWriter.takeAndSaveScreenshot(name, (TakesScreenshot) webDriver);
 	}
-		
+
 	protected int getChromeDriverVersion(ChromeDriver chromeDriver)
 	{
 		Map<?, ?> chromeCap = (Map<?, ?>) chromeDriver.getCapabilities().getCapability("chrome");

@@ -58,7 +58,8 @@ public class RemoteHandStarter
 			CONFIG_FILE_OPTIONS_PARAM = "configFileOption", 
 			WINDOWS_OPTIONS_PARAM = "windowsMode",
 			GRID_MODE_OPTIONS_PARAM = "grid";
-	public static final String ENV_VARS_PARAM = "enableEnvVars";
+	public static final String ENV_VARS_PARAM = "enableEnvVars",
+			USE_WEBP_IMAGE_ENCODER_PARAM = "useWebpImageEncoder";
 
 
 	public static void main(String[] args)
@@ -321,7 +322,7 @@ public class RemoteHandStarter
 	@SuppressWarnings("static-access")
 	private static Map<String, Option> createOptionMap()
 	{
-		Map<String, Option> optionMap = new HashMap<>(10);
+		Map<String, Option> optionMap = new HashMap<>(11);
 
 		Option enableServerMode = OptionBuilder
 				.isRequired(false)
@@ -388,6 +389,11 @@ public class RemoteHandStarter
 				.withDescription("Enables environment variables. Example: to option SessionExpire (in ini file) " + 
 						"option will be RH_SESSION_EXPIRE").create(ENV_VARS_PARAM);
 		optionMap.put(ENV_VARS_PARAM, envVarsMode);
+
+		Option useWebpImageEncoder = OptionBuilder
+				.isRequired(false)
+				.withDescription("Enables WebP image encoder").create(USE_WEBP_IMAGE_ENCODER_PARAM);
+		optionMap.put(USE_WEBP_IMAGE_ENCODER_PARAM, useWebpImageEncoder);
 
 		return optionMap;
 	}

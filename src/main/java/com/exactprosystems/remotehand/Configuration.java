@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package com.exactprosystems.remotehand;
 
+import com.exactprosystems.remotehand.screenwriter.DefaultScreenWriter;
+import com.exactprosystems.remotehand.screenwriter.ScreenWriter;
+import com.exactprosystems.remotehand.screenwriter.WebpScreenWriter;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -39,14 +44,17 @@ public abstract class Configuration
 	public final String PROPERTY_NOT_SET = "Property '%s' is not set. Using default value = '%s'";
 
 	public final String CONFIG_FILE_NAME = "config.ini";
+	public static final Path SCREENSHOTS_DIR_PATH = Paths.get("screenshots");
 	public final int DEF_PORT = 8008;
 	public final char DEF_DELIMITER = ',';
 	public final char DEF_TEXT_QUALIFIER = '"';
 	public final int DEF_SESSION_EXPIRE = 10; // 10 minutes
 	public final int DEF_DRIVER_POOL_SIZE = 1;
 	public final int DEF_SEND_KEYS_MAX_RETRIES = 3;
+	public final float DEF_WEBP_QUALITY_FACTOR = 100f;
 	public final String DEF_FILE_STORAGE = "generated/",
-			DEF_HOST = "localhost";
+			DEF_HOST = "localhost",
+			DEF_WEBP_LIBRARY_PATH = "libwebp.so";
 
 	public final String PARAM_HOST = "Host",
 			PARAM_PORT = "Port",
@@ -55,7 +63,10 @@ public abstract class Configuration
 			PARAM_SESSIONEXPIRE = "SessionExpire",
 			PARAM_FILE_STORAGE = "DefaultFileStorage",
 			PARAM_DRIVER_POOL_SIZE = "WebDriverPoolSize",
-			PARAM_SEND_KEYS_MAX_RETRIES = "SendKeysMaxRetries";
+			PARAM_SEND_KEYS_MAX_RETRIES = "SendKeysMaxRetries",
+			PARAM_WEBP_LIBRARY_PATH = "WebpLibPath",
+			PARAM_WEBP_QUALITY_FACTOR = "WebpQualityFactor",
+			PARAM_WEBP_LOSSLESS_COMPRESSION = "WebpLosslessCompression";
 
 	private volatile String host;
 	private volatile int port;
@@ -65,9 +76,14 @@ public abstract class Configuration
 	private volatile int driverPoolSize;
 	private volatile int sendKeysMaxRetries;
 	private volatile File fileStorage;
+	private volatile ScreenWriter<?> defaultScreenWriter;
 	
 	protected boolean acceptEnvVars;
-	
+	protected String webpLibraryPath;
+	protected float webpQualityFactor;
+	protected boolean useWebpImageEncoder;
+	protected boolean losslessCompression;
+
 	protected Map<String, String> options;
 
 	protected Configuration(CommandLine commandLine)
@@ -86,11 +102,14 @@ public abstract class Configuration
 			configFileName = commandLine.getOptionValue(RemoteHandStarter.CONFIG_PARAM, CONFIG_FILE_NAME);
 			logger.info(String.format("Using configuration file '%s'", configFileName));
 			this.acceptEnvVars = commandLine.hasOption(RemoteHandStarter.ENV_VARS_PARAM);
+			this.useWebpImageEncoder = commandLine.hasOption(RemoteHandStarter.USE_WEBP_IMAGE_ENCODER_PARAM);
 			logger.info("Allowed configuration options from env vars {}", acceptEnvVars);
 		} else {
 			configFileName = CONFIG_FILE_NAME;
 			logger.info("Used default config file");
 			this.acceptEnvVars = false;
+			this.useWebpImageEncoder = this.loadProperty(RemoteHandStarter.USE_WEBP_IMAGE_ENCODER_PARAM, Boolean.FALSE,
+					Boolean::parseBoolean);
 			logger.info("Env vars is not allowed");			
 		}
 		
@@ -125,8 +144,22 @@ public abstract class Configuration
 		this.fileStorage = new File(this.loadProperty(PARAM_FILE_STORAGE, DEF_FILE_STORAGE));
 		this.driverPoolSize = this.loadProperty(PARAM_DRIVER_POOL_SIZE, DEF_DRIVER_POOL_SIZE, Integer::parseInt);
 		this.sendKeysMaxRetries = this.loadProperty(PARAM_SEND_KEYS_MAX_RETRIES, DEF_SEND_KEYS_MAX_RETRIES, Integer::parseInt);
+		this.webpLibraryPath = this.loadProperty(PARAM_WEBP_LIBRARY_PATH, DEF_WEBP_LIBRARY_PATH);
+		this.webpQualityFactor = this.loadProperty(PARAM_WEBP_QUALITY_FACTOR, DEF_WEBP_QUALITY_FACTOR, Float::parseFloat);
+		this.losslessCompression = this.loadProperty(PARAM_WEBP_LOSSLESS_COMPRESSION, Boolean.TRUE, Boolean::parseBoolean);
+		this.defaultScreenWriter = createDefaultScreenWriter();
 	}
-	
+
+	protected ScreenWriter<?> createDefaultScreenWriter() {
+		if (useWebpImageEncoder) {
+			WebpScreenWriter webpScreenWriter = new WebpScreenWriter(webpQualityFactor, losslessCompression);
+			logger.info("Enabled webp image encoder. Encoder version: {}", Integer.toHexString(webpScreenWriter.getEncoderVersion()));
+			return webpScreenWriter;
+		} else {
+			return new DefaultScreenWriter();
+		}
+	}
+
 	protected Properties getDefaultProperties()
 	{
 		Properties defProperties = new Properties();
@@ -262,5 +295,17 @@ public abstract class Configuration
 	public int getSendKeysMaxRetries()
 	{
 		return sendKeysMaxRetries;
+	}
+
+	public String getWebpLibraryPath() {
+		return webpLibraryPath;
+	}
+
+	public float getWebpQualityFactor() {
+		return webpQualityFactor;
+	}
+
+	public ScreenWriter<?> getDefaultScreenWriter() {
+		return defaultScreenWriter;
 	}
 }

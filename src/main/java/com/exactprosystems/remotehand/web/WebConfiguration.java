@@ -19,6 +19,8 @@ package com.exactprosystems.remotehand.web;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -65,8 +67,7 @@ public class WebConfiguration extends Configuration {
 	public static final String CLIENT_LOGGING_LEVEL = "ClientLoggingLevel";
 	public static final String DRIVER_LOGGING_LEVEL = "DriverLoggingLevel";
 	public static final String PERFORMANCE_LOGGING_LEVEL = "PerformanceLoggingLevel";
-	
-	public static final String SCREENSHOTS_DIR_NAME = "screenshots";
+
 	public static final String DRIVER_LOGS_DIR_NAME = "driverLogs";
 	
 	private static final Level DEF_LOG_LEVEL = Level.OFF;
