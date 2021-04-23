@@ -1,13 +1,10 @@
 plugins {
     id "java"
-    // id 'java-library'
     id 'application'
     id 'maven-publish'
     id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id 'signing'
 }
-
-// apply plugin: "maven-publish"
 
 group = 'com.exactpro.remotehand'
 version = release_version
@@ -15,6 +12,8 @@ version = release_version
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
 }
 
 ext {
@@ -69,14 +68,14 @@ dependencies {
 jar {
     archivesBaseName = "${archivesBaseName}"
     manifest {
-        attributes 'Main-Class': 'com.exactprosystems.remotehand.RemoteHandStarter'
+        attributes 'Main-Class': 'com.exactpro.remotehand.RemoteHandStarter'
         attributes "Class-Path": configurations.runtimeClasspath.collect { "lib/${it.getName()}" }.join(' ')
         attributes('Created-By': System.getProperty('java.version') + ' (' + System.getProperty('java.vendor') + ')')
         attributes('Specification-Title': 'Remotehand')
         attributes('Specification-Vendor': 'Exactpro Systems LLC')
         attributes('Implementation-Title': rootProject.name)
         attributes('Implementation-Vendor': 'Exactpro Systems LLC')
-        attributes('Implementation-Vendor-Id': 'com.exactprosystems')
+        attributes('Implementation-Vendor-Id': 'com.exactpro')
         attributes('Implementation-Version': project.version)
     }
 }
@@ -95,10 +94,6 @@ task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     }
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
 // conditionals for publications
 tasks.withType(PublishToMavenRepository) {
     onlyIf {
@@ -195,6 +190,6 @@ clean {
     delete sharedDir
 }
 
-// wrapper {
-//     gradleVersion = '5.5'
-// }
+ wrapper {
+     gradleVersion = '6.6'
+ }
