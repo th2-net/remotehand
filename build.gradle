@@ -81,19 +81,19 @@ jar {
     }
 }
 
-// task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
-//     archiveAppendix = new Date().format('yyyyMMdd')
-//     archiveVersion = release_version
-//     from jar
-//     from ("${projectDir}") {
-//         include "config.ini"
-//         include "log4j.properties"
-//         include "README.md"
-//     }
-//     into ("lib/") {
-//         from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
-//     }
-// }
+task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
+    archiveAppendix = new Date().format('yyyyMMdd')
+    archiveVersion = release_version
+    from jar
+    from ("${projectDir}") {
+        include "config.ini"
+        include "log4j.properties"
+        include "README.md"
+    }
+    into ("lib/") {
+        from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
+    }
+}
 
 java {
     withJavadocJar()
