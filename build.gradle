@@ -1,18 +1,19 @@
 plugins {
     id "java"
-    id 'java-library'
     id 'application'
-    id "com.jfrog.bintray" version '1.8.5'
+    id 'maven-publish'
+    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
+    id 'signing'
 }
 
-apply plugin: "maven-publish"
-
-group = 'com.exactprosystems.remotehand'
+group = 'com.exactpro.remotehand'
 version = release_version
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+    withJavadocJar()
+    withSourcesJar()
 }
 
 ext {
@@ -20,7 +21,7 @@ ext {
 }
 
 application {
-    mainClassName = "com.exactprosystems.remotehand.RemoteHandStarter"
+    mainClassName = "com.exactpro.remotehand.RemoteHandStarter"
 }
 
 repositories {
@@ -28,6 +29,19 @@ repositories {
     maven {
         name 'Bintray'
         url 'https://dl.bintray.com/exactpro/th2'
+    }
+    maven {
+            name 'Sonatype_snapshots'
+            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+    }
+    maven {
+            name 'Sonatype_releases'
+            url 'https://s01.oss.sonatype.org/content/repositories/releases/'
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
     }
 }
 
@@ -54,14 +68,14 @@ dependencies {
 jar {
     archivesBaseName = "${archivesBaseName}"
     manifest {
-        attributes 'Main-Class': 'com.exactprosystems.remotehand.RemoteHandStarter'
+        attributes 'Main-Class': 'com.exactpro.remotehand.RemoteHandStarter'
         attributes "Class-Path": configurations.runtimeClasspath.collect { "lib/${it.getName()}" }.join(' ')
         attributes('Created-By': System.getProperty('java.version') + ' (' + System.getProperty('java.vendor') + ')')
         attributes('Specification-Title': 'Remotehand')
         attributes('Specification-Vendor': 'Exactpro Systems LLC')
         attributes('Implementation-Title': rootProject.name)
         attributes('Implementation-Vendor': 'Exactpro Systems LLC')
-        attributes('Implementation-Vendor-Id': 'com.exactprosystems')
+        attributes('Implementation-Vendor-Id': 'com.exactpro')
         attributes('Implementation-Version': project.version)
     }
 }
@@ -80,51 +94,102 @@ task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
     }
 }
 
+// conditionals for publications
+tasks.withType(PublishToMavenRepository) {
+    onlyIf {
+        (repository == publishing.repositories.nexusRepository &&
+            project.hasProperty('nexus_user') &&
+            project.hasProperty('nexus_password') &&
+            project.hasProperty('nexus_url')) ||
+        (repository == publishing.repositories.sonatype &&
+            project.hasProperty('sonatypeUsername') &&
+            project.hasProperty('sonatypePassword')) ||
+        (repository == publishing.repositories.localRepo)
+    }
+}
+tasks.withType(Sign) {
+    onlyIf { project.hasProperty('signingKey') &&
+        project.hasProperty('signingPassword')
+    }
+}
+// disable running task 'initializeSonatypeStagingRepository' on a gitlab
+tasks.whenTaskAdded {task ->
+    if(task.name.equals('initializeSonatypeStagingRepository') &&
+        !(project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword'))
+    ) {
+        task.enabled = false
+    }
+}
+
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
-        }
-        bintrayPublication(MavenPublication) {
-            from components.java
-            groupId group
-            artifactId rootProject.name
-            version project.version
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('name', rootProject.name)
-                root.appendNode('url', project.vcs_url)
+            from(components.java)
+            pom {
+              name = rootProject.name
+              packaging = 'jar'
+              description = rootProject.description
+              url = vcs_url
+              scm {
+                url = vcs_url
+              }
+              licenses {
+                license {
+                  name = 'The Apache License, Version 2.0'
+                  url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+              }
+              developers {
+                developer {
+                  id = 'developer'
+                  name = 'developer'
+                  email = 'developer@exactpro.com'
+                }
+              }
+              scm {
+                url = vcs_url
+              }
             }
         }
     }
-
     repositories {
         maven {
             name = 'localRepo'
             url = sharedDir
         }
-    }
-}
-
-bintray {
-    user = "${bintray_user}"
-    key = "${bintray_key}"
-    publications = ['bintrayPublication']
-    pkg {
-        repo = 'th2'
-        name = rootProject.name
-        userOrg = 'exactpro'
-        licenses = ['Apache-2.0']
-        vcsUrl = project.vcs_url
-        version {
-            name = project.version
-            desc = project.version
-            released  = new Date()
+//Nexus repo to publish from gitlab
+        maven {
+            name = 'nexusRepository'
+            credentials {
+                username = project.findProperty('nexus_user')
+                password = project.findProperty('nexus_password')
+            }
+            url = project.findProperty('nexus_url')
         }
     }
-    publish = true
 }
 
-wrapper {
-    gradleVersion = '5.5'
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
 }
+
+signing {
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.mavenJava
+}
+
+clean {
+    delete sharedDir
+}
+
+ wrapper {
+     gradleVersion = '6.6'
+ }

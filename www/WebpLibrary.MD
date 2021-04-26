@@ -13,8 +13,8 @@ git clone webp-repository
 cd libwebp
 make -f makefile.unix
 cd swig
-mkdir -p java/com/exactprosystems/remotehand/screenwriter
-swig -java -package com.exactprosystems.remotehand.screenwriter -outdir java/com/exactprosystems/remotehand/screenwriter -o libwebp_java_wrap.c libwebp.swig
+mkdir -p java/com/exactpro/remotehand/screenwriter
+swig -java -package com.exactpro.remotehand.screenwriter -outdir java/com/exactpro/remotehand/screenwriter -o libwebp_java_wrap.c libwebp.swig
 gcc -shared -fPIC -fno-strict-aliasing -O2 -I/path/to/java/Contents/Home/include/ -I/path/to/java/Contents/Home/include/ostype -L../src  libwebp_java_wrap.c -lwebp -o libwebp_ostype.so
 ```
 Copy the compiled library into `lib` folder and write the path to it in `config.ini` and use the following optional parameter  when you start application `-useWebpImageEncoder`.
