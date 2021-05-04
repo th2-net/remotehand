@@ -21,7 +21,6 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -32,7 +31,6 @@ import java.util.Map;
 public class WaitForElement extends WindowsAction {
 	private static final Logger loggerInstance = LoggerFactory.getLogger(WaitForElement.class);
 
-	private static final String FROM_ROOT_PARAM = "fromroot";
 	private static final String TIMEOUT_PARAM = "timeout";
 
 	@Override
@@ -44,7 +42,7 @@ public class WaitForElement extends WindowsAction {
 		}
 
 		int timeout = Integer.parseInt(timeoutString);
-		ElementSearcher elementSearcher = new ElementSearcher(params, getDriver(driverWrapper, params), cachedElements);
+		ElementSearcher elementSearcher = new ElementSearcher(params, getDriver(driverWrapper), cachedElements);
 		WebElement element = elementSearcher.searchElementWithWait(timeout);
 
 		if (element == null) {
@@ -58,11 +56,5 @@ public class WaitForElement extends WindowsAction {
 	@Override
 	protected Logger getLoggerInstance() {
 		return loggerInstance;
-	}
-
-
-	private static WindowsDriver<?> getDriver(WindowsDriverWrapper driverWrapper, Map<String, String> params) throws ScriptExecuteException {
-		boolean fromRoot = Boolean.parseBoolean(params.getOrDefault(FROM_ROOT_PARAM, "false"));
-		return fromRoot ? driverWrapper.getOrCreateRootDriver() : driverWrapper.getDriver();
 	}
 }

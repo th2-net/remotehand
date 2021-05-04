@@ -21,6 +21,7 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -39,8 +40,8 @@ public class Click extends WindowsAction {
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-		
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement element = es.searchElement();
 
 		String button = params.get(BUTTON);
@@ -52,7 +53,7 @@ public class Click extends WindowsAction {
 		xOffsetStr = params.get(X_OFFSET);
 		yOffsetStr = params.get(Y_OFFSET);
 
-		Actions actions = new Actions(driverWrapper.getDriver());
+		Actions actions = new Actions(driver);
 		
 		String fromBorder = params.get(ATTACHED_BORDER);
 		if (fromBorder != null && !fromBorder.isEmpty()) {

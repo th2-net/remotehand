@@ -37,7 +37,7 @@ public class GetScreenshot extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
 		String screenshotName = params.get(NAME_PARAM);
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
+		ElementSearcher es = new ElementSearcher(params, getDriver(driverWrapper), cachedElements);
 		WebElement element = es.searchElement();
 		return element == null
 				? this.takeScreenshot(screenshotName)

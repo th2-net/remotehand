@@ -22,6 +22,7 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -44,7 +45,8 @@ public class SendText extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		String clearBeforeStr = params.get("clearbefore");
 		String textToSend = params.get(TEXT_PARAM);
 		boolean clearBefore = "y".equals(clearBeforeStr) || "true".equals(clearBeforeStr);
@@ -60,7 +62,7 @@ public class SendText extends WindowsAction {
 			element = es.searchElement();
 			sendDirectCommand(element, inputCommands);
 		} else {
-			Actions actions = new Actions(driverWrapper.getDriver());
+			Actions actions = new Actions(driver);
 			if (es.isLocatorsAvailable()) {
 				element = es.searchElement();
 				actions.moveToElement(element);

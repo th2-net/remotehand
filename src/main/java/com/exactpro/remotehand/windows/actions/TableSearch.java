@@ -22,6 +22,7 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -64,11 +65,12 @@ public class TableSearch extends WindowsAction
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
 			WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException
 	{
+		WindowsDriver<?> driver = getDriver(driverWrapper);
 		try {
 			handleInputParams(params);
-			ElementSearcher elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
+			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
 			WebElement table = elementSearcher.searchElement();
-			setTimeOut(driverWrapper, 0);
+			setTimeOut(driver, 0);
 
 			WebElement row;
 			boolean rowFound = false;
@@ -96,7 +98,7 @@ public class TableSearch extends WindowsAction
 			logger.warn("Column cannot be found", e);
 			return "not found";
 		} finally {
-			setTimeOut(driverWrapper, driverWrapper.getImplicitlyWaitTimeout());
+			setTimeOut(driver, driverWrapper.getImplicitlyWaitTimeout());
 		}
 
 		return "found";
@@ -136,8 +138,8 @@ public class TableSearch extends WindowsAction
 		}
 	}
 
-	private void setTimeOut(WindowsDriverWrapper driverWrapper, int seconds) throws ScriptExecuteException {
-		driverWrapper.getDriver().manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
+	private void setTimeOut(WindowsDriver<?> driver, int seconds) {
+		driver.manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
 	}
 
 	@Override

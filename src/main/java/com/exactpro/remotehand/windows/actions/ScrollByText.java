@@ -23,6 +23,7 @@ import com.exactpro.remotehand.windows.SearchParams;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
+import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -41,7 +42,8 @@ public class ScrollByText extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, CachedWebElements cachedElements) throws ScriptExecuteException {
 
-		ElementSearcher searcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		ElementSearcher searcher = new ElementSearcher(params, driver, cachedElements);
 		WebElement expectedElement = searcher.searchElement();
 		
 		if (expectedElement.isDisplayed()) {
@@ -62,7 +64,7 @@ public class ScrollByText extends WindowsAction {
 
 		int count = 0;
 		boolean displayed;
-		Actions actions = new Actions(driverWrapper.getDriver());
+		Actions actions = new Actions(driver);
 		do {
 			for (String str : list) {
 				if (handler.needSpecialSend(str)) {

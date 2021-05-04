@@ -36,7 +36,7 @@ public class ClickContextMenu extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		WindowsDriver<?> driver = driverWrapper.getOrCreateRootDriver();
+		WindowsDriver<?> driver = getDriver(driverWrapper);
 		
 		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement element = es.searchElement();

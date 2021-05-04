@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 public abstract class WindowsAction extends Action {
 	private static volatile Pattern ELEMENT_EXTRACTOR_PATTERN = null; 
 	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
+	private static final String FROM_ROOT_PARAM = "fromroot";
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
 	private Map<String, String> params = null;
@@ -146,6 +147,12 @@ public abstract class WindowsAction extends Action {
 		see.setScreenshotId(screenshotId);
 		return see;
 	}
+
+	protected WindowsDriver<?> getDriver(WindowsDriverWrapper driverWrapper) throws ScriptExecuteException {
+		boolean fromRoot = Boolean.parseBoolean(params.getOrDefault(FROM_ROOT_PARAM, "false"));
+		return fromRoot ? driverWrapper.getOrCreateRootDriver() : driverWrapper.getDriver();
+	}
+
 
 	private static String tryExtractErrorMessage(WebDriverException e) {
 		String exceptionMessage = e.getMessage();

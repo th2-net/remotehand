@@ -21,7 +21,6 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -47,17 +46,9 @@ public class WaitForAttribute extends WindowsAction {
 		String expectedValue = params.get(EXPECTED_VALUE_PARAM);
 		String timeout = params.get(MAX_TIMEOUT_PARAM);
 		String checkIntervalStr = params.getOrDefault(CHECK_INTERVAL_PARAM, "1000");
-		boolean fromRoot = Boolean.parseBoolean(params.getOrDefault("fromroot", "false"));
-		
-		WindowsDriver<?> driver = null;
-		try {
-			if (fromRoot) {
-				driver = driverWrapper.getOrCreateRootDriver();
-			} else {
-				driver = driverWrapper.getDriver();
-			}
 
-			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
+		try {
+			ElementSearcher elementSearcher = new ElementSearcher(params, getDriver(driverWrapper), cachedElements);
 			WebElement element = elementSearcher.searchElement();
 
 			if (StringUtils.isEmpty(attributeName)) {

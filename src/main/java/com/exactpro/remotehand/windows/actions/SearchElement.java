@@ -21,6 +21,7 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
+import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
@@ -38,7 +39,8 @@ public class SearchElement extends WindowsAction {
 			throw new ScriptExecuteException("Id is not specified");
 		}
 
-		ElementSearcher elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement webElement = elementSearcher.searchElement();
 		cachedWebElements.storeWebElement(getId(), webElement);
 		
