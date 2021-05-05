@@ -17,6 +17,7 @@
 package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.windows.WADCapabilityType;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
@@ -75,14 +76,14 @@ public class GetWindow extends WindowsAction {
 
 			if (newDriver) {
 				DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-				capabilities.setCapability("appTopLevelWindow", handleHex);
+				capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, handleHex);
 
-				capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
+				capabilities.setCapability(WADCapabilityType.EXPERIMENTAL_DRIVER, Boolean.TRUE.toString());
 				if (driverWrapper.getCreateSessionTimeout() != null) {
-					capabilities.setCapability("createSessionTimeout", driverWrapper.getCreateSessionTimeout());
+					capabilities.setCapability(WADCapabilityType.CREATE_SESSION_TIMEOUT, driverWrapper.getCreateSessionTimeout());
 				}
 				if (driverWrapper.getNewCommandTimeout() != null) {
-					capabilities.setCapability("newCommandTimeout", driverWrapper.getNewCommandTimeout());
+					capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
 				}
 				driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
 			}

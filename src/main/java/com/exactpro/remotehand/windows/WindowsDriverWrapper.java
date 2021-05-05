@@ -35,6 +35,7 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 	private static final String APP_TOP_LEVEL_WINDOW_CAPABILITY = "appTopLevelWindow";
 	
 	private WindowsDriver<?> driver;
+	private WindowsDriver<?> nonExperimentalDriver;
 	private WindowsDriver<?> rootDriver;
 	private URL driverUrl;
 	
@@ -51,6 +52,22 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 			throw new ScriptExecuteException("Driver was not created. Driver creating action was not performed");
 		}
 		return driver;
+	}
+	
+	public WindowsDriver<?> getNonExperimentalDriver() throws ScriptExecuteException {
+		if (this.nonExperimentalDriver == null) {
+			if (driver == null) {
+				//TODO
+				throw new ScriptExecuteException("");
+			}
+			String windowHandle = driver.getWindowHandle();
+			DesiredCapabilities capabilities = this.createCommonCapabilities();
+			capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, windowHandle);
+			capabilities.setCapability(WADCapabilityType.EXPERIMENTAL_DRIVER, Boolean.FALSE.toString());
+			//TODO 2
+			this.nonExperimentalDriver = this.newDriver(capabilities);
+		}
+		return this.nonExperimentalDriver;
 	}
 
 	public WindowsDriver<?> getDriverNullable() {
@@ -111,10 +128,6 @@ public class WindowsDriverWrapper implements DriverWrapper<WindowsDriver<?>>
 		oldDriver.close();
 		
 		return driver;
-	}
-
-	public boolean isExperimentalDriver() {
-		return windowsConfiguration.isExperimentalDriver();
 	}
 
 	public String getWaitForApp() {

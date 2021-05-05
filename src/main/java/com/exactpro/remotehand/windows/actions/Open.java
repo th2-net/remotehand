@@ -16,10 +16,10 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.windows.WADCapabilityType;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -61,21 +61,21 @@ public class Open extends WindowsAction {
 		Path exeFilePath = workDirPath.resolve(execFile).normalize();
 
 		DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-		capabilities.setCapability(MobileCapabilityType.APP, exeFilePath.toString().replace('/', '\\'));
-		capabilities.setCapability("appWorkingDir", workDirPath.toString().replace('/', '\\'));
+		capabilities.setCapability(WADCapabilityType.APP, exeFilePath.toString().replace('/', '\\'));
+		capabilities.setCapability(WADCapabilityType.APP_WORKING_DIR, workDirPath.toString().replace('/', '\\'));
 		if (StringUtils.isNotBlank(appArgs)) {
-			capabilities.setCapability("appArguments", appArgs);
+			capabilities.setCapability(WADCapabilityType.APP_ARGUMENTS, appArgs);
 		}
 
-		capabilities.setCapability("ms:experimental-webdriver", driverWrapper.isExperimentalDriver());
+		capabilities.setCapability(WADCapabilityType.EXPERIMENTAL_DRIVER, Boolean.TRUE.toString());
 		if (driverWrapper.getWaitForApp() != null) {
-			capabilities.setCapability("ms:waitForAppLaunch", driverWrapper.getWaitForApp());
+			capabilities.setCapability(WADCapabilityType.WAIT_FOR_LAUNCH, driverWrapper.getWaitForApp());
 		}
 		if (driverWrapper.getCreateSessionTimeout() != null) {
-			capabilities.setCapability("createSessionTimeout", driverWrapper.getCreateSessionTimeout());
+			capabilities.setCapability(WADCapabilityType.CREATE_SESSION_TIMEOUT, driverWrapper.getCreateSessionTimeout());
 		}
 		if (driverWrapper.getNewCommandTimeout() != null) {
-			capabilities.setCapability("newCommandTimeout", driverWrapper.getNewCommandTimeout());
+			capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
 		}
 		
 		driverWrapper.setDriver(driverWrapper.newDriver(capabilities));

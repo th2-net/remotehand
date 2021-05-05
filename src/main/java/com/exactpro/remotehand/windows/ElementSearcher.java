@@ -38,9 +38,9 @@ public class ElementSearcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElementSearcher.class);
 	
-	private final Map<String, String> record;
-	private final WindowsDriver<?> driver;
-	private final CachedWebElements webElements;
+	protected final Map<String, String> record;
+	protected final WindowsDriver<?> driver;
+	protected final CachedWebElements webElements;
 	
 	private static final SearchParams.HeaderKeys DEFAULT_KEYS = new SearchParams.HeaderKeys("locator",
 			"matcher", "matcherindex");
@@ -51,7 +51,7 @@ public class ElementSearcher {
 		this.webElements = webElements;
 	}
 
-	private List<SearchParams> processFrom(SearchParams.HeaderKeys keys) {
+	protected List<SearchParams> processFrom(SearchParams.HeaderKeys keys) {
 		
 		int ind = 1;
 		String locator, matcher;
@@ -72,8 +72,8 @@ public class ElementSearcher {
 		return l;
 
 	}
-	
-	private By parseBy (String using, String id) {
+
+	protected By parseBy (String using, String id) {
 
 		switch (using.toLowerCase()) {
 			case "accessibilityid" : return new ByAccessibilityId(id);
@@ -172,9 +172,8 @@ public class ElementSearcher {
 				afterSearch.run();
 		}
 	}
-
-
-	private <T extends SearchContext> WebElement findWebElement(T element, By by, Integer matcherIndex) {
+	
+	protected  <T extends SearchContext> WebElement findWebElement(T element, By by, Integer matcherIndex) {
 		return matcherIndex == null ? element.findElement(by) : element.findElements(by).get(matcherIndex);
 	}
 }

@@ -16,8 +16,10 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.windows.ElementSearcher;
+import com.exactpro.remotehand.windows.ElementSearcherNonExp;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
@@ -32,13 +34,24 @@ public class SearchElement extends WindowsAction {
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SearchElement.class);
 	
+	public static final String EXPERIMENTAL_PARAM = "isexperimental";
+	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, CachedWebElements cachedWebElements) throws ScriptExecuteException {
 		if (getId() == null) {
 			throw new ScriptExecuteException("Id is not specified");
 		}
 
-		ElementSearcher elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, true);
+
+		ElementSearcher elementSearcher;
+		if (experimental) {
+			elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		} else {
+			elementSearcher = new ElementSearcherNonExp(params, driverWrapper.getDriver(),
+					driverWrapper.getNonExperimentalDriver(), cachedWebElements);
+		}
+		
 		WebElement webElement = elementSearcher.searchElement();
 		cachedWebElements.storeWebElement(getId(), webElement);
 		
