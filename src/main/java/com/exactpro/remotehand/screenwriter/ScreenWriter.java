@@ -18,11 +18,15 @@ package com.exactpro.remotehand.screenwriter;
 
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebConfiguration;
+import io.appium.java_client.windows.WindowsDriver;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
@@ -72,6 +76,26 @@ public abstract class ScreenWriter<T> {
 			return dataToBytes(screenshotData);
 		} catch (IOException e) {
 			throw new ScriptExecuteException("Error while processing screenshot of element", e);
+		}
+	}
+
+	public Color getElementColor(WindowsDriver<?> driver, WebElement element) throws ScriptExecuteException {
+		return getElementColor(driver, element, null);
+	}
+
+	public Color getElementColor(WindowsDriver<?> driver, WebElement element, java.awt.Point displacedPoint) throws ScriptExecuteException {
+		try {
+			BufferedImage sourceImage = bytesToImage(driver.getScreenshotAs(OutputType.BYTES));
+			Point p = element.getLocation();
+			Dimension size = element.getSize();
+			int width = getElementScreenshotSize(p.getX(), size.getWidth(), sourceImage.getWidth());
+			int height = getElementScreenshotSize(p.getY(), size.getHeight(), sourceImage.getHeight());
+			BufferedImage elementImage = sourceImage.getSubimage(p.getX(), p.getY(), width, height);
+			return displacedPoint == null
+					? new Color(elementImage.getRGB(size.getWidth() / 2, size.getHeight() / 2)) // get the color of the center pixel
+					: new Color(elementImage.getRGB(displacedPoint.x, displacedPoint.y)); // get the color of the displaced pixel
+		} catch (IOException e) {
+			throw new ScriptExecuteException("Error while extracting color of element", e);
 		}
 	}
 
