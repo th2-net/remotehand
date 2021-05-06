@@ -16,11 +16,13 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,12 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 public class CheckElement extends WindowsAction {
+	
+	public static final String ATTRIBUTE_NAME = "attributename";
+	public static final String SAVE_ELEMENT_NAME = "saveelement";
+	
+	public static final String FOUND_VALUE = "found";
+	public static final String NOT_FOUND_VALUE = "not found";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(CheckElement.class);
 
@@ -37,14 +45,20 @@ public class CheckElement extends WindowsAction {
 		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
 		WebElement element = es.searchElementWithoutWait();
 
-		String attributeName = params.get("attributename");
+		String attributeName = params.get(ATTRIBUTE_NAME);
 		if (attributeName != null && element != null) {
 			return element.getAttribute(attributeName);
 		} else if (element != null) {
-			return "found";
+			String id = getId();
+			if (RhUtils.getBooleanOrDefault(params, SAVE_ELEMENT_NAME, false) &&
+					StringUtils.isNotEmpty(id)) {
+				cachedWebElements.storeWebElement(id, element);
+			}
+			
+			return FOUND_VALUE;
 		}
 
-		return "not found";
+		return NOT_FOUND_VALUE;
 	}
 
 	@Override
