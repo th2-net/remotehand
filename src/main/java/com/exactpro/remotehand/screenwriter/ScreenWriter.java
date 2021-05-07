@@ -92,7 +92,7 @@ public abstract class ScreenWriter<T> {
 			int height = getElementScreenshotSize(p.getY(), size.getHeight(), sourceImage.getHeight());
 			BufferedImage elementImage = sourceImage.getSubimage(p.getX(), p.getY(), width, height);
 			return displacedPoint == null
-					? new Color(elementImage.getRGB(size.getWidth() / 2, size.getHeight() / 2)) // get the color of the center pixel
+					? new Color(elementImage.getRGB(width / 2, height / 2)) // get the color of the center pixel
 					: new Color(elementImage.getRGB(displacedPoint.x, displacedPoint.y)); // get the color of the displaced pixel
 		} catch (IOException e) {
 			throw new ScriptExecuteException("Error while extracting color of element", e);
