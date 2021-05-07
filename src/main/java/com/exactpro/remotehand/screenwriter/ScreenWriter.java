@@ -91,9 +91,14 @@ public abstract class ScreenWriter<T> {
 			int width = getElementScreenshotSize(p.getX(), size.getWidth(), sourceImage.getWidth());
 			int height = getElementScreenshotSize(p.getY(), size.getHeight(), sourceImage.getHeight());
 			BufferedImage elementImage = sourceImage.getSubimage(p.getX(), p.getY(), width, height);
-			return displacedPoint == null
-					? new Color(elementImage.getRGB(width / 2, height / 2)) // get the color of the center pixel
-					: new Color(elementImage.getRGB(displacedPoint.x, displacedPoint.y)); // get the color of the displaced pixel
+
+			if (displacedPoint == null)
+				return new Color(elementImage.getRGB(width / 2, height / 2)); // get the color of the center pixel
+
+			if (displacedPoint.x > width || displacedPoint.y > height)
+				throw new ScriptExecuteException("The selected point is outside the bounds of the element");
+
+			return new Color(elementImage.getRGB(displacedPoint.x, displacedPoint.y)); // get the color of the displaced pixel
 		} catch (IOException e) {
 			throw new ScriptExecuteException("Error while extracting color of element", e);
 		}
