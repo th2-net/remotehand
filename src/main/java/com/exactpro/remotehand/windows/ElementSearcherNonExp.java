@@ -48,6 +48,7 @@ public class ElementSearcherNonExp extends ElementSearcher {
 		WebElement lastSavedEl = null;
 		for (SearchParams pair : pairs) {
 			By by;
+			Integer index = null;
 			if ("cachedId".equals(pair.locator)) {
 				logger.trace("Get element from cache by {} = {}", pair.locator, pair.matcher);
 				lastSavedEl = getCachedElement(pair);
@@ -58,10 +59,11 @@ public class ElementSearcherNonExp extends ElementSearcher {
 				by = By.id(runtimeId);
 			} else {
 				by = parseBy(pair.locator, pair.matcher);
+				index = pair.parsedIndex;
 				logger.trace("Searching by {} = {}", pair.locator, pair.matcher);
 			}
 			
-			we = findWebElement(we == null ? driverNotExp : we, by, pair.parsedIndex);
+			we = findWebElement(we == null ? driverNotExp : we, by, index);
 		}
 
 		return findWebElement(lastSavedEl == null ? driver : lastSavedEl, By.id(this.getRuntimeId(we)), null);
