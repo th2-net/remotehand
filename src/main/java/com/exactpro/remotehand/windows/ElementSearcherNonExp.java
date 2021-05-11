@@ -18,6 +18,7 @@ package com.exactpro.remotehand.windows;
 
 import com.exactpro.remotehand.ScriptExecuteException;
 import io.appium.java_client.windows.WindowsDriver;
+import org.apache.commons.lang3.NotImplementedException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
@@ -49,16 +50,12 @@ public class ElementSearcherNonExp extends ElementSearcher {
 			By by;
 			if ("cachedId".equals(pair.locator)) {
 				logger.trace("Get element from cache by {} = {}", pair.locator, pair.matcher);
-				we = webElements.getWebElement(pair.matcher);
-				if (we == null) {
-					throw new ScriptExecuteException("Saved elements with rh-id " + pair.matcher + " is not found");
-				}
-				String runtimeId = this.getRuntimeId(we);
+				lastSavedEl = getCachedElement(pair);
+				String runtimeId = this.getRuntimeId(lastSavedEl);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Found rh-id {} win_id {}", pair.matcher, runtimeId);
 				}
 				by = By.id(runtimeId);
-				lastSavedEl = we;
 			} else {
 				by = parseBy(pair.locator, pair.matcher);
 				logger.trace("Searching by {} = {}", pair.locator, pair.matcher);
@@ -69,7 +66,12 @@ public class ElementSearcherNonExp extends ElementSearcher {
 
 		return findWebElement(lastSavedEl == null ? driver : lastSavedEl, By.id(this.getRuntimeId(we)), null);
 	}
-	
+
+	@Override
+	public List<WebElement> searchElements(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
+		throw new NotImplementedException("Not implemented");
+	}
+
 	protected String getRuntimeId(WebElement webElement) throws ScriptExecuteException {
 		if (webElement instanceof RemoteWebElement) {
 			return ((RemoteWebElement) webElement).getId();

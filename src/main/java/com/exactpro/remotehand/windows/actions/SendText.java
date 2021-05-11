@@ -44,7 +44,7 @@ public class SendText extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		ElementSearcher es = this.createElementSearcher(driverWrapper, params, cachedWebElements);
 		String clearBeforeStr = params.get("clearbefore");
 		String textToSend = params.get(TEXT_PARAM);
 		boolean clearBefore = "y".equals(clearBeforeStr) || "true".equals(clearBeforeStr);

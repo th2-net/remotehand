@@ -17,6 +17,7 @@
 package com.exactpro.remotehand.windows;
 
 import com.exactpro.remotehand.Action;
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.utils.ExceptionUtils;
@@ -35,6 +36,9 @@ import java.util.regex.Pattern;
 public abstract class WindowsAction extends Action {
 	private static volatile Pattern ELEMENT_EXTRACTOR_PATTERN = null; 
 	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
+
+	public static final String EXPERIMENTAL_PARAM = "isexperimental";
+
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
 	private Map<String, String> params = null;
@@ -172,5 +176,16 @@ public abstract class WindowsAction extends Action {
 			ELEMENT_EXTRACTOR_PATTERN = Pattern.compile("Element info: \\{[a-zA-Z0-9, =]*}");
 
 		return ELEMENT_EXTRACTOR_PATTERN;
+	}
+
+	protected ElementSearcher createElementSearcher(WindowsDriverWrapper driverWrapper, Map<String, String> params, CachedWebElements cachedWebElements) throws ScriptExecuteException {
+		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, true);
+
+		if (experimental) {
+			return new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		} else {
+			return new ElementSearcherNonExp(params, driverWrapper.getDriver(),
+					driverWrapper.getNonExperimentalDriver(), cachedWebElements);
+		}
 	}
 }

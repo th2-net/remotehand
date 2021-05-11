@@ -21,6 +21,7 @@ import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WindowsSessionContext extends SessionContext {
@@ -69,17 +70,27 @@ public class WindowsSessionContext extends SessionContext {
 
 	public static class CachedWebElements {
 		private final Map<String, WebElement> cachedObjects;
+		private final Map<String, List<WebElement>> cachedLists;
 
 		public CachedWebElements() {
 			this.cachedObjects = new HashMap<>();
+			this.cachedLists = new HashMap<>();
 		}
 		
 		public void storeWebElement(String id, WebElement webElement) {
 			this.cachedObjects.put(id, webElement);
 		}
 
+		public void storeWebElementList(String id, List<WebElement> webElement) {
+			this.cachedLists.put(id, webElement);
+		}
+
 		public WebElement getWebElement(String id) {
 			return this.cachedObjects.get(id);
+		}
+
+		public List<WebElement> getWebElementList(String id) {
+			return this.cachedLists.get(id);
 		}
 	}
 }

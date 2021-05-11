@@ -28,13 +28,14 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 public class SearchElement extends WindowsAction {
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SearchElement.class);
-	
-	public static final String EXPERIMENTAL_PARAM = "isexperimental";
+
+	public static final String MULTIPLE_ELEMENTS_PARAM = "multipleelements";
 	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, CachedWebElements cachedWebElements) throws ScriptExecuteException {
@@ -42,24 +43,27 @@ public class SearchElement extends WindowsAction {
 			throw new ScriptExecuteException("Id is not specified");
 		}
 
-		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, true);
+		boolean multiple = RhUtils.getBooleanOrDefault(params, MULTIPLE_ELEMENTS_PARAM, false);
 
-		ElementSearcher elementSearcher;
-		if (experimental) {
-			elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		ElementSearcher elementSearcher = this.createElementSearcher(driverWrapper, params, cachedWebElements);
+
+		if (!multiple) {
+			WebElement webElement = elementSearcher.searchElement();
+			cachedWebElements.storeWebElement(getId(), webElement);
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("Stored element to cached. RH_id: {} Win_id: {}", getId(),
+						(webElement instanceof RemoteWebElement) ? ((RemoteWebElement) webElement).getId() : "");
+			}
 		} else {
-			elementSearcher = new ElementSearcherNonExp(params, driverWrapper.getDriver(),
-					driverWrapper.getNonExperimentalDriver(), cachedWebElements);
+			List<WebElement> list = elementSearcher.searchElements();
+			cachedWebElements.storeWebElementList(getId(), list);
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("Stored elements to cached. RH_id: {} Count: {}", getId(), list.size());
+			}
 		}
-		
-		WebElement webElement = elementSearcher.searchElement();
-		cachedWebElements.storeWebElement(getId(), webElement);
-		
-		if (logger.isDebugEnabled()) {
-			logger.debug("Stored element to cached. RH_id: {} Win_id: {}", getId(), 
-					(webElement instanceof RemoteWebElement) ? ((RemoteWebElement) webElement).getId() : "");
-		}
-		
+
 		return null;
 	}
 
