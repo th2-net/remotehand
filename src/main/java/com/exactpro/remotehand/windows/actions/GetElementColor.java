@@ -33,8 +33,7 @@ import java.util.Map;
 public class GetElementColor extends WindowsAction {
 	protected static final Logger loggerInstance = LoggerFactory.getLogger(GetElementColor.class);
 
-	public static final String X_OFFSET = "xoffset", Y_OFFSET = "yoffset",
-			RESPONSE_FORMAT = "format", DEFAULT_RESPONSE_FORMAT = "%s;%s;%s";
+	public static final String X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
 
 
 	@Override
@@ -48,7 +47,7 @@ public class GetElementColor extends WindowsAction {
 			throw new ScriptExecuteException("Error while extracting color of element. Element not found");
 		Color elementColor = screenWriter.getElementColor(driver, element, displacedPoint);
 
-		return getFormattedResult(elementColor);
+		return convertToHex(elementColor);
 	}
 
 
@@ -75,8 +74,7 @@ public class GetElementColor extends WindowsAction {
 		return null;
 	}
 
-	private String getFormattedResult(Color elementColor) {
-		String format = getParams().getOrDefault(RESPONSE_FORMAT, DEFAULT_RESPONSE_FORMAT);
-		return String.format(format, elementColor.getRed(), elementColor.getGreen(), elementColor.getBlue());
+	private String convertToHex(Color elementColor) {
+		return String.format("#%02X%02X%02X", elementColor.getRed(), elementColor.getGreen(), elementColor.getBlue());
 	}
 }
