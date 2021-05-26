@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
@@ -27,25 +28,28 @@ import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class Click extends WindowsAction {
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(Click.class);
 
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
-			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers", ATTACHED_BORDER = "attachedborder",
-			LEFT_TOP = "left_top", RIGHT_TOP = "right_top", LEFT_BOTTOM = "left_bottom", RIGHT_BOTTOM = "right_bottom";
+			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", ATTACHED_BORDER = "attachedborder", LEFT_TOP = "left_top",
+			RIGHT_TOP = "right_top", LEFT_BOTTOM = "left_bottom", RIGHT_BOTTOM = "right_bottom",
+			HOLD_KEY_DOWN = "holdkeydown";
 
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-		
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
+	                  WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
 		WebElement element = es.searchElement();
 
-		String button = params.get(BUTTON);
-		if (button == null)
-			button = LEFT;
+		String button = params.getOrDefault(BUTTON, LEFT);
 
 		String xOffsetStr, yOffsetStr;
 		int xOffset = 0, yOffset = 0;
@@ -95,22 +99,28 @@ public class Click extends WindowsAction {
 		else
 			actions = actions.moveToElement(element);
 
-		if (button.equals(LEFT))
-			actions.click();
-		else if (button.equals(RIGHT))
-			actions.contextClick();
-		else if (button.equals(MIDDLE))
-		{
-			this.logger.error("Middle click is not implemented.");
-			return null;
+		List<CharSequence> holdKeysDown = extractKeys(params.get(HOLD_KEY_DOWN));
+		processHoldKeys(actions::keyDown, holdKeysDown);
+
+		switch (button) {
+			case LEFT:
+				actions.click();
+				break;
+			case RIGHT:
+				actions.contextClick();
+				break;
+			case MIDDLE:
+				this.logger.error("Middle click is not implemented.");
+				return null;
+			case DOUBLE:
+				actions.doubleClick();
+				break;
+			default:
+				this.logger.error("Button may be only left, right, middle or double (for double click with left button).");
+				return null;
 		}
-		else if (button.equals(DOUBLE))
-			actions.doubleClick();
-		else
-		{
-			this.logger.error("Button may be only left, right, middle or double (for double click with left button).");
-			return null;
-		}
+
+		processHoldKeys(actions::keyUp, holdKeysDown);
 
 		actions.perform();
 		
@@ -120,5 +130,33 @@ public class Click extends WindowsAction {
 	@Override
 	public Logger getLoggerInstance() {
 		return loggerInstance;
+	}
+
+
+	protected void processHoldKeys(Function<CharSequence, Actions> action, List<CharSequence> holdKeysDown) {
+		if (holdKeysDown.isEmpty())
+			return;
+
+		holdKeysDown.forEach(action::apply);
+	}
+
+
+	private List<CharSequence> extractKeys(String key) {
+		if (key == null)
+			return Collections.emptyList();
+
+		String trimKey = key.trim();
+		if (!trimKey.startsWith(SendKeysHandler.KEY_SIGN) && !trimKey.endsWith(SendKeysHandler.KEY_SIGN))
+			return Collections.emptyList();
+
+		String[] splitKeys = trimKey.substring(1, trimKey.length() - 1).split("\\+");
+		List<CharSequence> result = new ArrayList<>(splitKeys.length);
+		for (String splitKey : splitKeys) {
+			CharSequence keySequence = SendKeysHandler.KEYS.get(splitKey.toLowerCase());
+			if (keySequence != null)
+				result.add(keySequence);
+		}
+
+		return result;
 	}
 }
