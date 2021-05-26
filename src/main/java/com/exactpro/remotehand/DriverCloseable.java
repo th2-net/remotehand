@@ -16,7 +16,6 @@
 
 package com.exactpro.remotehand;
 
-public interface DriverWrapper<T>
-{
-	T getDriver() throws ScriptExecuteException;
+public interface DriverCloseable {
+	void close() throws ScriptExecuteException;
 }

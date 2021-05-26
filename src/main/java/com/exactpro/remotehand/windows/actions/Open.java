@@ -42,15 +42,8 @@ public class Open extends WindowsAction {
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) {
 		
 		// closing previous drivers
-		if (driverWrapper.getDriverNullable() != null) {
-			this.logger.debug("Disposing previously created drivers");
-			try {
-				driverWrapper.getDriverNullable().close();
-			} catch (Exception e) {
-				logger.warn("Error while disposing driver", e);
-			}
-			driverWrapper.setDriver(null);
-		}
+		driverWrapper.resetWindowDrivers();
+		
 		this.logger.debug("Creating new driver");
 		
 		String workDir = params.get("workdir");
@@ -78,7 +71,7 @@ public class Open extends WindowsAction {
 			capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
 		}
 		
-		driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
+		driverWrapper.createDriver(capabilities, DEFAULT_EXPERIMENTAL);
 		this.logger.debug("New driver created");
 		return null;
 	}

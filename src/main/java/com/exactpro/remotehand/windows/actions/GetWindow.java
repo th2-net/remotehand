@@ -16,6 +16,7 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.windows.WADCapabilityType;
 import com.exactpro.remotehand.windows.WindowsAction;
@@ -50,43 +51,28 @@ public class GetWindow extends WindowsAction {
 		else
 			byName = true;
 
-		WindowsDriver<?> driver1 = driverWrapper.getOrCreateRootDriver();
+		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, true);
+		WindowsDriver<?> driver1 = driverWrapper.getDriver(true, experimental);
 		List<? extends WebElement> elements = byName ? driver1.findElementsByName(targetWindowMatcher) : driver1.findElementsByAccessibilityId(targetWindowMatcher);
 		if (elements.size() == 1) {
 			String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
 			logger.debug("Handle str for window : {} {}", targetWindowMatcher, handleString);
 			int handleInt = Integer.parseInt(handleString);
 			String handleHex = Integer.toHexString(handleInt);
-
-			boolean newDriver = true;
-			if (driverWrapper.getDriverNullable() != null) {
-				try {
-					driverWrapper.getDriver().switchTo().window(handleHex);
-					newDriver = false;
-				} catch (Exception e) {
-					logger.error("Error while switching window", e);
-					try {
-						driverWrapper.getDriverNullable().close();
-					} catch (Exception e1) {
-						logger.error("Error while closing driver", e1);
-					}
-					newDriver = true;
-				}
+			
+			driverWrapper.resetWindowDrivers();
+			
+			DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
+			capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, handleHex);
+			
+			if (driverWrapper.getCreateSessionTimeout() != null) {
+				capabilities.setCapability(WADCapabilityType.CREATE_SESSION_TIMEOUT, driverWrapper.getCreateSessionTimeout());
 			}
-
-			if (newDriver) {
-				DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-				capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, handleHex);
-
-				capabilities.setCapability(WADCapabilityType.EXPERIMENTAL_DRIVER, Boolean.TRUE.toString());
-				if (driverWrapper.getCreateSessionTimeout() != null) {
-					capabilities.setCapability(WADCapabilityType.CREATE_SESSION_TIMEOUT, driverWrapper.getCreateSessionTimeout());
-				}
-				if (driverWrapper.getNewCommandTimeout() != null) {
-					capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
-				}
-				driverWrapper.setDriver(driverWrapper.newDriver(capabilities));
+			if (driverWrapper.getNewCommandTimeout() != null) {
+				capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
 			}
+			driverWrapper.createDriver(capabilities, true);
+				
 			return null;
 		} else {
 			String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowMatcher);

@@ -47,17 +47,11 @@ public class WaitForAttribute extends WindowsAction {
 		String expectedValue = params.get(EXPECTED_VALUE_PARAM);
 		String timeout = params.get(MAX_TIMEOUT_PARAM);
 		String checkIntervalStr = params.getOrDefault(CHECK_INTERVAL_PARAM, "1000");
-		boolean fromRoot = Boolean.parseBoolean(params.getOrDefault("fromroot", "false"));
 		
 		WindowsDriver<?> driver = null;
 		try {
-			if (fromRoot) {
-				driver = driverWrapper.getOrCreateRootDriver();
-			} else {
-				driver = driverWrapper.getDriver();
-			}
 
-			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
+			ElementSearcher elementSearcher = new ElementSearcher(params, this.getDriver(driverWrapper), cachedElements);
 			WebElement element = elementSearcher.searchElement();
 
 			if (StringUtils.isEmpty(attributeName)) {

@@ -18,9 +18,11 @@ package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.windows.ElementSearcher;
+import com.exactpro.remotehand.windows.WinActions;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -39,8 +41,9 @@ public class Click extends WindowsAction {
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-		
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement element = es.searchElement();
 
 		String button = params.get(BUTTON);
@@ -52,7 +55,7 @@ public class Click extends WindowsAction {
 		xOffsetStr = params.get(X_OFFSET);
 		yOffsetStr = params.get(Y_OFFSET);
 
-		Actions actions = new Actions(driverWrapper.getDriver());
+		Actions actions = WinActions.createAndCheck(driver, element);
 		
 		String fromBorder = params.get(ATTACHED_BORDER);
 		if (fromBorder != null && !fromBorder.isEmpty()) {
@@ -95,21 +98,22 @@ public class Click extends WindowsAction {
 		else
 			actions = actions.moveToElement(element);
 
-		if (button.equals(LEFT))
-			actions.click();
-		else if (button.equals(RIGHT))
-			actions.contextClick();
-		else if (button.equals(MIDDLE))
-		{
-			this.logger.error("Middle click is not implemented.");
-			return null;
-		}
-		else if (button.equals(DOUBLE))
-			actions.doubleClick();
-		else
-		{
-			this.logger.error("Button may be only left, right, middle or double (for double click with left button).");
-			return null;
+		switch (button) {
+			case LEFT:
+				actions.click();
+				break;
+			case RIGHT:
+				actions.contextClick();
+				break;
+			case MIDDLE:
+				this.logger.error("Middle click is not implemented.");
+				return null;
+			case DOUBLE:
+				actions.doubleClick();
+				break;
+			default:
+				this.logger.error("Button may be only left, right, middle or double (for double click with left button).");
+				return null;
 		}
 
 		actions.perform();

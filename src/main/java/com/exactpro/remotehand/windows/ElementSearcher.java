@@ -104,10 +104,21 @@ public class ElementSearcher {
 		WebElement we = null;
 		for (SearchParams pair : pairs) {
 			if ("cachedId".equals(pair.locator)) {
-				we = getCachedElement(pair);
+				WebElement cachedElement = getCachedElement(pair);
+				if (!(cachedElement instanceof RemoteWebElement)) {
+					logger.error("Expected : {} Actual : {}", RemoteWebElement.class.getName(), cachedElement.getClass().getName());
+					throw new ScriptExecuteException("Incorrect object stored in cache.");
+				}
+				RemoteWebElement rwe = (RemoteWebElement) cachedElement;
 				if (logger.isDebugEnabled()) {
-					logger.debug("Found rh-id {} win_id {}", pair.matcher,
-							we instanceof RemoteWebElement ? ((RemoteWebElement) we).getId() : "");
+					logger.debug("Found rh-id {} win_id {}", pair.matcher, rwe.getId());
+				}
+				if (rwe.getWrappedDriver() != driver) {
+					By by = By.id(rwe.getId());
+					logger.trace("Searching by id = {}", rwe.getId());
+					we = findWebElement(we == null ? driver : we, by, null);
+				} else {
+					we = cachedElement;
 				}
 			} else {
 				By by = parseBy(pair.locator, pair.matcher);

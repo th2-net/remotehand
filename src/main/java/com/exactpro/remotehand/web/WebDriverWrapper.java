@@ -16,25 +16,23 @@
 
 package com.exactpro.remotehand.web;
 
-import com.exactpro.remotehand.DriverWrapper;
+import com.exactpro.remotehand.DriverCloseable;
+import com.exactpro.remotehand.ScriptExecuteException;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
 
-public class WebDriverWrapper implements DriverWrapper<WebDriver>
+public class WebDriverWrapper implements DriverCloseable
 {
 	private final WebDriver driver;
 	private final File downloadDir;
-
-
+	
 	public WebDriverWrapper(WebDriver driver, File downloadDir)
 	{
 		this.driver = driver;
 		this.downloadDir = downloadDir;
 	}
-
-
-	@Override
+	
 	public WebDriver getDriver()
 	{
 		return driver;
@@ -43,5 +41,10 @@ public class WebDriverWrapper implements DriverWrapper<WebDriver>
 	public File getDownloadDir()
 	{
 		return downloadDir;
+	}
+
+	@Override
+	public void close() throws ScriptExecuteException {
+		this.driver.close();
 	}
 }

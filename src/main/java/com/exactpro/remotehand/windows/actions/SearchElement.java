@@ -19,7 +19,6 @@ package com.exactpro.remotehand.windows.actions;
 import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.windows.ElementSearcher;
-import com.exactpro.remotehand.windows.ElementSearcherNonExp;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
@@ -45,7 +44,7 @@ public class SearchElement extends WindowsAction {
 
 		boolean multiple = RhUtils.getBooleanOrDefault(params, MULTIPLE_ELEMENTS_PARAM, false);
 
-		ElementSearcher elementSearcher = this.createElementSearcher(driverWrapper, params, cachedWebElements);
+		ElementSearcher elementSearcher = new ElementSearcher(params, this.getDriver(driverWrapper), cachedWebElements);
 
 		if (!multiple) {
 			WebElement webElement = elementSearcher.searchElement();

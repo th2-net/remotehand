@@ -26,10 +26,10 @@ import org.apache.commons.cli.CommandLine;
 import java.util.Map;
 
 public class WindowsRemoteHandManager implements IRemoteHandManager {
-	private final DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider;
+	private final DriverPoolProvider<WindowsDriverWrapper> driverPoolProvider;
 	private final WindowsManager windowsManager = new WindowsManager();
 
-	public WindowsRemoteHandManager(DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider)
+	public WindowsRemoteHandManager(DriverPoolProvider<WindowsDriverWrapper> driverPoolProvider)
 	{
 		this.driverPoolProvider = driverPoolProvider;
 	}
