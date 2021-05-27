@@ -50,25 +50,34 @@ public class WindowsDriverWrapper implements DriverCloseable
 		if (root) {
 			driver = experimental ? rootDriverExp : rootDriverNotExp;
 			if (driver == null) {
+				logger.debug("Creating experimental-{} root driver", experimental);
 				driver = createRootDriver(experimental);
 			}
 		} else {
 			driver = experimental ? driverExp : driverNotExp;
 			if (driver == null) {
+				logger.debug("Creating experimental-{} driver from other driver handleId", experimental);
 				WindowsDriver<?> opposite = experimental ? driverNotExp : driverExp;
 				if (opposite == null) {
 					throw new ScriptExecuteException("Driver was not created. Driver creating action was not performed");
 				}
-				driver = d1(opposite.getWindowHandle(), experimental);
+				driver = createFromHandle(opposite.getWindowHandle(), experimental);
 			}
 		}
 		return driver;
 	}
 	
-	private WindowsDriver<?> d1(String windowHandle, boolean experimental) throws ScriptExecuteException {
+	private WindowsDriver<?> createFromHandle(String windowHandle, boolean experimental) throws ScriptExecuteException {
 		DesiredCapabilities capabilities = this.createCommonCapabilities();
 		capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, windowHandle);
-		return this.createDriver(capabilities, experimental);
+		this.setExperimentalCapability(capabilities, experimental);
+		WindowsDriver<?> windowsDriver = this.newDriver(capabilities);
+		if (experimental) {
+			this.driverExp = windowsDriver;
+		} else {
+			this.driverNotExp = windowsDriver;
+		}
+		return windowsDriver;
 	}
 
 	private WindowsDriver<?> createRootDriver(boolean experimental) {
@@ -88,6 +97,8 @@ public class WindowsDriverWrapper implements DriverCloseable
 	}
 	
 	public WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean experimental, Integer timeout) {
+		logger.debug("Creating experimental-{} driver with specified capabilities", experimental);
+		logger.trace("Specified capabilities: {}", capabilities);
 		this.resetWindowDrivers();
 		this.setExperimentalCapability(capabilities, experimental);
 		WindowsDriver<?> windowsDriver = this.newDriver(capabilities, timeout);
