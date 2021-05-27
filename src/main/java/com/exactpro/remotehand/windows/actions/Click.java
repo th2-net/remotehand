@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 public class Click extends WindowsAction {
 
@@ -133,11 +133,11 @@ public class Click extends WindowsAction {
 	}
 
 
-	protected void processHoldKeys(Function<CharSequence, Actions> action, List<CharSequence> holdKeysDown) {
+	protected void processHoldKeys(Consumer<CharSequence> action, List<CharSequence> holdKeysDown) {
 		if (holdKeysDown.isEmpty())
 			return;
 
-		holdKeysDown.forEach(action::apply);
+		holdKeysDown.forEach(action);
 	}
 
 
