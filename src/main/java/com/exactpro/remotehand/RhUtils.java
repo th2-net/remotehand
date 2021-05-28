@@ -30,8 +30,8 @@ public class RhUtils
 {
 	public static final String SESSION_FOR_FILE_MODE = "Main";
 	
-	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
-	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
+	public static final Set<String> YES = new HashSet<>(Arrays.asList("y", "yes", "t", "true", "1", "+"));
+	public static final Set<String> NO = new HashSet<>(Arrays.asList("n", "no", "f", "false", "0", "-"));
 
 	public static boolean getBooleanOrDefault(Map<String, String> params, String name, boolean defaultValue)
 	{

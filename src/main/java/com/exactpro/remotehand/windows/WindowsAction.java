@@ -38,7 +38,7 @@ public abstract class WindowsAction extends Action {
 	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
 
 	public static final String EXPERIMENTAL_PARAM = "isexperimental";
-	private static final String FROM_ROOT_PARAM = "fromroot";
+	public static final String FROM_ROOT_PARAM = "fromroot";
 	
 	public static final Boolean DEFAULT_EXPERIMENTAL = Boolean.TRUE;
 

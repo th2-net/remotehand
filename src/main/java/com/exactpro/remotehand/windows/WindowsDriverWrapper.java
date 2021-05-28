@@ -183,6 +183,20 @@ public class WindowsDriverWrapper implements DriverCloseable
 		}
 	}
 	
+	public void restartDriver(boolean root, boolean experimental) throws ScriptExecuteException {
+		logger.debug("Restarting driver root: {} experimental: {}", root, experimental);
+		if (root) {
+			WindowsDriver<?> driver = experimental ? this.rootDriverExp : this.rootDriverNotExp;
+			closeDriver(driver, "root exp: " + experimental);
+			this.createRootDriver(experimental);
+		} else {
+			WindowsDriver<?> driver = experimental ? this.driverExp : this.driverNotExp;
+			String handle = driver.getWindowHandle();
+			closeDriver(driver, "exp: " + experimental);
+			this.createFromHandle(handle, experimental);
+		}
+	}
+	
 	private void setExperimentalCapability(DesiredCapabilities capabilities, boolean value) {
 		capabilities.setCapability(WADCapabilityType.EXPERIMENTAL_DRIVER, Boolean.toString(value));
 	}

@@ -39,7 +39,8 @@ public class WindowsActionsMapping {
 		MaximizeMainWindow,
 		TableSearch,
 		WaitForElement,
-		GetScreenshot
+		GetScreenshot,
+		RestartDriver
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -70,6 +71,7 @@ public class WindowsActionsMapping {
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
 			case GetScreenshot:			return new GetScreenshot();
+			case RestartDriver:			return new RestartDriver();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
