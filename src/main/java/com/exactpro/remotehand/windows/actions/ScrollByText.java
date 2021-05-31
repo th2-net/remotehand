@@ -20,7 +20,7 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.SearchParams;
-import com.exactpro.remotehand.windows.WinActions;
+import com.exactpro.remotehand.windows.WinActionUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
@@ -63,7 +63,7 @@ public class ScrollByText extends WindowsAction {
 
 		int count = 0;
 		boolean displayed;
-		Actions actions = WinActions.createAndCheck(this.getDriver(driverWrapper));
+		Actions actions = WinActionUtils.createAndCheck(this.getDriver(driverWrapper));
 		do {
 			for (String str : list) {
 				if (handler.needSpecialSend(str)) {

@@ -16,39 +16,19 @@
 
 package com.exactpro.remotehand.windows;
 
-import com.exactpro.remotehand.ScriptExecuteException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.RemoteWebElement;
 
 public class WinActions extends Actions {
 	
-	private WebDriver driver;
+	private final WebDriver driver;
 	
 	public WinActions(WebDriver driver) {
 		super(driver);
 		this.driver = driver;
 	}
-	
-	public static WinActions createAndCheck(WebDriver driver, WebElement... elements) throws ScriptExecuteException {
-		WinActions actions = new WinActions(driver);
-		actions.checkElements(elements);
-		return actions;
-	}
-	
-	public void checkElements(WebElement... elements) throws ScriptExecuteException {
-		if (elements == null)
-			return;
 
-		for (WebElement element : elements) {
-			if (element instanceof RemoteWebElement) {
-				RemoteWebElement rwe = (RemoteWebElement) element;
-				if (rwe.getWrappedDriver() != this.driver) {
-					throw new ScriptExecuteException("Element was found by different driver than attached to actions");
-				}
-			}
-			 
-		}
+	public WebDriver getAttachedDriver() {
+		return driver;
 	}
 }

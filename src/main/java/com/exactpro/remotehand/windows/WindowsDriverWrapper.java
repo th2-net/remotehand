@@ -174,12 +174,22 @@ public class WindowsDriverWrapper implements DriverCloseable
 		this.driverNotExp = null;
 	}
 	
-	public void switchDriversTo(String handle) {
+	public void switchDriversTo(String handle) throws ScriptExecuteException {
 		if (driverExp != null) {
 			this.driverExp.switchTo().window(handle);
+			String switchedHandle = this.driverExp.getWindowHandle();
+			if (!handle.equals(switchedHandle)) {
+				logger.error("Tried to change window handle for experimental WAD to {} but current is {}", handle, switchedHandle);
+				throw new ScriptExecuteException("Couldn't change current window for experimental driver");
+			}
 		}
 		if (driverNotExp != null) {
 			this.driverNotExp.switchTo().window(handle);
+			String switchedHandle = this.driverNotExp.getWindowHandle();
+			if (!handle.equals(switchedHandle)) {
+				logger.error("Tried to change window handle for not-experimental WAD to {} but current is {}", handle, switchedHandle);
+				throw new ScriptExecuteException("Couldn't change current window for not-experimental driver");
+			}
 		}
 	}
 	

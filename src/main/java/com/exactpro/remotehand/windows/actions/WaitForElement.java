@@ -21,7 +21,6 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;

@@ -267,8 +267,7 @@ public class SendKeys extends WebAction
 			a.keyUp(Keys.ALT).perform();
 	}
 	
-	protected boolean needEnable(WebElement element, Map<String, String> params)
-	{
+	protected boolean needEnable(WebElement element, Map<String, String> params) throws ScriptExecuteException {
 		if (element.isEnabled())
 			return false;
 		return RhUtils.getBooleanOrDefault(params, CAN_BE_DISABLED, false);

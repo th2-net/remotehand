@@ -32,25 +32,10 @@ public class RestartDriver extends WindowsAction {
 	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-		boolean fromRoot = this.getBoolean(params, FROM_ROOT_PARAM);
-		boolean experimental = this.getBoolean(params, EXPERIMENTAL_PARAM);
+		boolean fromRoot = RhUtils.getMandatoryBoolean(params, FROM_ROOT_PARAM);
+		boolean experimental = RhUtils.getMandatoryBoolean(params, EXPERIMENTAL_PARAM);
 		driverWrapper.restartDriver(fromRoot, experimental);
 		return null;
-	}
-	
-	private boolean getBoolean(Map<String, String> params, String key) throws ScriptExecuteException {
-		String param = params.get(key);
-		if (param == null || param.isEmpty()) {
-			throw new ScriptExecuteException("Param should be specified : " + key);
-		}
-		if (RhUtils.YES.contains(param)) {
-			return true;
-		} else if (RhUtils.NO.contains(param)) {
-			return false;
-		} else {
-			throw new ScriptExecuteException(String.format("Invalid value for param %s. boolean required (actual: %s", 
-					key, param));
-		}
 	}
 
 	@Override

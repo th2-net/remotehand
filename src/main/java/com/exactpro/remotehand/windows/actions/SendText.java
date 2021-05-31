@@ -19,7 +19,7 @@ package com.exactpro.remotehand.windows.actions;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import com.exactpro.remotehand.windows.ElementSearcher;
-import com.exactpro.remotehand.windows.WinActions;
+import com.exactpro.remotehand.windows.WinActionUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
@@ -63,7 +63,7 @@ public class SendText extends WindowsAction {
 			element = es.searchElement();
 			sendDirectCommand(element, inputCommands);
 		} else {
-			Actions actions = WinActions.createAndCheck(driver, element);
+			Actions actions = WinActionUtils.createAndCheck(driver, element);
 			if (es.isLocatorsAvailable()) {
 				element = es.searchElement();
 				actions.moveToElement(element);

@@ -20,7 +20,6 @@ import com.exactpro.remotehand.*;
 import com.exactpro.remotehand.http.HttpLogonHandler;
 import com.exactpro.remotehand.sessions.LogonHandler;
 import com.exactpro.remotehand.sessions.SessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.Map;

@@ -20,7 +20,6 @@ import com.exactpro.remotehand.Action;
 import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
-import com.exactpro.remotehand.utils.ExceptionUtils;
 import com.exactpro.remotehand.web.WebScriptCompiler;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import io.appium.java_client.windows.WindowsDriver;
@@ -30,8 +29,6 @@ import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class WindowsAction extends Action {
 	
