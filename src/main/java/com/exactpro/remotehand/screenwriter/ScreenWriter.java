@@ -18,6 +18,7 @@ package com.exactpro.remotehand.screenwriter;
 
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebConfiguration;
+import com.exactpro.remotehand.windows.ElementOffsetUtils;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -79,26 +80,24 @@ public abstract class ScreenWriter<T> {
 		}
 	}
 
-	public Color getElementColor(WindowsDriver<?> driver, WebElement element) throws ScriptExecuteException {
-		return getElementColor(driver, element, null);
-	}
-
-	public Color getElementColor(WindowsDriver<?> driver, WebElement element, java.awt.Point displacedPoint) throws ScriptExecuteException {
+	public Color getElementColor(WindowsDriver<?> driver, ElementOffsetUtils.ElementOffsets elementOffsets) throws ScriptExecuteException {
 		try {
 			BufferedImage sourceImage = bytesToImage(driver.getScreenshotAs(OutputType.BYTES));
+			WebElement element = elementOffsets.element;
+
 			Point p = element.getLocation();
 			Dimension size = element.getSize();
 			int width = getElementScreenshotSize(p.getX(), size.getWidth(), sourceImage.getWidth());
 			int height = getElementScreenshotSize(p.getY(), size.getHeight(), sourceImage.getHeight());
 			BufferedImage elementImage = sourceImage.getSubimage(p.getX(), p.getY(), width, height);
 
-			if (displacedPoint == null)
+			if (!elementOffsets.hasOffset)
 				return new Color(elementImage.getRGB(width / 2, height / 2)); // get the color of the center pixel
 
-			if (displacedPoint.x > width || displacedPoint.y > height)
+			if (elementOffsets.xOffset > width || elementOffsets.yOffset > height)
 				throw new ScriptExecuteException("The selected point is outside the bounds of the element");
 
-			return new Color(elementImage.getRGB(displacedPoint.x, displacedPoint.y)); // get the color of the displaced pixel
+			return new Color(elementImage.getRGB(elementOffsets.xOffset, elementOffsets.yOffset)); // get the color of the displaced pixel
 		} catch (IOException e) {
 			throw new ScriptExecuteException("Error while extracting color of element", e);
 		}
