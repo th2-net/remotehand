@@ -17,12 +17,8 @@
 package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
-import com.exactpro.remotehand.windows.ElementSearcher;
-import com.exactpro.remotehand.windows.WindowsAction;
-import com.exactpro.remotehand.windows.WindowsDriverWrapper;
-import com.exactpro.remotehand.windows.WindowsSessionContext;
+import com.exactpro.remotehand.windows.*;
 import io.appium.java_client.windows.WindowsDriver;
-import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +35,14 @@ public class GetElementColor extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
 	                  WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-		Point displacedPoint = getDisplacedPoint(params);
 		WindowsDriver<?> driver = driverWrapper.getDriver();
 		ElementSearcher es = new ElementSearcher(params, driver, cachedElements);
 		WebElement element = es.searchElement();
 		if (element == null)
 			throw new ScriptExecuteException("Error while extracting color of element. Element not found");
-		Color elementColor = screenWriter.getElementColor(driver, element, displacedPoint);
+		ElementOffsetUtils.ElementOffsetParams elementOffsetParams
+				= new ElementOffsetUtils.ElementOffsetParams(element, params.get(X_OFFSET), params.get(Y_OFFSET));
+		Color elementColor = screenWriter.getElementColor(driver, ElementOffsetUtils.calculateOffset(elementOffsetParams));
 
 		return convertToHex(elementColor);
 	}
@@ -56,23 +53,6 @@ public class GetElementColor extends WindowsAction {
 		return loggerInstance;
 	}
 
-
-	private Point getDisplacedPoint(Map<String, String> params) throws ScriptExecuteException {
-		String xOffsetString = params.get(X_OFFSET);
-		String yOffsetString = params.get(Y_OFFSET);
-
-		if (!StringUtils.isEmpty(xOffsetString) && !StringUtils.isEmpty(yOffsetString)) {
-			int xOffset = Integer.parseInt(xOffsetString);
-			int yOffset = Integer.parseInt(yOffsetString);
-
-			if (xOffset < 0 || yOffset < 0)
-				throw new ScriptExecuteException("Co-ordinates cannot be negative");
-
-			return new Point(xOffset, yOffset);
-		}
-
-		return null;
-	}
 
 	private String convertToHex(Color elementColor) {
 		return String.format("#%02X%02X%02X", elementColor.getRed(), elementColor.getGreen(), elementColor.getBlue());
