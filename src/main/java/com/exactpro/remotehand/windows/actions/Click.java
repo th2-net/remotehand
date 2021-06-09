@@ -17,13 +17,13 @@
 package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
+import org.apache.commons.lang3.StringUtils;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WinActionUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -36,8 +36,7 @@ public class Click extends WindowsAction {
 	private static final Logger loggerInstance = LoggerFactory.getLogger(Click.class);
 
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
-			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers", ATTACHED_BORDER = "attachedborder",
-			LEFT_TOP = "left_top", RIGHT_TOP = "right_top", LEFT_BOTTOM = "left_bottom", RIGHT_BOTTOM = "right_bottom";
+			X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
@@ -47,56 +46,21 @@ public class Click extends WindowsAction {
 		WebElement element = es.searchElement();
 
 		String button = params.get(BUTTON);
-		if (button == null)
+		if (StringUtils.isEmpty(button))
 			button = LEFT;
-
-		String xOffsetStr, yOffsetStr;
-		int xOffset = 0, yOffset = 0;
-		xOffsetStr = params.get(X_OFFSET);
-		yOffsetStr = params.get(Y_OFFSET);
+		
+		ElementOffsetUtils.ElementOffsetParams elementOffsetParams 
+				= new ElementOffsetUtils.ElementOffsetParams(element, params.get(X_OFFSET), params.get(Y_OFFSET));
+		ElementOffsetUtils.ElementOffsets elementOffsets = ElementOffsetUtils.calculateOffset(elementOffsetParams);
 
 		Actions actions = WinActionUtils.createAndCheck(driver, element);
 		
-		String fromBorder = params.get(ATTACHED_BORDER);
-		if (fromBorder != null && !fromBorder.isEmpty()) {
-			Dimension rect = element.getSize();
-			switch (fromBorder) {
-				case RIGHT_TOP:
-					xOffset = rect.getWidth();
-					yOffset = 0;
-					break;
-				case RIGHT_BOTTOM:
-					xOffset = rect.getWidth();
-					yOffset = rect.getHeight();
-					break;
-				case LEFT_BOTTOM:
-					xOffset = 0;
-					yOffset = rect.getHeight();
-					break;
-				case LEFT_TOP:
-					xOffset = 0;
-					yOffset = 0;
-					break;
-				default:
-					throw new ScriptExecuteException("Unrecognized option: attachedBorder: " + fromBorder);
-			}
-		}
 
-		if ((xOffsetStr != null && !xOffsetStr.isEmpty()) && (yOffsetStr != null && !yOffsetStr.isEmpty()))
-		{
-			try
-			{
-				xOffset += Integer.parseInt(xOffsetStr);
-				yOffset += Integer.parseInt(yOffsetStr);
-			}
-			catch (Exception e)
-			{
-				this.logger.error("xoffset or yoffset is not integer value");
-			}
-			actions = actions.moveToElement(element, xOffset, yOffset);
-		}
-		else
+		if (elementOffsets.hasOffset) {
+			actions = actions.moveToElement(element, elementOffsets.xOffset, elementOffsets.yOffset);
+		} else {
 			actions = actions.moveToElement(element);
+		}
 
 		switch (button) {
 			case LEFT:
@@ -106,14 +70,12 @@ public class Click extends WindowsAction {
 				actions.contextClick();
 				break;
 			case MIDDLE:
-				this.logger.error("Middle click is not implemented.");
-				return null;
+				throw new ScriptExecuteException("Middle click is not implemented.");
 			case DOUBLE:
 				actions.doubleClick();
 				break;
 			default:
-				this.logger.error("Button may be only left, right, middle or double (for double click with left button).");
-				return null;
+				throw new ScriptExecuteException("Button may be only left, right, middle or double (for double click with left button).");
 		}
 
 		actions.perform();

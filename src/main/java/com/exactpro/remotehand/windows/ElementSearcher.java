@@ -41,9 +41,6 @@ public class ElementSearcher {
 	protected final Map<String, String> record;
 	protected final WindowsDriver<?> driver;
 	protected final CachedWebElements webElements;
-	
-	private static final SearchParams.HeaderKeys DEFAULT_KEYS = new SearchParams.HeaderKeys("locator",
-			"matcher", "matcherindex");
 
 	public ElementSearcher(Map<String, String> record, WindowsDriver<?> driver, CachedWebElements webElements) {
 		this.record = record;
@@ -89,11 +86,11 @@ public class ElementSearcher {
 	}
 
 	public boolean isLocatorsAvailable() {
-		return isLocatorsAvailable(DEFAULT_KEYS);
+		return isLocatorsAvailable(SearchParams.HeaderKeys.DEFAULT);
 	}
 
 	public WebElement searchElement() throws ScriptExecuteException {
-		return searchElement(DEFAULT_KEYS);
+		return searchElement(SearchParams.HeaderKeys.DEFAULT);
 	}
 
 	public List<WebElement> searchElements() throws ScriptExecuteException {
@@ -154,7 +151,7 @@ public class ElementSearcher {
 	}
 
 	public WebElement searchElementWithoutWait() throws ScriptExecuteException {
-		return searchElementWithoutWait(DEFAULT_KEYS);
+		return searchElementWithoutWait(SearchParams.HeaderKeys.DEFAULT);
 	}
 
 	public WebElement searchElementWithoutWait(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
@@ -173,7 +170,7 @@ public class ElementSearcher {
 	}
 
 	public WebElement searchElementWithWait(int implicitTimeout) throws ScriptExecuteException {
-		return searchElementWithWait(DEFAULT_KEYS, implicitTimeout);
+		return searchElementWithWait(SearchParams.HeaderKeys.DEFAULT, implicitTimeout);
 	}
 
 	public WebElement searchElementWithWait(SearchParams.HeaderKeys keys, int implicitTimeout) throws ScriptExecuteException {
