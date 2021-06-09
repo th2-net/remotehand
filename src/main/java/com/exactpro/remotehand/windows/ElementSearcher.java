@@ -94,7 +94,7 @@ public class ElementSearcher {
 	}
 
 	public List<WebElement> searchElements() throws ScriptExecuteException {
-		return searchElements(DEFAULT_KEYS);
+		return searchElements(SearchParams.HeaderKeys.DEFAULT);
 	}
 
 	protected WebElement searchElement(List<SearchParams> pairs) throws ScriptExecuteException {

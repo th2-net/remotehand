@@ -17,6 +17,7 @@
 package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.windows.ElementOffsetUtils;
 import org.apache.commons.lang3.StringUtils;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WinActionUtils;
