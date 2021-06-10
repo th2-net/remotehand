@@ -41,6 +41,8 @@ public class SearchElement extends WindowsAction {
 		if (getId() == null) {
 			throw new ScriptExecuteException("Id is not specified");
 		}
+		
+		cachedWebElements.removeElements(getId());
 
 		boolean multiple = RhUtils.getBooleanOrDefault(params, MULTIPLE_ELEMENTS_PARAM, false);
 

@@ -73,6 +73,10 @@ public class TableSearch extends WindowsAction
 			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
 			WebElement table = elementSearcher.searchElement();
 			setTimeOut(driver, 0);
+			
+			if (saveResult) {
+				cachedElements.removeElements(getId());
+			}
 
 			WebElement row;
 			boolean rowFound = false;
@@ -100,7 +104,7 @@ public class TableSearch extends WindowsAction
 			logger.warn("Column cannot be found", e);
 			return "not found";
 		} finally {
-			if (driver == null)
+			if (driver != null)
 				setTimeOut(driver, driverWrapper.getImplicitlyWaitTimeout());
 		}
 

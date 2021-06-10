@@ -38,17 +38,21 @@ public class WindowsLoggingDriver<T extends WebElement> extends WindowsDriver<T>
 	public Response execute(String driverCommand, Map<String, ?> parameters) {
 		long startTime = System.currentTimeMillis();
 		logger.info("Executing command: {}", driverCommand);
-		Response response = super.execute(driverCommand, parameters);
-		logger.info("Command {} executed in {} millis", driverCommand, System.currentTimeMillis() - startTime);
-		return response;
+		try {
+			return super.execute(driverCommand, parameters);
+		} finally {
+			logger.info("Command {} executed in {} millis", driverCommand, System.currentTimeMillis() - startTime);
+		}
 	}
 
 	@Override
 	public Response execute(String command) {
 		long startTime = System.currentTimeMillis();
 		logger.info("Executing command: {}", command);
-		Response response = super.execute(command);
-		logger.info("Command {} executed in {} millis", command, System.currentTimeMillis() - startTime);
-		return response;
+		try {
+			return super.execute(command);
+		} finally {
+			logger.info("Command {} executed in {} millis", command, System.currentTimeMillis() - startTime);
+		}
 	}
 }

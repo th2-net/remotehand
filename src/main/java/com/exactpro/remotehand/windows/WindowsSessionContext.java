@@ -17,6 +17,7 @@
 package com.exactpro.remotehand.windows;
 
 import com.exactpro.remotehand.sessions.SessionContext;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
 import java.net.URL;
@@ -79,6 +80,13 @@ public class WindowsSessionContext extends SessionContext {
 		
 		public void storeWebElement(String id, WebElement webElement) {
 			this.cachedObjects.put(id, webElement);
+		}
+
+		public void removeElements(String id) {
+			if (StringUtils.isNotEmpty(id)) {
+				this.cachedObjects.remove(id);
+				this.cachedLists.remove(id);
+			}
 		}
 
 		public void storeWebElementList(String id, List<WebElement> webElement) {

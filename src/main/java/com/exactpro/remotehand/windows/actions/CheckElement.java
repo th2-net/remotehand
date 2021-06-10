@@ -44,15 +44,18 @@ public class CheckElement extends WindowsAction {
 
 		ElementSearcher es = new ElementSearcher(params, this.getDriver(driverWrapper), cachedWebElements);
 		WebElement element = es.searchElementWithoutWait();
+		boolean save = RhUtils.getBooleanOrDefault(params, SAVE_ELEMENT_NAME, false) &&
+				StringUtils.isNotEmpty(getId());
+		if (save) {
+			cachedWebElements.removeElements(getId());
+		}
 
 		String attributeName = params.get(ATTRIBUTE_NAME);
 		if (attributeName != null && element != null) {
 			return element.getAttribute(attributeName);
 		} else if (element != null) {
-			String id = getId();
-			if (RhUtils.getBooleanOrDefault(params, SAVE_ELEMENT_NAME, false) &&
-					StringUtils.isNotEmpty(id)) {
-				cachedWebElements.storeWebElement(id, element);
+			if (save) {
+				cachedWebElements.storeWebElement(getId(), element);
 			}
 			
 			return FOUND_VALUE;
