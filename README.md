@@ -129,15 +129,15 @@ SetCheckbox,5,locator,matcher,true
 
 Instead of `Click` this action checks state of the checkbox before clicking. 
 
-If `checked` = true and checkbox is checked action will not click to element.
+If `checked` = "true" and checkbox is checked action will not click to element.
 
-You can clear checkbox using `checked` = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
+You can clear checkbox using `checked` = "false". Default value is "true".
 
 
 ### SendKeys
 ```
 #action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#canBeDisabled,#clear,#checkInput,#needClick
-SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes,no,no
+SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,true,true,false,false
 ```
 
 Optionally waits `wait` seconds for element specified by `matcher` and sends keys to it, inputting `text`. Element is found using `locator`.
@@ -151,13 +151,13 @@ Element to wait is found using `locator2`.
 
 Also, you can skip `locator2` and `matcher2` and RemoteHand will just wait `wait2` seconds before continuing the input with `text2`.
 
-If you want to fill disabled field use `canBeDisabled` = yes. Field will be enabled and disabled back after text input.
+If you want to fill disabled field use `canBeDisabled` = "true". Field will be enabled and disabled back after text input.
 
-If you want to clear field before sending keys use `clear` = yes ("no" by default).
+If you want to clear field before sending keys use `clear` = "false" ("true" by default).
 
-If you want to send keys without checking sending result value use `checkInput` = no ("yes" by default).
+If you want to send keys without checking sending result value use `checkInput` = "false" ("true" by default).
 
-If you want to send keys without clicking on element first use `needClick` = no ("yes" by default).
+If you want to send keys without clicking on element first use `needClick` = "false" ("true" by default).
 
 You can tell RemoteHand to press the following special keys by specifying corresponding codes:
 1. Up arrow - #up#
@@ -332,7 +332,7 @@ Search can be performed in different directions, user can control it with `searc
 
 `searchOffset` is number of pixels to scroll on each searching iteration (100 by default).
 
-If logical variable `doScrollTo` = yes then action will perform same functional, as `ScrollDivTo`: element with scroll-bar will be scrolled to "offsetTop" value of this element with `yOffset` offset.
+If logical variable `doScrollTo` = "true" then action will perform same functional, as `ScrollDivTo`: element with scroll-bar will be scrolled to "offsetTop" value of this element with `yOffset` offset.
 
 
 ### PageSource
@@ -365,9 +365,9 @@ Optionally waits `wait` seconds for drop down list element specified by `matcher
 
 Selects specified in `text` value of drop down list. If there is no specified value in the list `default` value will be selected.
 
-If `noOptionalFail` is not true (y, yes, t, 1, +) action doesn't fail when `text` or `default` value are not founded.
+If `noOptionalFail` is not "true" action doesn't fail when `text` or `default` value are not founded.
 
-By default `noOptionalFail` is true.
+By default `noOptionalFail` is "true".
 
 
 ### SelectFrame
@@ -621,13 +621,17 @@ To place element as argument to code, use "@Element@" reference.
 
 ## Notes
 
+To set boolean value you can use following aliases:
+* `TRUE`: y, yes, t, true, 1, +
+* `FALSE`: n, no, f, false, 0, -
+
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
 
-The exception can be suppressed and further action execution can be skipped if `notFoundFail` action parameter is not true (y, yes, t, 1, +).
+The exception can be suppressed and further action execution can be skipped if `notFoundFail` action parameter is not "true".
 
 In case of `FindElement`, no exception is thrown because the action handles this case.
 
-All actions support optional parameter `execute`. If this parameter is set to false (n, no, f, 0, -), action will not be executed. Default value is true.
+All actions support optional parameter `execute`. If this parameter is set to "false", action will not be executed. Default value is "true".
 
 Possible `locator` values:
 1. cssSelector - in this case `matcher` should contain CSS path to the element like this: div.v-button.v-widget.default.v-button-default;
