@@ -103,22 +103,22 @@ Some useful info can be found below the list.
 Open,url
 ```
 
-Opens resource at <url>.
+Opens resource at `url`.
 
 
 ### Click
 ```
-#action,#wait,#locator,#matcher,#button,#xoffset,#yoffset,#modifiers
+#action,#wait,#locator,#matcher,#button,#xOffset,#yOffset,#modifiers
 Click,5,locator,matcher,mouse_button,10,10,"ctrl,shift"
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher> and clicks on it with <button> ("left" by default). Element is found using <locator>.
+Optionally waits `wait` seconds for element specified by `matcher` and clicks on it with `button` ("left" by default). Element is found using `locator`.
 
-Optional <xoffset> and <yoffset> parameters define position from element top left corner to click on.
+Optional `xOffset` and `yOffset` parameters define position from element top left corner to click on.
 
-Optional <modifiers> parameter is expected to be enumeration of modifier keys, e.g.: "ctrl,shift,alt"
+Optional `modifiers` parameter is expected to be enumeration of modifier keys, e.g.: "ctrl,shift,alt".
 
-Possible values of <button>: left, right, middle, double.
+Possible values of `button`: "left", "right", "middle", "double".
 
 
 ### SetCheckbox
@@ -127,38 +127,37 @@ Possible values of <button>: left, right, middle, double.
 SetCheckbox,5,locator,matcher,true
 ```
 
-Instead of Click this action checks state of the checkbox before clicking. 
+Instead of `Click` this action checks state of the checkbox before clicking. 
 
-If #checked = true and checkbox is checked action will not click to element. 
+If `checked` = true and checkbox is checked action will not click to element.
 
-You can clear checkbox using #checked = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
+You can clear checkbox using `checked` = false (n, no, f, 0, -). Default value is true (y, yes, t, 1, +).
 
 
 ### SendKeys
 ```
-#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#CanBeDisabled,#Clear,#CheckInput,#NeedClick
+#action,#wait,#locator,#matcher,#text,#wait2,#locator2,#matcher2,#text2,#canBeDisabled,#clear,#checkInput,#needClick
 SendKeys,5,locator,matcher,text,5,locator2,matcher2,text2,yes,yes,no,no
 ```
 
-"Clear" parameter can be true or yes when we want to clear element before sending.
+Optionally waits `wait` seconds for element specified by `matcher` and sends keys to it, inputting `text`. Element is found using `locator`.
 
-Optionally waits <wait> seconds for element specified by <matcher> and sends keys to it, inputting <text>. Element is found using <locator>.
+In some cases it is needed to wait for some element to appear after first input and then continue the input (for example, need to wait for autocomplete box to appear).
 
-In some cases it is needed to wait for some element to appear after first input and then continue the input 
-(for example, need to wait for autocomplete box to appear). 
+In these cases optional parameters `wait2`, `locator2`, `matcher2` and `text2` come in handy:
+after inputting `text`, RemoteHand will wait `wait2` seconds for element specified by `matcher2` and then continue the input, inputting `text2`.
 
-In these cases optional parameters <wait2>, <locator2>, <matcher2> and <text2> come in handy: 
-after inputing <text>, RemoteHand will wait <wait2> seconds for element specified by <matcher2> and then continue the input, inputing <text2>.
+Element to wait is found using `locator2`.
 
-Element to wait is found using <locator2>. 
+Also, you can skip `locator2` and `matcher2` and RemoteHand will just wait `wait2` seconds before continuing the input with `text2`.
 
-Also, you can skip <locator2> and <matcher2> and RemoteHand will just wait <wait2> seconds before continuing the input with <text2>.
+If you want to fill disabled field use `canBeDisabled` = yes. Field will be enabled and disabled back after text input.
 
-If you want to fill disabled field use #CanBeDisabled=yes. Field will be enabled and disabled back after text input.
+If you want to clear field before sending keys use `clear` = yes ("no" by default).
 
-If you want to send keys without checking sending result value use #CheckInput=no ('yes' by default).
+If you want to send keys without checking sending result value use `checkInput` = no ("yes" by default).
 
-If you want to send keys without clicking on element first use #NeedClick=no ('yes' by default).
+If you want to send keys without clicking on element first use `needClick` = no ("yes" by default).
 
 You can tell RemoteHand to press the following special keys by specifying corresponding codes:
 1. Up arrow - #up#
@@ -179,7 +178,7 @@ You can tell RemoteHand to press the following special keys by specifying corres
 1. Home (for example, to move to the start of the line) - #home#
 1. Insert - #insert#
 1. Delete - #delete#
-1. Functional keys, i.e. F1, F2 etc. - #f1#, #f2# etc.
+1. Functional keys, i.e. F1, F2, etc. - #f1#, #f2#, etc.
 1. Numpad keys - num0, num1, ..., num9
 1. Non-breaking space (Alt+0160, only for Windows) - #nbsp#
 1. Backspace - #backspace# 
@@ -189,12 +188,26 @@ The following example writes "text" in a field, then presses Down arrow to selec
 text#down##return#
 ```
 
-The keys and special codes can be combined in order to press a combination of keys. The combination is specified in "#" chars with keys delimited by "+". For example, to simulate input of '(' char you can use the following:
+The keys and special codes can be combined in order to press a combination of keys. The combination is specified in "#" chars with keys delimited by "+". For example, to simulate input of "(" char you can use the following:
 ```
 #shift+9#
 ```
 
-Special keys (Shift, Ctrl, Alt) can be hold during keys sending. To hold key you can place it in round brackets (ex. '(#shift#)a' will cause pressing key 'a' with shift holded).
+Special keys (Shift, Ctrl, Alt) can be hold during keys sending. To hold key you can place it in round brackets. For example, to type "text" with shift held you can use the following:
+```
+(#shift#)text
+```
+
+
+### SendKeysToActive
+```
+#action,#text,#text2
+SendKeysToActive,text,text2
+```
+
+Allows sending text to active element like `SendKeys` but without reference to locator.
+
+Has the same feature set as `SendKeys` action.
 
 
 ### WaitForElement
@@ -203,20 +216,20 @@ Special keys (Shift, Ctrl, Alt) can be hold during keys sending. To hold key you
 WaitForElement,5,locator,matcher
 ```
 
-Waits <seconds> seconds for element specified by <matcher>, element is found using <locator>.
+Waits `seconds` seconds for element specified by `matcher`, element is found using `locator`.
 
 Useful to make sure that certain element has appeared (page has been loaded till this element) before doing something on the page.
 
 
 ### WaitForNew
 ```
-#action,#seconds,#checkmillis,#locator,#matcher
+#action,#seconds,#checkMillis,#locator,#matcher
 WaitForNew,5,300,locator,matcher
 ```
 
-Waits <seconds> seconds for new elements specified by <matcher> to appear, elements are found using <locator>.
+Waits `seconds` seconds for new elements specified by `matcher` to appear, elements are found using `locator`.
 
-Check for new elements is performed every <checkmillis> milliseconds.
+Check for new elements is performed every `checkMillis` milliseconds.
 
 
 ### Wait
@@ -225,24 +238,30 @@ Check for new elements is performed every <checkmillis> milliseconds.
 Wait,5
 ```
 
-Makes a pause in execution for <seconds> seconds. 
+Makes a pause in execution for `seconds` seconds.
 
 Good to use this action when you're not sure which element to wait for and just want to give a page more time to be downloaded.
 
 
 ### GetElement
 ```
-#action,#wait,#locator,#matcher
-GetElement,5,locator,matcher
+#action,#wait,#locator,#matcher,#id
+GetElement,5,locator,matcher,Button
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher> and prints value of its outerHTML. Element is found using <locator>.
+Optionally waits `wait` seconds for element specified by `matcher` and prints value of its outerHTML. Element is found using `locator`.
 
-Optional parameter <id> defines identifier to make references to element text in next actions: if <id>="Button", @{Button} is a reference to text of found element.
+Optional parameter `id` defines identifier to make references to element text in next actions: if `id` = Button, @{Button} is a reference to text of found element.
+
 
 ### GetElementInnerHtml
+```
+#action,#wait,#locator,#matcher
+GetElementInnerHtml,5,locator,matcher
+```
 
-The same as GETELEMENT but retrieves innerHTML text of the node.
+The same as `GetElement` but retrieves innerHTML text of the node.
+
 
 ### GetElementValue
 ```
@@ -250,15 +269,18 @@ The same as GETELEMENT but retrieves innerHTML text of the node.
 GetElementValue,5,locator,matcher
 ```
 
-Allows to obtain element value. For example value of tag <input>.
+The same as `GetElement` but allows obtaining element's value. For example value of tag \<input>.
 
-### GetElementValue
+
+### GetElementAttribute
 ```
-#action,#wait,#locator,#matcher,#attribute
-GetElementValue,5,locator,matcher,class
+#action,#wait,#locator,#matcher,#attribute,#default
+GetElementAttribute,5,locator,matcher,class,default
 ```
 
-Allows to obtain element's attribute value. For example, class of element.
+The same as `GetElement` but allows obtaining element's attribute value. For example, class of element.
+
+If there is no specified attribute in the element `default` value will be selected.
 
 
 ### GetDynamicTable
@@ -267,9 +289,9 @@ Allows to obtain element's attribute value. For example, class of element.
 GetDynamicTable,5,locator,matcher
 ```
 
-Optionally waits <wait> seconds for table element specified by <matcher> and prints its contents as <tbody>, <tr> and <td> tags. Table element is found using <locator>.
+Optionally waits `wait` seconds for table element specified by `matcher` and prints its contents as \<tbody>, \<tr> and \<td> tags. Table element is found using `locator`.
 
-If possible, action scrolls the table down to force it to be loaded completelly if lazy loading is enabled for the table.
+If possible, action scrolls the table down to force it to be loaded completely if lazy loading is enabled for the table.
 
 
 ### ScrollTo
@@ -278,39 +300,39 @@ If possible, action scrolls the table down to force it to be loaded completelly 
 ScrollTo,5,locator,matcher
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher> and scrolls browser window to it. Element is found using <locator>.
+Optionally waits `wait` seconds for element specified by `matcher` and scrolls browser window to it. Element is found using `locator`.
 
-Note that all of actions working with elements (Click, SendKeys, etc.) will scroll to the element automatically if it is invisible.
+Note that all actions working with elements (`Click`, `SendKeys`, etc.) will scroll to the element automatically if it is invisible.
 
 
 ### ScrollDivTo
 ```
-#action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#yoffset
+#action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#yOffset
 ScrollDivTo,5,locator,matcher,5,locator2,matcher2,-100
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
+Optionally waits `wait` seconds for element specified by `matcher`, this element is found using `locator`. Scroll of this element will be manipulated by this action.
 
-Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Element with scroll-bar will be scrolled to 'offsetTop' of this element.
+Then optionally waits `wait2` seconds for element specified by `matcher2`, this element is found using `locator2`. Element with scroll-bar will be scrolled to "offsetTop" of this element.
 
-Action can optionally move scroll by <yoffset> (positive or negative integer) pixels after scrolling to specified element.
+Action can optionally move scroll by `yOffset` (positive or negative integer) pixels after scrolling to specified element.
 
 
 ### ScrollDivUntil
 ```
-#action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#searchdir,#searchoffset,#doscrollto,#yoffset
+#action,#wait,#locator,#matcher,#wait2,#locator2,#matcher2,#searchDir,#searchOffset,#doScrollTo,#yOffset
 ScrollDivUntil,5,locator,matcher,5,locator2,matcher2,both,300,y,-100
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher>, this element is found using <locator>. Scroll of this element will be manipulated by this action.
+Optionally waits `wait` seconds for element specified by `matcher`, this element is found using `locator`. Scroll of this element will be manipulated by this action.
 
-Then optionally waits <wait2> seconds for element specified by <matcher2>, this element is found using <locator2>. Previous element will scroll until this element will appear.
+Then optionally waits `wait2` seconds for element specified by `matcher2`, this element is found using `locator2`. Previous element will scroll until this element will appear.
 
-Search can be performed in different directions, user can control it with <searchdir> variable. Possible values: 'up', 'down' and 'both'.
+Search can be performed in different directions, user can control it with `searchDir` variable. Possible values: "up", "down" and "both".
 
-<searchoffset> is number of pixels to scroll on each searching iteration (100 by default).
+`searchOffset` is number of pixels to scroll on each searching iteration (100 by default).
 
-If logical variable <doscrollto> is TRUE then action will perform same functional, as SCROLLDIVTO: element with scroll-bar will be scrolled to 'offsetTop' of this element with <yoffset> offset.
+If logical variable `doScrollTo` = yes then action will perform same functional, as `ScrollDivTo`: element with scroll-bar will be scrolled to "offsetTop" value of this element with `yOffset` offset.
 
 
 ### PageSource
@@ -335,13 +357,28 @@ Refreshes current page, loading it again. Useful to collapse all tree nodes and 
 
 ### Select
 ```
-#action,#wait,#locator,#matcher,#text,#default,#nooptionalfail
+#action,#wait,#locator,#matcher,#text,#default,#noOptionalFail
 Select,5,locator,matcher,selectedValue,defaultValue,true
 ```
 
-Selects specified in selectedValue value of drop down list. If there is no specified value in the list default value will be
-selected. If nooptionalfail is not in list ("y", "yes", "t", "true", "1", "+") action doesn't fail when selectedValue or default value are not founded.
-By default nooptionalfail is true.
+Optionally waits `wait` seconds for drop down list element specified by `matcher`, this element is found using `locator`.
+
+Selects specified in `text` value of drop down list. If there is no specified value in the list `default` value will be selected.
+
+If `noOptionalFail` is not true (y, yes, t, 1, +) action doesn't fail when `text` or `default` value are not founded.
+
+By default `noOptionalFail` is true.
+
+
+### SelectFrame
+```
+#action,#wait,#locator,#matcher
+SelectFrame,5,locator,matcher
+```
+
+Optionally waits `wait` seconds for element specified by `matcher`, this element is found using `locator`, then switches to element's frame.
+
+If `locator` and `matcher` was not specified switches to default frame.
 
 
 ### ClearElement
@@ -350,7 +387,7 @@ By default nooptionalfail is true.
 ClearElement,5,locator,matcher
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher> and clears its value. Element is found using <locator>.
+Optionally waits `wait` seconds for element specified by `matcher` and clears its value. Element is found using `locator`.
 
 Useful for input controls.
 
@@ -361,7 +398,7 @@ Useful for input controls.
 Output,text
 ```
 
-Prints <text> to script output. Useful to divide outputs of actions like GetElement, GetDynamicTable etc.
+Prints `text` value to script output. Useful to divide outputs of actions like `GetElement`, `GetDynamicTable`, etc.
 
 
 ### FindElement
@@ -370,16 +407,16 @@ Prints <text> to script output. Useful to divide outputs of actions like GetElem
 FindElement,5,locator,matcher,controlID
 ```
 
-Optionally waits <wait> seconds for element specified by <matcher> and <locator>. If element is found, "<id>=found" is printed in output. Else "<id>=notfound" is printed.
+Optionally waits `wait` seconds for element specified by `matcher` and `locator`. If element is found, "\<id>=found" is printed in output. Else "\<id>=notfound" is printed.
 
 
 ### KeyAction
 ```
-#action,#key,#keyaction
+#action,#key,#keyAction
 KeyAction,#shift#,down
 ```
 
-Allows to perform action over key specified for SendKeys action without reference to locator. Available values of #keyaction param: press (press key), down (hold key), up (release key).
+Allows performing action over key specified for `SendKeys` action without reference to locator. Available values of `keyAction` param: "press" (press key), "down" (hold key), "up" (release key).
 
 
 ### PressKey
@@ -388,45 +425,43 @@ Allows to perform action over key specified for SendKeys action without referenc
 PressKey,#tab#
 ```
 
-Allows to send one of keys specified for SendKeys action without reference to locator. Equals to KeyAction with #keyaction=press.
-
-
-### SendKeysToActive
-```
-#action,#text,#text2
-SendKeysToActive,text,text2
-```
-
-Allows to send text to active element like SendKeys but without reference to locator.
+Allows sending one of keys specified for `SendKeys` action without reference to locator. Equals to `KeyAction` with `keyAction` = press.
 
 
 ### UploadFile
 ```
-#action,#wait,#locator,#matcher,#absolutepath
+#action,#wait,#locator,#matcher,#absolutePath
 UploadFile,5,locator,matcher,absolutepath
 ```
 
 Uploads file by locator, using absolute path to the file or path relative to RemoteHand directory.
 
 
-### Download
+### DownloadFile
+```
+#action,#actionType
+DownloadFile,snapshot
 
-You are able to download files from GUI with this action. First of all you need to make a snapshot of a download directory.
+#action,#actionType,#localPath
+DownloadFile,download,true
+```
 
-To do this, call the action with #actiontype = snapshot. Then call the action with #actiontype = download.
+You are able to download files from GUI with this action. First you need to make a snapshot of a download directory.
+
+To do this, call the action with `actionType` = snapshot. Then call the action with `actionType` = download.
 
 If there are some new files in the download directory, action output will contain local path or HTTP link of the downloaded file.
 
-The output depends on #localpath parameter. By default it is 'false' which results in HTTP link in the output.
+The output depends on `localPath` parameter. By default, it is "false" which results in HTTP link in the output.
 
 
 ### SwitchWindow
 ```
 #action,#window
-SwitchWindow,N
+SwitchWindow,1
 ```
 
-Switches the window. N is an order of opened window (e.g. 0 - is a parent window for all windows, 1 - next child window)
+Switches the window. `window` is an order of opened window (e.g. 0 - is a parent window for all windows, 1 - next child window).
 
 
 ### CloseWindow
@@ -444,7 +479,7 @@ Closes currently opened window and focuses at the firstly opened window (0 windo
 GetCurrentURL
 ```
 
-Returns URL of active open window
+Returns URL of active open window.
 
 
 ### SetZoom
@@ -453,7 +488,8 @@ Returns URL of active open window
 SetZoom,140%
 ```
 
-Sets zoom value for current page. Possible formats: 140% / 1.4 .
+Sets zoom `value` for current page. Possible formats: "140%" or "1.4".
+
 
 ### DurationStart
 ```
@@ -461,22 +497,24 @@ Sets zoom value for current page. Possible formats: 140% / 1.4 .
 DurationStart,Start1
 ```
 
-Sets start of period to measure duration. ID is used for reference in further GetDuration actions.
+Sets start of period to measure duration. `id` is used for reference in further `GetDuration` actions.
+
 
 ### GetDuration
 ```
-#action,#StartId,#Name
+#action,#startId,#name
 GetDuration,Start1,Period1
 ```
 
-Returns duration of period from DurationStart action till this action. 
+Returns duration of period from `DurationStart` action till this action. 
 
-DurationStart action is taken by ID specified in optional StartId parameter. If no StartId is specified, last DurationStart action is taken.
+DurationStart action is taken by ID specified in optional `startId` parameter. If no `startId` is specified, last `DurationStart` action is taken.
 
-Name parameter is used in action result. Example of result:
+`name` parameter is used in action result. Example of result:
 ```
 Duration Period1: 20275
 ```
+
 
 ### StoreElementState
 ```
@@ -485,19 +523,23 @@ StoreElementState,5,locator,matcher,screen_id
 ```
 
 Optionally waits `wait` seconds for element specified by `matcher` and takes its screenshot, storing it under `id`.
-Element is found using `locator`.\
-Screenshot is stored for further verification for changes via WaitForChanges action.
+
+Element is found using `locator`.
+
+Screenshot is stored for further verification for changes via `WaitForChanges` action.
 
 
 ### WaitForChanges
 ```
-#action,#seconds,#checkmillis,#locator,#matcher,#screenshotId
+#action,#seconds,#checkMillis,#locator,#matcher,#screenshotId
 WaitForChanges,20,50,locator,matcher,screen_id
 ```
 
-Waits `seconds` for changes in element specified by `matcher` and found by using `locator`.\
-Changes are found by comparing element screenshot with the one stored under `id`.\
-Check for changes is performed (i.e. new screenshot is taken) every `checkmillis` milliseconds.
+Waits `seconds` for changes in element specified by `matcher` and found by using `locator`.
+
+Changes are found by comparing element screenshot with the one stored under `screenshotId`.
+
+Check for changes is performed (i.e. new screenshot is taken) every `checkMillis` milliseconds.
 
 
 ### AcceptAlert
@@ -506,7 +548,7 @@ Check for changes is performed (i.e. new screenshot is taken) every `checkmillis
 AcceptAlert,5
 ```
 
-Waits `wait` seconds for alert dialog to appear and accepts it, i.e. presses OK button.
+Waits `wait` seconds for alert dialog to appear and accepts it, i.e. presses "OK" button.
 
 
 ### DismissAlert
@@ -515,7 +557,7 @@ Waits `wait` seconds for alert dialog to appear and accepts it, i.e. presses OK 
 DismissAlert,5
 ```
 
-Waits `wait` seconds for alert dialog to appeat and dismisses it, i.e. presses Cancel button.
+Waits `wait` seconds for alert dialog to appear and dismisses it, i.e. presses "Cancel" button.
 
 
 ### CheckImageAvailability
@@ -526,19 +568,9 @@ CheckImageAvailability,5,locator,matcher
 
 This action checks that the specified image is available on page. 
 
-Optionally waits `wait` seconds for <img src="img_source"...> element specified by <matcher> and <locator>. 
+Optionally waits `wait` seconds for \<img src="img_source"...> element specified by `matcher` and `locator`.
 
-If element is found and the image is available, "true" is printed in output. Else "false" is printed.
-
-
-### GetElementScreenshot
-```
-#action,#wait,#locator,#matcher,#name
-GetElementScreenshot,5,locator,matcher,screen1
-```
-
-Takes a screenshot of the *element* and saves it to the disk.\
-`name` is optional and will be used as a part of screenshot filename.
+If element is found, and the image is available, "true" is printed in output. Else "false" is printed.
 
 
 ### GetScreenshot
@@ -547,28 +579,63 @@ Takes a screenshot of the *element* and saves it to the disk.\
 GetScreenshot,screen1
 ```
 
-Takes a screenshot of the *whole application* and saves it to the disk.\
-`name` is optional and will be used as a part of screenshot filename.
+Takes a screenshot of the *whole application* and saves it to the disk.
+
+`name` is optional and will be used as a part of screenshot file name.
+
+
+### GetElementScreenshot
+```
+#action,#wait,#locator,#matcher,#name
+GetElementScreenshot,5,locator,matcher,screen1
+```
+
+Takes a screenshot of the *element* and saves it to the disk.
+
+Optionally waits `wait` seconds for element specified by `matcher`, this element is found using `locator`.
+
+`name` is optional and will be used as a part of screenshot file name.
+
+
+### ExecuteJs
+```
+#action,#commands
+ExecuteJs,document.getElementById('element').value='value';
+```
+
+Executes JavaScript code from `commands` on current page.
+
+
+### ExecuteJsOnElement
+```
+#action,#commands,#wait,#locator,#matcher
+ExecuteJsOnElement,@Element@.value='value';,5,locator,matcher
+```
+
+Optionally waits `wait` seconds for element specified by `matcher`, this element is found using `locator`, then switches to element's frame.
+
+Executes JavaScript code from `commands` on current page, uses found element as argument to JavaScript code.
+
+To place element as argument to code, use "@Element@" reference.
+
 
 ## Notes
 
 All actions that wait for some element will check the page contents till given element appears or till given number of seconds passes, throwing ScriptExecuteException if no element had appeared in time. 
 
-The exception can be suppressed and further action execution can be skipped if NotFoundFail action parameter is not true (y, yes, t, 1, +)
+The exception can be suppressed and further action execution can be skipped if `notFoundFail` action parameter is not true (y, yes, t, 1, +).
 
-In case of FindElement, no exception is thrown because the action handles this case.
+In case of `FindElement`, no exception is thrown because the action handles this case.
 
-All actions support optional parameter #execute. If this parameter is set to false (n, no, f, 0, -), action will not be executed.
+All actions support optional parameter `execute`. If this parameter is set to false (n, no, f, 0, -), action will not be executed. Default value is true.
 
-Default value is true.
+Possible `locator` values:
+1. cssSelector - in this case `matcher` should contain CSS path to the element like this: div.v-button.v-widget.default.v-button-default;
+1. xpath - `matcher` should contain XPath to the element, for example: //button[contains(@class, 'v-nativebutton v-widget')];
+1. tagName - in this case `matcher` is a tag name of the element;
+1. id - then `matcher` contains id of the element.
 
-Possible <locator> values:
-1. cssSelector - in this case <matcher> should contain CSS path to the element like this: div.v-button.v-widget.default.v-button-default;
-1. xpath - <matcher> should contain XPath to the element, for example: //button[contains(@class, 'v-nativebutton v-widget')];
-1. tagName - in this case <matcher> is a tag name of the element;
-1. id - then <matcher> contains id of the element.
-
-You can specify non-breaking space (&nbsp;) in xpath using special value #nbsp#. For example: //span[text()="#nbsp#"].
+You can specify non-breaking space (\&nbsp;) in xpath using special value #nbsp#. For example: //span[text()="#nbsp#"].
 
 RemoteHand can use web element dictionary, which contains list of web elements by tags: #webId,#locator,#matcher,#type,#desc.
 
@@ -581,4 +648,4 @@ click2,cssSelector,<matcher>,link,some link...
 sendKeys1,xpath,<matcher>,input,some input...
 ```
 
-You can use in script the parameter 'webId', RemoteHand will replace it with 'locator' and 'matcher'. But these parameters can not be used together!
+You can use in script the parameter `webId`, RemoteHand will replace it with `locator` and `matcher`. These parameters can not be used together!
