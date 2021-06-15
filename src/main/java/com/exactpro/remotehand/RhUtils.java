@@ -20,15 +20,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.contains;
 
-public class RhUtils
-{
+public class RhUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(RhUtils.class);
 	public static final String SESSION_FOR_FILE_MODE = "Main";
+	
 	
 	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
 	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
@@ -83,20 +86,51 @@ public class RhUtils
 				|| contains(msg, "not reachable");
 	}
 
-	public static Map<String, String> buildFilters(String filters) {
+	public static List<Filter> buildFilters(String filters) throws ScriptExecuteException {
 		if (StringUtils.isEmpty(filters))
-			return Collections.emptyMap();
-		Map<String, String> result = new HashMap<>();
+			return Collections.emptyList();
 
 		String[] splitFilters = filters.split(";");
+		List<Filter> result = new ArrayList<>(splitFilters.length);
 		for (String splitFilter : splitFilters) {
 			String[] kvPair = splitFilter.split("=", -1);
-			if (kvPair.length != 2)
-				continue;
-
-			result.put(kvPair[0], kvPair[1]);
+			if (kvPair.length == 3) {
+				int index;
+				try {
+					index = Integer.parseInt(kvPair[2]);
+				} catch (NumberFormatException e) {
+					throw new ScriptExecuteException("Cannot extract index: " + kvPair[2]);
+				}
+				if (index < 0) {
+					throw new ScriptExecuteException("Index cannot be less than 0: " + index);
+				}
+				result.add(new Filter(kvPair[0], index, kvPair[1]));
+			} else if (kvPair.length == 2) {
+				result.add(new Filter(kvPair[0], kvPair[1]));
+			} else {
+				logger.warn("Cannot process filters: {}", splitFilter);
+			}
 		}
 
 		return result;
+	}
+	
+	public static class Filter {
+		
+		public final String name;
+		public final Integer index;
+		public final String value;
+
+		public Filter(String name, Integer index, String value) {
+			this.name = name;
+			this.index = index;
+			this.value = value;
+		}
+
+		public Filter(String name, String value) {
+			this.name = name;
+			this.index = null;
+			this.value = value;
+		}
 	}
 }

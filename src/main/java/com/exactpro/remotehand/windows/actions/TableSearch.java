@@ -50,6 +50,9 @@ public class TableSearch extends WindowsAction
 	private static final String ROW_ELEMENT_VALUE_FORMAT = "rowelementvalueformat";
 	private static final String DEFAULT_ELEMENT_VALUE_FORMAT = "Value.Value";
 	private static final String SAVE_RESULT = "saveresult";
+	
+	public static final String NOT_FOUND = "not found";
+	public static final String FOUND = "found";
 
 	private String rowNameFormat;
 	private String rowElementNameFormat;
@@ -58,7 +61,7 @@ public class TableSearch extends WindowsAction
 	private int columnIndex;
 	private int firstRowIndex;
 	private boolean saveResult;
-	private Map<String, String> filtersMap;
+	private List<RhUtils.Filter> filtersMap;
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
@@ -76,11 +79,23 @@ public class TableSearch extends WindowsAction
 			while (!rowFound) {
 				row = findRow(table, i + firstRowIndex);
 
-				for (Map.Entry<String, String> kvFilter : filtersMap.entrySet()) {
-					String rowName = format(rowElementNameFormat, kvFilter.getKey(), i);
-					WebElement rowElement = row.findElement(By.name(rowName));
+				for (RhUtils.Filter kvFilter : filtersMap) {
+					String rowName = format(rowElementNameFormat, kvFilter.name, i);
+					WebElement rowElement;
+					
+					if (kvFilter.index == null) {
+						rowElement = row.findElement(By.name(rowName));
+					} else {
+						List<WebElement> elements = row.findElements(By.name(rowName));
+						if (elements == null || elements.size() < kvFilter.index) {
+							logger.warn("Not found element with id {} and index {} on row #{}", rowName, kvFilter.index, i + firstRowIndex);
+							return NOT_FOUND;
+						}
+						rowElement = elements.get(kvFilter.index);
+					}
+					
 					String attribute = StringUtils.defaultString(rowElement.getAttribute(rowElementValueFormat), StringUtils.EMPTY);
-					rowFound = kvFilter.getValue().equals(attribute);
+					rowFound = kvFilter.value.equals(attribute);
 					if (!rowFound)
 						break;
 				}
@@ -94,12 +109,12 @@ public class TableSearch extends WindowsAction
 			}
 		} catch (NoSuchElementException e) {
 			logger.warn("Column cannot be found", e);
-			return "not found";
+			return NOT_FOUND;
 		} finally {
 			setTimeOut(driverWrapper, driverWrapper.getImplicitlyWaitTimeout());
 		}
 
-		return "found";
+		return FOUND;
 	}
 
 	private void handleInputParams(Map<String, String> params) throws ScriptExecuteException
