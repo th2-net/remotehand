@@ -21,10 +21,8 @@ import com.exactpro.remotehand.screenwriter.ScreenWriter;
 import com.exactpro.remotehand.windows.*;
 import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,16 +50,16 @@ public class ColorsCollector extends WindowsAction {
 		if (element == null)
 			throw new ScriptExecuteException("Error while extracting color of element. Element not found");
 
-		Pair<Point, Point> coordinates;
+		Rectangle rectangle;
 		if (isCoordinatesEmpty(params)) {
-			coordinates = getDefaultCoordinates(element);
+			rectangle = getDefaultRectangle(element);
 		} else {
 			ElementOffsetUtils.ElementOffsets startOffset = getOffset(element, params.get(START_X_OFFSET), params.get(STAR_Y_OFFSET));
 			ElementOffsetUtils.ElementOffsets endOffset = getOffset(element, params.get(END_X_OFFSET), params.get(END_Y_OFFSET));
-			coordinates = correctCoordinates(startOffset, endOffset);
+			rectangle = getRectangleFromOffsets(startOffset, endOffset);
 		}
 
-		return screenWriter.getElementColors(driver, element, coordinates).stream()
+		return screenWriter.getElementColors(driver, element, rectangle).stream()
 				.map(ScreenWriter::convertToHex)
 				.collect(Collectors.joining(";"));
 	}
@@ -78,8 +76,8 @@ public class ColorsCollector extends WindowsAction {
 		return ElementOffsetUtils.calculateOffset(position);
 	}
 
-	private Pair<Point, Point> correctCoordinates(ElementOffsetUtils.ElementOffsets firstOffset,
-	                                              ElementOffsetUtils.ElementOffsets secondOffset) {
+	private Rectangle getRectangleFromOffsets(ElementOffsetUtils.ElementOffsets firstOffset,
+	                                          ElementOffsetUtils.ElementOffsets secondOffset) throws ScriptExecuteException {
 		int startXCoordinate, endXCoordinate;
 		if (firstOffset.xOffset > secondOffset.xOffset) {
 			startXCoordinate = secondOffset.xOffset;
@@ -87,7 +85,7 @@ public class ColorsCollector extends WindowsAction {
 		} else {
 			startXCoordinate = firstOffset.xOffset;
 			endXCoordinate = secondOffset.xOffset;
-		} 
+		}
 
 		int startYCoordinate, endYCoordinate;
 		if (firstOffset.yOffset > secondOffset.yOffset) {
@@ -98,10 +96,13 @@ public class ColorsCollector extends WindowsAction {
 			endYCoordinate = secondOffset.yOffset;
 		}
 
-		Point firstPoint = new Point(startXCoordinate, startYCoordinate);
-		Point secondPoint = new Point(endXCoordinate, endYCoordinate);
+		if (startXCoordinate != firstOffset.xOffset || startYCoordinate != firstOffset.yOffset)
+			loggerInstance.info("Coordinates are swapped");
 
-		return new ImmutablePair<>(firstPoint, secondPoint);
+		if (startXCoordinate < 0 || startYCoordinate < 0)
+			throw new ScriptExecuteException("Coordinates cannot be less than zero");
+
+		return new Rectangle(startXCoordinate, startYCoordinate, endYCoordinate, endXCoordinate);
 	}
 
 	private boolean isCoordinatesEmpty(Map<String, String> params) {
@@ -109,11 +110,8 @@ public class ColorsCollector extends WindowsAction {
 				|| StringUtils.isEmpty(params.get(STAR_Y_OFFSET)) || StringUtils.isEmpty(params.get(END_Y_OFFSET));
 	}
 
-	private Pair<Point, Point> getDefaultCoordinates(WebElement element) {
-		Point firstPoint = new Point(0, 0);
+	private Rectangle getDefaultRectangle(WebElement element) {
 		Dimension size = element.getSize();
-		Point secondPoint = new Point(size.getWidth(), size.getHeight());
-
-		return new ImmutablePair<>(firstPoint, secondPoint);
+		return new Rectangle(0, 0, size.getHeight(), size.getWidth());
 	}
 }

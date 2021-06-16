@@ -20,9 +20,9 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebConfiguration;
 import com.exactpro.remotehand.windows.ElementOffsetUtils;
 import io.appium.java_client.windows.WindowsDriver;
-import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,13 +101,21 @@ public abstract class ScreenWriter<T> {
 		}
 	}
 
-	public Set<Color> getElementColors(WindowsDriver<?> driver, WebElement element, Pair<Point, Point> coordinates) throws ScriptExecuteException {
+	public Set<Color> getElementColors(WindowsDriver<?> driver, WebElement element, Rectangle rectangle) throws ScriptExecuteException {
 		try {
 			BufferedImage elementImage = getSubImage(driver, element);
 			Set<Color> colors = new LinkedHashSet<>();
 
-			for (int i = coordinates.getLeft().getX(); i < coordinates.getRight().getX(); i++) {
-				for (int j = coordinates.getLeft().getY(); j < coordinates.getRight().getY(); j++) {
+			int endXCoordinate = rectangle.getWidth();
+			if (elementImage.getWidth() < endXCoordinate)
+				endXCoordinate = elementImage.getWidth();
+
+			int endYCoordinate = rectangle.getHeight();
+			if (elementImage.getHeight() < endYCoordinate)
+				endYCoordinate = elementImage.getHeight();
+
+			for (int i = rectangle.getX(); i <= endXCoordinate; i++) {
+				for (int j = rectangle.getY(); j <= endYCoordinate; j++) {
 					colors.add(new Color(elementImage.getRGB(i, j)));
 				}
 			}
