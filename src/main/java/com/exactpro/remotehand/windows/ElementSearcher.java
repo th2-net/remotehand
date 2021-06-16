@@ -60,14 +60,13 @@ public class ElementSearcher {
 			String matcherIndexStr = record.get(keys.index + indexSuffix);
 			Integer matcherIndex = StringUtils.isEmpty(matcherIndexStr) ? null : Integer.parseInt(matcherIndexStr);
 			ind++;
-			if (StringUtils.isNotEmpty(locator) && StringUtils.isNotEmpty(matcher)) {
+			if (StringUtils.isNotEmpty(locator) && StringUtils.isNotEmpty(matcher) || isRootLocator(locator)) {
 				l.add(new SearchParams(locator, matcher, matcherIndex));
 			}
 			
 		} while (locator != null && matcher != null);
-		
-		return l;
 
+		return l;
 	}
 
 	protected By parseBy (String using, String id) {
@@ -77,6 +76,7 @@ public class ElementSearcher {
 			case "name" : return new By.ByName(id);
 			case "tagname" : return new By.ByTagName(id);
 			case "xpath": return new By.ByXPath(id);
+			case "root": return new By.ByName(driver.getTitle());
 		}
 		throw new IllegalArgumentException("unknown using methods");
 	}
@@ -204,6 +204,10 @@ public class ElementSearcher {
 	
 	protected <T extends SearchContext> WebElement findWebElement(T element, By by, Integer matcherIndex) {
 		return matcherIndex == null ? element.findElement(by) : element.findElements(by).get(matcherIndex);
+	}
+
+	private boolean isRootLocator(String locatorAsString) {
+		return "root".equals(locatorAsString);
 	}
 
 	protected WebElement getCachedElement(SearchParams pair) throws ScriptExecuteException {
