@@ -26,8 +26,10 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.util.Map;
 
+import static com.exactpro.remotehand.screenwriter.ScreenWriter.convertToHex;
+
 public class GetElementColor extends WindowsAction {
-	protected static final Logger loggerInstance = LoggerFactory.getLogger(GetElementColor.class);
+	private static final Logger loggerInstance = LoggerFactory.getLogger(GetElementColor.class);
 
 	public static final String X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
 
@@ -51,10 +53,5 @@ public class GetElementColor extends WindowsAction {
 	@Override
 	protected Logger getLoggerInstance() {
 		return loggerInstance;
-	}
-
-
-	private String convertToHex(Color elementColor) {
-		return String.format("#%02X%02X%02X", elementColor.getRed(), elementColor.getGreen(), elementColor.getBlue());
 	}
 }
