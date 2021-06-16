@@ -80,13 +80,26 @@ public class ColorsCollector extends WindowsAction {
 
 	private Pair<Point, Point> correctCoordinates(ElementOffsetUtils.ElementOffsets firstOffset,
 	                                              ElementOffsetUtils.ElementOffsets secondOffset) {
-		Point firstPoint = firstOffset.xOffset > secondOffset.xOffset
-				? new Point(secondOffset.xOffset, firstOffset.xOffset)
-				: new Point(firstOffset.xOffset, secondOffset.xOffset);
+		int startXCoordinate, endXCoordinate;
+		if (firstOffset.xOffset > secondOffset.xOffset) {
+			startXCoordinate = secondOffset.xOffset;
+			endXCoordinate = firstOffset.xOffset;
+		} else {
+			startXCoordinate = firstOffset.xOffset;
+			endXCoordinate = secondOffset.xOffset;
+		} 
 
-		Point secondPoint = firstOffset.yOffset > secondOffset.yOffset
-				? new Point(secondOffset.yOffset, firstOffset.yOffset)
-				: new Point(firstOffset.yOffset, secondOffset.yOffset);
+		int startYCoordinate, endYCoordinate;
+		if (firstOffset.yOffset > secondOffset.yOffset) {
+			startYCoordinate = secondOffset.yOffset;
+			endYCoordinate = firstOffset.yOffset;
+		} else {
+			startYCoordinate = firstOffset.yOffset;
+			endYCoordinate = secondOffset.yOffset;
+		}
+
+		Point firstPoint = new Point(startXCoordinate, startYCoordinate);
+		Point secondPoint = new Point(endXCoordinate, endYCoordinate);
 
 		return new ImmutablePair<>(firstPoint, secondPoint);
 	}
