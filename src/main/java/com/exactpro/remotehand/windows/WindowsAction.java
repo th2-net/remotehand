@@ -166,11 +166,11 @@ public abstract class WindowsAction extends Action {
 		String baseExceptionMessage = exceptionMessage.substring(0, endFirstLine);
 		int endMessage = baseExceptionMessage.indexOf(END_EXCEPTION_MESSAGE);
 		if (endMessage != -1) {
-			errorMsgBuilder.append(baseExceptionMessage);
-		} else {
 			errorMsgBuilder.append(baseExceptionMessage, 0, endMessage);
+		} else {
+			errorMsgBuilder.append(baseExceptionMessage);
 		}
-		
+
 		String additionalInfo = e.getAdditionalInformation();
 		if (additionalInfo != null && !additionalInfo.isEmpty()) {
 			additionalInfo = additionalInfo.substring(Math.max(0, additionalInfo.indexOf("Capabilities ")));
