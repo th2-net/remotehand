@@ -37,7 +37,7 @@ public class RhUtils
 		return getBoolean(params, name, false, defaultValue);
 	}
 
-	public static boolean getMandatoryBoolean(Map<String, String> params, String name) throws ScriptExecuteException {
+	public static boolean getBoolean(Map<String, String> params, String name) throws ScriptExecuteException {
 		return getBoolean(params, name, true, false);
 	}
 

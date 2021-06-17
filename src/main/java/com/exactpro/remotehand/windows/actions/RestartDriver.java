@@ -32,8 +32,8 @@ public class RestartDriver extends WindowsAction {
 	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-		boolean fromRoot = RhUtils.getMandatoryBoolean(params, FROM_ROOT_PARAM);
-		boolean experimental = RhUtils.getMandatoryBoolean(params, EXPERIMENTAL_PARAM);
+		boolean fromRoot = RhUtils.getBoolean(params, FROM_ROOT_PARAM);
+		boolean experimental = RhUtils.getBoolean(params, EXPERIMENTAL_PARAM);
 		driverWrapper.restartDriver(fromRoot, experimental);
 		return null;
 	}

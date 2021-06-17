@@ -107,9 +107,8 @@ public class ElementSearcher {
 					throw new ScriptExecuteException("Incorrect object stored in cache.");
 				}
 				RemoteWebElement rwe = (RemoteWebElement) cachedElement;
-				if (logger.isDebugEnabled()) {
-					logger.debug("Found rh-id {} win_id {}", pair.matcher, rwe.getId());
-				}
+				logger.debug("Found rh-id {} win_id {}", pair.matcher, rwe.getId());
+				
 				if (rwe.getWrappedDriver() != driver) {
 					By by = By.id(rwe.getId());
 					logger.trace("Searching by id = {}", rwe.getId());

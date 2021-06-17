@@ -62,23 +62,16 @@ public class WindowsDriverWrapper implements DriverCloseable
 				if (opposite == null) {
 					throw new ScriptExecuteException("Driver was not created. Driver creating action was not performed");
 				}
-				driver = createFromHandle(opposite.getWindowHandle(), experimental);
+				driver = createDriverFromHandle(opposite.getWindowHandle(), experimental);
 			}
 		}
 		return driver;
 	}
 	
-	private WindowsDriver<?> createFromHandle(String windowHandle, boolean experimental) throws ScriptExecuteException {
+	private WindowsDriver<?> createDriverFromHandle(String windowHandle, boolean experimental) {
 		DesiredCapabilities capabilities = this.createCommonCapabilities();
 		capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, windowHandle);
-		this.setExperimentalCapability(capabilities, experimental);
-		WindowsDriver<?> windowsDriver = this.newDriver(capabilities);
-		if (experimental) {
-			this.driverExp = windowsDriver;
-		} else {
-			this.driverNotExp = windowsDriver;
-		}
-		return windowsDriver;
+		return createDriver(capabilities, experimental);
 	}
 
 	private WindowsDriver<?> createRootDriver(boolean experimental) {
@@ -192,7 +185,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 		this.switchDriver(driverNotExp, handle, "Not experimental WAD");
 	}
 	
-	public void restartDriver(boolean root, boolean experimental) throws ScriptExecuteException {
+	public void restartDriver(boolean root, boolean experimental) {
 		logger.debug("Restarting driver root: {} experimental: {}", root, experimental);
 		if (root) {
 			WindowsDriver<?> driver = experimental ? this.rootDriverExp : this.rootDriverNotExp;
@@ -202,7 +195,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 			WindowsDriver<?> driver = experimental ? this.driverExp : this.driverNotExp;
 			String handle = driver.getWindowHandle();
 			closeDriver(driver, "exp: " + experimental);
-			this.createFromHandle(handle, experimental);
+			this.createDriverFromHandle(handle, experimental);
 		}
 	}
 	
