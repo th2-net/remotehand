@@ -42,23 +42,20 @@ public class CheckElement extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		ElementSearcher es = new ElementSearcher(params, this.getDriver(driverWrapper), cachedWebElements);
-		WebElement element = es.searchElementWithoutWait();
-		boolean save = RhUtils.getBooleanOrDefault(params, SAVE_ELEMENT_NAME, false) &&
-				StringUtils.isNotEmpty(getId());
+		boolean save = StringUtils.isNotEmpty(getId()) && RhUtils.getBooleanOrDefault(params, SAVE_ELEMENT_NAME, false);
 		if (save) {
 			cachedWebElements.removeElements(getId());
 		}
+		
+		ElementSearcher es = new ElementSearcher(params, this.getDriver(driverWrapper), cachedWebElements);
+		WebElement element = es.searchElementWithoutWait();
 
-		String attributeName = params.get(ATTRIBUTE_NAME);
-		if (attributeName != null && element != null) {
-			return element.getAttribute(attributeName);
-		} else if (element != null) {
+		if (element != null) {
 			if (save) {
 				cachedWebElements.storeWebElement(getId(), element);
 			}
-			
-			return FOUND_VALUE;
+			String attributeName = params.get(ATTRIBUTE_NAME);
+			return (attributeName != null) ? element.getAttribute(attributeName) : FOUND_VALUE;
 		}
 
 		return NOT_FOUND_VALUE;

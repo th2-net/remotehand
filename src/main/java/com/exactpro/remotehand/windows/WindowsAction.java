@@ -37,7 +37,7 @@ public abstract class WindowsAction extends Action {
 	public static final String EXPERIMENTAL_PARAM = "isexperimental";
 	public static final String FROM_ROOT_PARAM = "fromroot";
 	
-	public static final Boolean DEFAULT_EXPERIMENTAL = Boolean.TRUE;
+	public static final boolean DEFAULT_EXPERIMENTAL = true;
 
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;

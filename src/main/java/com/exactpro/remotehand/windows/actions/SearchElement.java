@@ -59,10 +59,7 @@ public class SearchElement extends WindowsAction {
 		} else {
 			List<WebElement> list = elementSearcher.searchElements();
 			cachedWebElements.storeWebElementList(getId(), list);
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Stored elements to cached. RH_id: {} Count: {}", getId(), list.size());
-			}
+			logger.debug("Stored elements to cached. RH_id: {} Count: {}", getId(), list.size());
 		}
 
 		return null;

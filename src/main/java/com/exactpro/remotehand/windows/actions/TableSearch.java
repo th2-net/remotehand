@@ -69,14 +69,15 @@ public class TableSearch extends WindowsAction
 		WindowsDriver<?> driver = null;
 		try {
 			handleInputParams(params);
+
+			if (saveResult) {
+				cachedElements.removeElements(getId());
+			}
+			
 			driver = this.getDriver(driverWrapper);
 			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
 			WebElement table = elementSearcher.searchElement();
 			setTimeOut(driver, 0);
-			
-			if (saveResult) {
-				cachedElements.removeElements(getId());
-			}
 
 			WebElement row;
 			boolean rowFound = false;

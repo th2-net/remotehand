@@ -106,7 +106,7 @@ public class ScrollToElement extends WindowsAction {
 		ElementOffsetUtils.ElementOffsetParams elementOffsetParams = new ElementOffsetUtils.ElementOffsetParams(element,
 				params.get(CLICK_OFFSET_X_PARAM), params.get(CLICK_OFFSET_Y_PARAM));
 		final ElementOffsetUtils.ElementOffsets elementOffsets = ElementOffsetUtils.calculateOffset(elementOffsetParams);;
-		final Actions actions = WinActionUtils.createAndCheck(driver, element);
+		final Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
 		return () -> {
 			if (elementOffsets.hasOffset) {
 				actions.moveToElement(element, elementOffsets.xOffset, elementOffsets.yOffset);
@@ -127,7 +127,7 @@ public class ScrollToElement extends WindowsAction {
 		final List<String> list = handler.processInputText(textValue);
 		
 		WebElement element = elementSearcher.searchElement(keys);
-		final Actions actions = WinActionUtils.createAndCheck(driver, element);
+		final Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
 		actions.moveToElement(element).click();
 		final String textControlId = ((RemoteWebElement) element).getId();
 		

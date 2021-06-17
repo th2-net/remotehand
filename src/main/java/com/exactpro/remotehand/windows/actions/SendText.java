@@ -63,7 +63,7 @@ public class SendText extends WindowsAction {
 			element = es.searchElement();
 			sendDirectCommand(element, inputCommands);
 		} else {
-			Actions actions = WinActionUtils.createAndCheck(driver, element);
+			Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
 			if (es.isLocatorsAvailable()) {
 				element = es.searchElement();
 				actions.moveToElement(element);

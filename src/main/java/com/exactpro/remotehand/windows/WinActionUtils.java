@@ -28,7 +28,7 @@ public class WinActionUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(WinActionUtils.class);
 
-	public static WinActions createAndCheck(WebDriver driver, WebElement... elements) throws ScriptExecuteException {
+	public static WinActions createActionsAndCheck(WebDriver driver, WebElement... elements) throws ScriptExecuteException {
 		WinActions actions = new WinActions(driver);
 		checkElements(actions, elements);
 		return actions;

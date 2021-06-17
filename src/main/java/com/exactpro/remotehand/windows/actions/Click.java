@@ -54,7 +54,7 @@ public class Click extends WindowsAction {
 				= new ElementOffsetUtils.ElementOffsetParams(element, params.get(X_OFFSET), params.get(Y_OFFSET));
 		ElementOffsetUtils.ElementOffsets elementOffsets = ElementOffsetUtils.calculateOffset(elementOffsetParams);
 
-		Actions actions = WinActionUtils.createAndCheck(driver, element);
+		Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
 		
 
 		if (elementOffsets.hasOffset) {

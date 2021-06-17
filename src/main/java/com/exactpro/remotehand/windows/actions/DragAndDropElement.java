@@ -56,7 +56,7 @@ public class DragAndDropElement extends WindowsAction {
 		ElementOffsetUtils.ElementOffsets toOffsets = ElementOffsetUtils.calculateOffset(
 				new ElementOffsetParams(toElement, params.get(TO_OFFSET_X), params.get(TO_OFFSET_Y)));
 
-		Actions actions = WinActionUtils.createAndCheck(driver, fromElement, toElement);
+		Actions actions = WinActionUtils.createActionsAndCheck(driver, fromElement, toElement);
 		if (fromOffsets.hasOffset) {
 			actions.moveToElement(fromOffsets.element, fromOffsets.xOffset, fromOffsets.yOffset);
 		} else {

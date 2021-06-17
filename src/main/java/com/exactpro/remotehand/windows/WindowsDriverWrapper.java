@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class WindowsDriverWrapper implements DriverCloseable
 {
@@ -81,15 +82,9 @@ public class WindowsDriverWrapper implements DriverCloseable
 	}
 
 	private WindowsDriver<?> createRootDriver(boolean experimental) {
-		DesiredCapabilities rootCapabilities = this.createRootCapabilities();
-		this.setExperimentalCapability(rootCapabilities, experimental);
-		WindowsDriver<?> windowsDriver = newDriver(rootCapabilities);
-		if (experimental) {
-			this.rootDriverExp = windowsDriver;
-		} else {
-			this.rootDriverNotExp = windowsDriver;
-		}
-		return windowsDriver;
+		DesiredCapabilities rootCapabilities = createRootCapabilities();
+		Integer timeout = getImplicitlyWaitTimeout();
+		return createDriver(rootCapabilities, experimental, timeout, this::setRootDriverExp, this::setRootDriverNotExp);
 	}
 
 	public WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean experimental) {
@@ -100,13 +95,19 @@ public class WindowsDriverWrapper implements DriverCloseable
 		logger.debug("Creating experimental-{} driver with specified capabilities", experimental);
 		logger.trace("Specified capabilities: {}", capabilities);
 		this.resetWindowDrivers();
-		this.setExperimentalCapability(capabilities, experimental);
+		return createDriver(capabilities, experimental, timeout, this::setDriverExp, this::setDriverNotExp);
+	}
+
+	private WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean isExperimental, Integer timeout,
+	                                      Consumer<WindowsDriver<?>> driverExpConsumer,
+	                                      Consumer<WindowsDriver<?>> driverNotExpConsumer) {
+		this.setExperimentalCapability(capabilities, isExperimental);
 		WindowsDriver<?> windowsDriver = this.newDriver(capabilities, timeout);
-		if (experimental) {
-			this.driverExp = windowsDriver;
-		} else {
-			this.driverNotExp = windowsDriver;
-		}
+		if (isExperimental)
+			driverExpConsumer.accept(windowsDriver);
+		else
+			driverNotExpConsumer.accept(windowsDriver);
+
 		return windowsDriver;
 	}
 
@@ -174,23 +175,21 @@ public class WindowsDriverWrapper implements DriverCloseable
 		this.driverNotExp = null;
 	}
 	
+	private void switchDriver(WindowsDriver<?> driver, String handle, String driverName) throws ScriptExecuteException {
+		if (driver != null) {
+			driver.switchTo().window(handle);
+			String switchedHandle = driver.getWindowHandle();
+			if (!handle.equals(switchedHandle)) {
+				logger.error("Tried to change window handle for {} to {} but current is {}", driverName, handle, switchedHandle);
+				throw new ScriptExecuteException("Couldn't change current window for " + driverName);
+			}
+			logger.debug("{} switched to window-handle {}", driverName, switchedHandle);
+		}
+	}
+	
 	public void switchDriversTo(String handle) throws ScriptExecuteException {
-		if (driverExp != null) {
-			this.driverExp.switchTo().window(handle);
-			String switchedHandle = this.driverExp.getWindowHandle();
-			if (!handle.equals(switchedHandle)) {
-				logger.error("Tried to change window handle for experimental WAD to {} but current is {}", handle, switchedHandle);
-				throw new ScriptExecuteException("Couldn't change current window for experimental driver");
-			}
-		}
-		if (driverNotExp != null) {
-			this.driverNotExp.switchTo().window(handle);
-			String switchedHandle = this.driverNotExp.getWindowHandle();
-			if (!handle.equals(switchedHandle)) {
-				logger.error("Tried to change window handle for not-experimental WAD to {} but current is {}", handle, switchedHandle);
-				throw new ScriptExecuteException("Couldn't change current window for not-experimental driver");
-			}
-		}
+		this.switchDriver(driverExp, handle, "Experimental WAD");
+		this.switchDriver(driverNotExp, handle, "Not experimental WAD");
 	}
 	
 	public void restartDriver(boolean root, boolean experimental) throws ScriptExecuteException {
@@ -205,6 +204,22 @@ public class WindowsDriverWrapper implements DriverCloseable
 			closeDriver(driver, "exp: " + experimental);
 			this.createFromHandle(handle, experimental);
 		}
+	}
+	
+	private void setDriverExp(WindowsDriver<?> driver) {
+		this.driverExp = driver;
+	}
+
+	private void setDriverNotExp(WindowsDriver<?> driver) {
+		this.driverNotExp = driver;
+	}
+
+	private void setRootDriverExp(WindowsDriver<?> driver) {
+		this.rootDriverExp = driver;
+	}
+
+	private void setRootDriverNotExp(WindowsDriver<?> driver) {
+		this.rootDriverNotExp = driver;
 	}
 	
 	private void setExperimentalCapability(DesiredCapabilities capabilities, boolean value) {

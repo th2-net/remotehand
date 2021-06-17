@@ -62,7 +62,7 @@ public class ScrollByText extends WindowsAction {
 
 		int count = 0;
 		boolean displayed;
-		Actions actions = WinActionUtils.createAndCheck(this.getDriver(driverWrapper));
+		Actions actions = WinActionUtils.createActionsAndCheck(this.getDriver(driverWrapper));
 		do {
 			for (String str : list) {
 				if (handler.needSpecialSend(str)) {
