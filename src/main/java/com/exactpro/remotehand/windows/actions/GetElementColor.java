@@ -37,7 +37,7 @@ public class GetElementColor extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
 	                  WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-		WindowsDriver<?> driver = driverWrapper.getDriver();
+		WindowsDriver<?> driver = this.getDriver(driverWrapper);
 		ElementSearcher es = new ElementSearcher(params, driver, cachedElements);
 		WebElement element = es.searchElement();
 		if (element == null)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 package com.exactpro.remotehand.windows;
 
 import com.exactpro.remotehand.sessions.SessionContext;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WindowsSessionContext extends SessionContext {
@@ -69,17 +71,34 @@ public class WindowsSessionContext extends SessionContext {
 
 	public static class CachedWebElements {
 		private final Map<String, WebElement> cachedObjects;
+		private final Map<String, List<WebElement>> cachedLists;
 
 		public CachedWebElements() {
 			this.cachedObjects = new HashMap<>();
+			this.cachedLists = new HashMap<>();
 		}
 		
 		public void storeWebElement(String id, WebElement webElement) {
 			this.cachedObjects.put(id, webElement);
 		}
 
+		public void removeElements(String id) {
+			if (StringUtils.isNotEmpty(id)) {
+				this.cachedObjects.remove(id);
+				this.cachedLists.remove(id);
+			}
+		}
+
+		public void storeWebElementList(String id, List<WebElement> webElement) {
+			this.cachedLists.put(id, webElement);
+		}
+
 		public WebElement getWebElement(String id) {
 			return this.cachedObjects.get(id);
+		}
+
+		public List<WebElement> getWebElementList(String id) {
+			return this.cachedLists.get(id);
 		}
 	}
 }

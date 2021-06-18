@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package com.exactpro.remotehand;
+package com.exactpro.remotehand.windows;
 
-public interface DriverWrapper<T>
-{
-	T getDriver() throws ScriptExecuteException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.interactions.Actions;
+
+public class WinActions extends Actions {
+	
+	private final WebDriver driver;
+	
+	public WinActions(WebDriver driver) {
+		super(driver);
+		this.driver = driver;
+	}
+
+	public WebDriver getAttachedDriver() {
+		return driver;
+	}
 }

@@ -22,6 +22,7 @@ import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import com.exactpro.remotehand.windows.ElementOffsetUtils;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.SearchParams;
+import com.exactpro.remotehand.windows.WinActionUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
@@ -54,8 +55,9 @@ public class ScrollToElement extends WindowsAction {
 	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-		
-		this.elementSearcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
+
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		this.elementSearcher = new ElementSearcher(params, driver, cachedElements);
 		boolean elementInTree = RhUtils.getBooleanOrDefault(params, ELEMENT_IN_TREE_PARAM, true);
 		boolean elementShouldDisplayed = RhUtils.getBooleanOrDefault(params, ELEMENT_SHOULD_BE_DISPLAYED, true);
 		int maxIterations = RhUtils.getIntegerOrDefault(params, MAX_ITERATION_PARAM, 10);
@@ -64,8 +66,8 @@ public class ScrollToElement extends WindowsAction {
 
 		ScrollPerformer scrollPerformer = null;
 		switch (scrollType) {
-			case "Click": scrollPerformer = this.clickPerformer(driverWrapper.getDriver(), params, actionKeys); break;
-			case "Text": scrollPerformer = this.textPerformer(driverWrapper.getDriver(), params, actionKeys); break;
+			case "Click": scrollPerformer = this.clickPerformer(driver, params, actionKeys); break;
+			case "Text": scrollPerformer = this.textPerformer(driver, params, actionKeys); break;
 			default: throw new ScriptExecuteException("Unknown scroll type");
 		}
 		
@@ -104,7 +106,7 @@ public class ScrollToElement extends WindowsAction {
 		ElementOffsetUtils.ElementOffsetParams elementOffsetParams = new ElementOffsetUtils.ElementOffsetParams(element,
 				params.get(CLICK_OFFSET_X_PARAM), params.get(CLICK_OFFSET_Y_PARAM));
 		final ElementOffsetUtils.ElementOffsets elementOffsets = ElementOffsetUtils.calculateOffset(elementOffsetParams);;
-		final Actions actions = new Actions(driver);
+		final Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
 		return () -> {
 			if (elementOffsets.hasOffset) {
 				actions.moveToElement(element, elementOffsets.xOffset, elementOffsets.yOffset);
@@ -123,9 +125,9 @@ public class ScrollToElement extends WindowsAction {
 		}
 		
 		final List<String> list = handler.processInputText(textValue);
-				
-		final Actions actions = new Actions(driver);
+		
 		WebElement element = elementSearcher.searchElement(keys);
+		final Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
 		actions.moveToElement(element).click();
 		final String textControlId = ((RemoteWebElement) element).getId();
 		

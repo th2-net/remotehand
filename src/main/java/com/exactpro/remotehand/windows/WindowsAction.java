@@ -17,9 +17,9 @@
 package com.exactpro.remotehand.windows;
 
 import com.exactpro.remotehand.Action;
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
-import com.exactpro.remotehand.utils.ExceptionUtils;
 import com.exactpro.remotehand.web.WebScriptCompiler;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import io.appium.java_client.windows.WindowsDriver;
@@ -29,12 +29,16 @@ import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class WindowsAction extends Action {
-	private static volatile Pattern ELEMENT_EXTRACTOR_PATTERN = null; 
+	
 	private static final String END_EXCEPTION_MESSAGE = "(WARNING: The server did not provide any stacktrace information)";
+
+	public static final String EXPERIMENTAL_PARAM = "isexperimental";
+	public static final String FROM_ROOT_PARAM = "fromroot";
+	
+	public static final boolean DEFAULT_EXPERIMENTAL = true;
+
 	protected WindowsSessionContext windowsSessionContext;
 	protected Logger logger;
 	private Map<String, String> params = null;
@@ -103,12 +107,7 @@ public abstract class WindowsAction extends Action {
 			} catch (ScriptExecuteException e) {
 				throw addScreenshot(e);
 			} catch (WebDriverException e) {
-				WindowsDriver<?> driver = windowsSessionContext.getCurrentDriver().getDriver();
-				String baseMessage = tryExtractErrorMessage(e);
-				String errMsg = baseMessage + ExceptionUtils.EOL + driver.getCapabilities() + ExceptionUtils.EOL +
-						"Driver " + WebDriverException.SESSION_ID + ": " + driver.getSessionId();
-
-				throw addScreenshot(new WindowsScriptExecuteException(errMsg, e));
+				throw addScreenshot(new WindowsScriptExecuteException(tryExtractErrorMessage(e), e));
 			}
 		} else {
 			this.logger.info("Action was not executed due condition. And will be skipped");
@@ -132,7 +131,8 @@ public abstract class WindowsAction extends Action {
 	}
 
 	protected String takeScreenshot(String name) throws ScriptExecuteException {
-		return screenWriter.takeAndSaveScreenshot(name, windowsSessionContext.getCurrentDriver().getDriver());
+		WindowsDriver<?> driver = windowsSessionContext.getCurrentDriver().getDriver(false, true);
+		return screenWriter.takeAndSaveScreenshot(name, driver);
 	}
 
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
@@ -147,30 +147,41 @@ public abstract class WindowsAction extends Action {
 		return see;
 	}
 
-	private static String tryExtractErrorMessage(WebDriverException e) {
-		String exceptionMessage = e.getMessage();
-		String[] splitExceptionMessages = exceptionMessage.split("\n");
-		if (splitExceptionMessages.length == 0)
-			throw e;
-
-		String baseExceptionMessage = splitExceptionMessages[0];
-		int endMessage = baseExceptionMessage.indexOf(END_EXCEPTION_MESSAGE);
-		String message = endMessage == -1
-				? baseExceptionMessage
-				: baseExceptionMessage.substring(0, endMessage);
-
-		Pattern pattern = getElementExtractorPattern();
-		Matcher matcher = pattern.matcher(exceptionMessage);
-		if (endMessage > -1 && matcher.find())
-			message += " " + matcher.group(0);
-
-		return message;
+	protected WindowsDriver<?> getDriver(WindowsDriverWrapper driverWrapper) throws ScriptExecuteException {
+		boolean fromRoot = RhUtils.getBooleanOrDefault(params, FROM_ROOT_PARAM, false);
+		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, DEFAULT_EXPERIMENTAL);
+		return driverWrapper.getDriver(fromRoot, experimental);
 	}
 
-	private static Pattern getElementExtractorPattern() {
-		if (ELEMENT_EXTRACTOR_PATTERN == null)
-			ELEMENT_EXTRACTOR_PATTERN = Pattern.compile("Element info: \\{[a-zA-Z0-9, =]*}");
+	private static String tryExtractErrorMessage(WebDriverException e) {
+		
+		StringBuilder errorMsgBuilder = new StringBuilder();
+		
+		String exceptionMessage = e.getMessage();
+		int endFirstLine = exceptionMessage.indexOf('\n');
+		if (endFirstLine == -1) {
+			endFirstLine = exceptionMessage.length();
+		}
 
-		return ELEMENT_EXTRACTOR_PATTERN;
+		String baseExceptionMessage = exceptionMessage.substring(0, endFirstLine);
+		int endMessage = baseExceptionMessage.indexOf(END_EXCEPTION_MESSAGE);
+		if (endMessage != -1) {
+			errorMsgBuilder.append(baseExceptionMessage, 0, endMessage);
+		} else {
+			errorMsgBuilder.append(baseExceptionMessage);
+		}
+
+		String additionalInfo = e.getAdditionalInformation();
+		if (additionalInfo != null && !additionalInfo.isEmpty()) {
+			additionalInfo = additionalInfo.substring(Math.max(0, additionalInfo.indexOf("Capabilities ")));
+			errorMsgBuilder.append(' ').append(additionalInfo);
+		}
+		
+		String systemInfo = e.getSystemInformation();
+		if (systemInfo != null) {
+			errorMsgBuilder.append(' ').append(systemInfo);
+		}
+
+		return errorMsgBuilder.toString();
 	}
 }
