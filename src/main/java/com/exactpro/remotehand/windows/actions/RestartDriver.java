@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,30 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
-import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class ClickContextMenu extends WindowsAction {
+public class RestartDriver extends WindowsAction {
 
-	private static final Logger loggerInstance = LoggerFactory.getLogger(ClickContextMenu.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestartDriver.class);
 	
 	@Override
-	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-
-		WindowsDriver<?> driver = driverWrapper.getOrCreateRootDriver();
-		
-		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
-		WebElement element = es.searchElement();
-
-		Actions actions = new Actions(driver);
-		actions.click(element);
-		actions.perform();
-		
+	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
+		boolean fromRoot = RhUtils.getBoolean(params, FROM_ROOT_PARAM);
+		boolean experimental = RhUtils.getBoolean(params, EXPERIMENTAL_PARAM);
+		driverWrapper.restartDriver(fromRoot, experimental);
 		return null;
 	}
 
 	@Override
 	protected Logger getLoggerInstance() {
-		return loggerInstance;
+		return logger;
 	}
 }

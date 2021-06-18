@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,17 +47,11 @@ public class WaitForAttribute extends WindowsAction {
 		String expectedValue = params.get(EXPECTED_VALUE_PARAM);
 		String timeout = params.get(MAX_TIMEOUT_PARAM);
 		String checkIntervalStr = params.getOrDefault(CHECK_INTERVAL_PARAM, "1000");
-		boolean fromRoot = Boolean.parseBoolean(params.getOrDefault("fromroot", "false"));
 		
 		WindowsDriver<?> driver = null;
 		try {
-			if (fromRoot) {
-				driver = driverWrapper.getOrCreateRootDriver();
-			} else {
-				driver = driverWrapper.getDriver();
-			}
 
-			ElementSearcher elementSearcher = new ElementSearcher(params, driver, cachedElements);
+			ElementSearcher elementSearcher = new ElementSearcher(params, this.getDriver(driverWrapper), cachedElements);
 			WebElement element = elementSearcher.searchElement();
 
 			if (StringUtils.isEmpty(attributeName)) {

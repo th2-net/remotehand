@@ -50,7 +50,6 @@ public class WebActionsMapping
 		SelectFrame,
 		FindElement,
 		SetCheckbox,
-		GetFromCanvasTable,
 		SendKeysToActive,
 		KeyAction,
 		PressKey,

@@ -64,7 +64,7 @@ public class SwitchActiveWindow extends WindowsAction {
 		else
 			byName = true;
 		
-		WindowsDriver<?> driver = driverWrapper.getDriver();
+		WindowsDriver<?> driver = this.getDriver(driverWrapper);
 		
 		long startTime = System.currentTimeMillis();
 		boolean firstIt = true;
@@ -99,7 +99,7 @@ public class SwitchActiveWindow extends WindowsAction {
 				for (String handle : handles) {
 					String title = null;
 					try {
-						driver.switchTo().window(handle);
+						driverWrapper.switchDriversTo(handle);
 						title = driver.getTitle();
 						this.logger.debug("Window {} title {}", handle, title);
 						if (isCurrentWindowExpected(driver, targetWindowMatcher, byName)) {

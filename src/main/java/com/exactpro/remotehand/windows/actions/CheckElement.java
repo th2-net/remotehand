@@ -16,11 +16,13 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,23 +30,35 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 public class CheckElement extends WindowsAction {
+	
+	public static final String ATTRIBUTE_NAME = "attributename";
+	public static final String SAVE_ELEMENT_NAME = "saveelement";
+	
+	public static final String FOUND_VALUE = "found";
+	public static final String NOT_FOUND_VALUE = "not found";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(CheckElement.class);
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
 
-		ElementSearcher es = new ElementSearcher(params, driverWrapper.getDriver(), cachedWebElements);
+		boolean save = StringUtils.isNotEmpty(getId()) && RhUtils.getBooleanOrDefault(params, SAVE_ELEMENT_NAME, false);
+		if (save) {
+			cachedWebElements.removeElements(getId());
+		}
+		
+		ElementSearcher es = new ElementSearcher(params, this.getDriver(driverWrapper), cachedWebElements);
 		WebElement element = es.searchElementWithoutWait();
 
-		String attributeName = params.get("attributename");
-		if (attributeName != null && element != null) {
-			return element.getAttribute(attributeName);
-		} else if (element != null) {
-			return "found";
+		if (element != null) {
+			if (save) {
+				cachedWebElements.storeWebElement(getId(), element);
+			}
+			String attributeName = params.get(ATTRIBUTE_NAME);
+			return (attributeName != null) ? element.getAttribute(attributeName) : FOUND_VALUE;
 		}
 
-		return "not found";
+		return NOT_FOUND_VALUE;
 	}
 
 	@Override

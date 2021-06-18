@@ -31,7 +31,6 @@ public class WindowsActionsMapping {
 		Wait,
 		ToggleCheckBox,
 		CheckElement,
-		ClickContextMenu,
 		GetWindow,
 		SearchElement,
 		WaitForAttribute,
@@ -43,7 +42,9 @@ public class WindowsActionsMapping {
 		WaitForElement,
 		GetScreenshot,
 		GetElementColor,
-		DragAndDropElement
+		DragAndDropElement,
+		RestartDriver,
+		ColorsCollector
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -66,7 +67,6 @@ public class WindowsActionsMapping {
 			case Wait:					return new Wait();
 			case CheckElement:			return new CheckElement();
 			case ToggleCheckBox:		return new ToggleCheckBox();
-			case ClickContextMenu:		return new ClickContextMenu();
 			case GetWindow:				return new GetWindow();
 			case SearchElement:			return new SearchElement();
 			case WaitForAttribute:		return new WaitForAttribute();
@@ -76,8 +76,10 @@ public class WindowsActionsMapping {
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
 			case GetScreenshot:			return new GetScreenshot();
+			case RestartDriver:			return new RestartDriver();
 			case GetElementColor:		return new GetElementColor();
 			case DragAndDropElement:	return new DragAndDropElement();
+			case ColorsCollector:		return new ColorsCollector();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}

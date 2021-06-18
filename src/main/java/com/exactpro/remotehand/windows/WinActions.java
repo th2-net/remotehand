@@ -14,37 +14,24 @@
  * limitations under the License.
  */
 
-package com.exactpro.remotehand.web;
+package com.exactpro.remotehand.windows;
 
-import com.exactpro.remotehand.DriverCloseable;
-import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.ExtendedActions;
+import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import org.openqa.selenium.WebDriver;
 
-import java.io.File;
-
-public class WebDriverWrapper implements DriverCloseable
-{
-	private final WebDriver driver;
-	private final File downloadDir;
-	
-	public WebDriverWrapper(WebDriver driver, File downloadDir)
-	{
-		this.driver = driver;
-		this.downloadDir = downloadDir;
-	}
-	
-	public WebDriver getDriver()
-	{
-		return driver;
+public class WinActions extends ExtendedActions {
+	public WinActions(WebDriver driver) {
+		super(driver);
 	}
 
-	public File getDownloadDir()
-	{
-		return downloadDir;
-	}
 
 	@Override
-	public void close() throws ScriptExecuteException {
-		this.driver.close();
+	protected String[] extractKeys(String modifiers) {
+		String trimModifiers = modifiers.trim();
+		if (!trimModifiers.startsWith(SendKeysHandler.KEY_SIGN) || !trimModifiers.endsWith(SendKeysHandler.KEY_SIGN))
+			return new String[] { };
+
+		return trimModifiers.substring(1, trimModifiers.length() - 1).split("\\+");
 	}
 }

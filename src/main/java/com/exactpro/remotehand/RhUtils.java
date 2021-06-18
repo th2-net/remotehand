@@ -32,17 +32,35 @@ public class RhUtils {
 	private static final Logger logger = LoggerFactory.getLogger(RhUtils.class);
 	public static final String SESSION_FOR_FILE_MODE = "Main";
 	
-	
-	public static final List<String> YES = Arrays.asList("y", "yes", "t", "true", "1", "+");
-	public static final List<String> NO = Arrays.asList("n", "no", "f", "false", "0", "-");
+	public static final Set<String> YES = new HashSet<>(Arrays.asList("y", "yes", "t", "true", "1", "+"));
+	public static final Set<String> NO = new HashSet<>(Arrays.asList("n", "no", "f", "false", "0", "-"));
 
-	public static boolean getBooleanOrDefault(Map<String, String> params, String name, boolean defaultValue)
-	{
-		String value = params.get(name);
-		if (value == null || value.isEmpty())
-			return defaultValue;
-		else 
-			return YES.contains(value.toLowerCase());
+	public static boolean getBooleanOrDefault(Map<String, String> params, String name, boolean defaultValue) throws ScriptExecuteException {
+		return getBoolean(params, name, false, defaultValue);
+	}
+
+	public static boolean getBoolean(Map<String, String> params, String name) throws ScriptExecuteException {
+		return getBoolean(params, name, true, false);
+	}
+
+	private static boolean getBoolean(Map<String, String> params, String key, boolean mandatory, boolean defaultValue) throws ScriptExecuteException {
+		String param = params.get(key);
+		if (param == null || param.isEmpty()) {
+			if (!mandatory) {
+				return defaultValue;
+			} else {
+				throw new ScriptExecuteException("Param should be specified : " + key);	
+			}
+		}
+		String lcParam = param.toLowerCase();
+		if (RhUtils.YES.contains(lcParam)) {
+			return true;
+		} else if (RhUtils.NO.contains(lcParam)) {
+			return false;
+		} else {
+			throw new ScriptExecuteException(String.format("Invalid value for param %s. boolean required (actual: %s",
+					key, param));
+		}
 	}
 
 	public static int getIntegerOrDefault(Map<String, String> params, String name, int defaultValue) throws ScriptExecuteException {
