@@ -25,8 +25,17 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class ExtendedActions extends Actions {
+	private final WebDriver driver;
+
+
 	public ExtendedActions(WebDriver driver) {
 		super(driver);
+		this.driver = driver;
+	}
+
+
+	public WebDriver getAttachedDriver() {
+		return driver;
 	}
 
 	public Set<CharSequence> applyClickModifiers(String modifiers) {

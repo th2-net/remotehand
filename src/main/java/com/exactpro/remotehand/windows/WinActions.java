@@ -21,16 +21,8 @@ import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import org.openqa.selenium.WebDriver;
 
 public class WinActions extends ExtendedActions {
-	
-	private final WebDriver driver;
-	
 	public WinActions(WebDriver driver) {
 		super(driver);
-		this.driver = driver;
-	}
-
-	public WebDriver getAttachedDriver() {
-		return driver;
 	}
 
 

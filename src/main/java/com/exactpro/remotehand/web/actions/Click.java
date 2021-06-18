@@ -71,7 +71,8 @@ public class Click extends WebAction
 		if (button == null)
 			button = LEFT;
 		
-		ExtendedActions actions = moveToElement(webDriver, element, params.get(X_OFFSET), params.get(Y_OFFSET));
+		ExtendedActions actions = new ExtendedActions(webDriver);
+		moveToElement(actions, element, params.get(X_OFFSET), params.get(Y_OFFSET));
 		logInfo("Moved to element: %s", webLocator);
 		
 		try
@@ -131,10 +132,7 @@ public class Click extends WebAction
 		return true;
 	}
 
-	private ExtendedActions moveToElement(WebDriver webDriver, WebElement element, String xOffsetStr, String yOffsetStr)
-	{
-		ExtendedActions actions = new ExtendedActions(webDriver);
-		
+	private void moveToElement(ExtendedActions actions, WebElement element, String xOffsetStr, String yOffsetStr) {
 		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr))
 		{
 			int xOffset = 0, yOffset = 0;
@@ -147,14 +145,16 @@ public class Click extends WebAction
 			{
 				logError("xoffset or yoffset is not integer value");
 			}
-			
-			if (webDriver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) webDriver) > 74)
+
+			WebDriver driver = actions.getAttachedDriver();
+			if (driver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) driver) > 74)
 			{
 				xOffset -= element.getSize().getWidth() / 2;
 				yOffset -= element.getSize().getHeight() / 2;
 			}
-			return (ExtendedActions) actions.moveToElement(element, xOffset, yOffset);
+			actions.moveToElement(element, xOffset, yOffset);;
+			return;
 		}
-		return (ExtendedActions) actions.moveToElement(element);
+		actions.moveToElement(element);
 	}
 }
