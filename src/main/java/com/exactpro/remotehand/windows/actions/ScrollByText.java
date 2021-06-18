@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.SearchParams;
+import com.exactpro.remotehand.windows.WinActionUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
@@ -41,7 +42,7 @@ public class ScrollByText extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, CachedWebElements cachedElements) throws ScriptExecuteException {
 
-		ElementSearcher searcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
+		ElementSearcher searcher = new ElementSearcher(params, this.getDriver(driverWrapper), cachedElements);
 		WebElement expectedElement = searcher.searchElement();
 		
 		if (expectedElement.isDisplayed()) {
@@ -49,8 +50,7 @@ public class ScrollByText extends WindowsAction {
 			return null;
 		}
 		
-		WebElement textControl = searcher.searchElement(new SearchParams.HeaderKeys("textlocator",
-				"textmatcher", "textmatcherindex"));
+		WebElement textControl = searcher.searchElement(new SearchParams.HeaderKeys("text"));
 		String textControlId = (textControl instanceof RemoteWebElement ? ((RemoteWebElement) textControl).getId() : "");
 		String text = params.get("texttosend");
 		String maxItStr = params.get("maxiterations");
@@ -62,7 +62,7 @@ public class ScrollByText extends WindowsAction {
 
 		int count = 0;
 		boolean displayed;
-		Actions actions = new Actions(driverWrapper.getDriver());
+		Actions actions = WinActionUtils.createActionsAndCheck(this.getDriver(driverWrapper));
 		do {
 			for (String str : list) {
 				if (handler.needSpecialSend(str)) {

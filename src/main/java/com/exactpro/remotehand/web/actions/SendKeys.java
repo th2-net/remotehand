@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,8 +267,7 @@ public class SendKeys extends WebAction
 			a.keyUp(Keys.ALT).perform();
 	}
 	
-	protected boolean needEnable(WebElement element, Map<String, String> params)
-	{
+	protected boolean needEnable(WebElement element, Map<String, String> params) throws ScriptExecuteException {
 		if (element.isEnabled())
 			return false;
 		return RhUtils.getBooleanOrDefault(params, CAN_BE_DISABLED, false);

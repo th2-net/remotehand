@@ -38,12 +38,9 @@ public class ElementSearcher {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElementSearcher.class);
 	
-	private final Map<String, String> record;
-	private final WindowsDriver<?> driver;
-	private final CachedWebElements webElements;
-	
-	private static final SearchParams.HeaderKeys DEFAULT_KEYS = new SearchParams.HeaderKeys("locator",
-			"matcher", "matcherindex");
+	protected final Map<String, String> record;
+	protected final WindowsDriver<?> driver;
+	protected final CachedWebElements webElements;
 
 	public ElementSearcher(Map<String, String> record, WindowsDriver<?> driver, CachedWebElements webElements) {
 		this.record = record;
@@ -51,7 +48,7 @@ public class ElementSearcher {
 		this.webElements = webElements;
 	}
 
-	private List<SearchParams> processFrom(SearchParams.HeaderKeys keys) {
+	protected List<SearchParams> processFrom(SearchParams.HeaderKeys keys) {
 		
 		int ind = 1;
 		String locator, matcher;
@@ -63,23 +60,23 @@ public class ElementSearcher {
 			String matcherIndexStr = record.get(keys.index + indexSuffix);
 			Integer matcherIndex = StringUtils.isEmpty(matcherIndexStr) ? null : Integer.parseInt(matcherIndexStr);
 			ind++;
-			if (StringUtils.isNotEmpty(locator) && StringUtils.isNotEmpty(matcher)) {
+			if (StringUtils.isNotEmpty(locator) && StringUtils.isNotEmpty(matcher) || isRootLocator(locator)) {
 				l.add(new SearchParams(locator, matcher, matcherIndex));
 			}
 			
 		} while (locator != null && matcher != null);
-		
-		return l;
 
+		return l;
 	}
-	
-	private By parseBy (String using, String id) {
+
+	protected By parseBy (String using, String id) {
 
 		switch (using.toLowerCase()) {
 			case "accessibilityid" : return new ByAccessibilityId(id);
 			case "name" : return new By.ByName(id);
 			case "tagname" : return new By.ByTagName(id);
 			case "xpath": return new By.ByXPath(id);
+			case "root": return new By.ByName(driver.getTitle());
 		}
 		throw new IllegalArgumentException("unknown using methods");
 	}
@@ -89,27 +86,35 @@ public class ElementSearcher {
 	}
 
 	public boolean isLocatorsAvailable() {
-		return isLocatorsAvailable(DEFAULT_KEYS);
+		return isLocatorsAvailable(SearchParams.HeaderKeys.DEFAULT);
 	}
 
 	public WebElement searchElement() throws ScriptExecuteException {
-		return searchElement(DEFAULT_KEYS);
+		return searchElement(SearchParams.HeaderKeys.DEFAULT);
 	}
-	
-	public WebElement searchElement(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
-		List<SearchParams> pairs = this.processFrom(keys);
 
+	public List<WebElement> searchElements() throws ScriptExecuteException {
+		return searchElements(SearchParams.HeaderKeys.DEFAULT);
+	}
+
+	protected WebElement searchElement(List<SearchParams> pairs) throws ScriptExecuteException {
 		WebElement we = null;
 		for (SearchParams pair : pairs) {
 			if ("cachedId".equals(pair.locator)) {
-				logger.trace("Get element from cache by {} = {}", pair.locator, pair.matcher);
-				we = webElements.getWebElement(pair.matcher);
-				if (we == null) {
-					throw new ScriptExecuteException("Saved elements with rh-id " + pair.matcher + " is not found");
+				WebElement cachedElement = getCachedElement(pair);
+				if (!(cachedElement instanceof RemoteWebElement)) {
+					logger.error("Expected : {} Actual : {}", RemoteWebElement.class.getName(), cachedElement.getClass().getName());
+					throw new ScriptExecuteException("Incorrect object stored in cache.");
 				}
-				if (logger.isDebugEnabled()) {
-					logger.debug("Found rh-id {} win_id {}", pair.matcher,
-							we instanceof RemoteWebElement ? ((RemoteWebElement) we).getId() : "");
+				RemoteWebElement rwe = (RemoteWebElement) cachedElement;
+				logger.debug("Found rh-id {} win_id {}", pair.matcher, rwe.getId());
+				
+				if (rwe.getWrappedDriver() != driver) {
+					By by = By.id(rwe.getId());
+					logger.trace("Searching by id = {}", rwe.getId());
+					we = findWebElement(we == null ? driver : we, by, null);
+				} else {
+					we = cachedElement;
 				}
 			} else {
 				By by = parseBy(pair.locator, pair.matcher);
@@ -117,12 +122,35 @@ public class ElementSearcher {
 				we = findWebElement(we == null ? driver : we, by, pair.parsedIndex);
 			}
 		}
-		
+
 		return we;
+	}
+	
+	public WebElement searchElement(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
+		List<SearchParams> pairs = this.processFrom(keys);
+		return this.searchElement(pairs);
+	}
+
+	public List<WebElement> searchElements(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
+		List<SearchParams> pairs = this.processFrom(keys);
+		int size = pairs.size();
+		SearchContext parent;
+		if (size == 0) {
+			return null;
+		} else if (size == 1) {
+			parent = driver;
+		} else {
+			parent = this.searchElement(pairs.subList(0, size - 1));
+		}
+
+		SearchParams lastEnt = pairs.get(size - 1);
+		By by = parseBy(lastEnt.locator, lastEnt.matcher);
+		logger.trace("Searching by {} = {}", lastEnt.locator, lastEnt.matcher);
+		return parent.findElements(by);
 	}
 
 	public WebElement searchElementWithoutWait() throws ScriptExecuteException {
-		return searchElementWithoutWait(DEFAULT_KEYS);
+		return searchElementWithoutWait(SearchParams.HeaderKeys.DEFAULT);
 	}
 
 	public WebElement searchElementWithoutWait(SearchParams.HeaderKeys keys) throws ScriptExecuteException {
@@ -141,7 +169,7 @@ public class ElementSearcher {
 	}
 
 	public WebElement searchElementWithWait(int implicitTimeout) throws ScriptExecuteException {
-		return searchElementWithWait(DEFAULT_KEYS, implicitTimeout);
+		return searchElementWithWait(SearchParams.HeaderKeys.DEFAULT, implicitTimeout);
 	}
 
 	public WebElement searchElementWithWait(SearchParams.HeaderKeys keys, int implicitTimeout) throws ScriptExecuteException {
@@ -172,9 +200,37 @@ public class ElementSearcher {
 				afterSearch.run();
 		}
 	}
-
-
-	private <T extends SearchContext> WebElement findWebElement(T element, By by, Integer matcherIndex) {
+	
+	protected <T extends SearchContext> WebElement findWebElement(T element, By by, Integer matcherIndex) {
 		return matcherIndex == null ? element.findElement(by) : element.findElements(by).get(matcherIndex);
+	}
+
+	private boolean isRootLocator(String locatorAsString) {
+		return "root".equals(locatorAsString);
+	}
+
+	protected WebElement getCachedElement(SearchParams pair) throws ScriptExecuteException {
+		logger.trace("Get element from cache by {} = {} (ind: {} )", pair.locator, pair.matcher, pair.parsedIndex);
+		WebElement we;
+		if (pair.parsedIndex == null) {
+			we = webElements.getWebElement(pair.matcher);
+		} else {
+			List<WebElement> webElementList = webElements.getWebElementList(pair.matcher);
+			if (webElementList == null) {
+				throw new ScriptExecuteException("Saved list elements with rh-id: " + pair.matcher + " is not found");
+			} else if (webElementList.size() <= pair.parsedIndex) {
+				throw new ScriptExecuteException(String.format("Saved elements with rh-id have less count (%s) than expected (%s)",
+						webElementList.size(), pair.parsedIndex + 1));
+			}
+			we = webElementList.get(pair.parsedIndex);
+		}
+		if (we == null) {
+			String locator = pair.matcher;
+			if (pair.parsedIndex != null) {
+				locator += " index: " + pair.parsedIndex;
+			}
+			throw new ScriptExecuteException("Saved elements with rh-id: " + locator + " is not found");
+		}
+		return we;
 	}
 }

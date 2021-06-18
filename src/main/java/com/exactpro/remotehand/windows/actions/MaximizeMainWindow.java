@@ -31,7 +31,7 @@ public class MaximizeMainWindow extends WindowsAction {
 	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-		driverWrapper.getDriver().manage().window().maximize();
+		this.getDriver(driverWrapper).manage().window().maximize();
 		return null;
 	}
 

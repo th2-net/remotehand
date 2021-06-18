@@ -32,11 +32,19 @@ public class SearchParams {
 		public final String locator;
 		public final String matcher;
 		public final String index;
+		
+		public static final HeaderKeys DEFAULT = new HeaderKeys("locator", "matcher", "matcherindex");
 
 		public HeaderKeys(String locator, String matcher, String index) {
 			this.locator = locator;
 			this.matcher = matcher;
 			this.index = index;
+		}
+
+		public HeaderKeys(String prefix) {
+			this.locator = prefix + DEFAULT.locator;
+			this.matcher = prefix + DEFAULT.matcher;
+			this.index = prefix + DEFAULT.index;
 		}
 	}
 }

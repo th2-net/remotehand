@@ -18,9 +18,11 @@ package com.exactpro.remotehand.screenwriter;
 
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebConfiguration;
+import com.exactpro.remotehand.windows.ElementOffsetUtils;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public abstract class ScreenWriter<T> {
 	private static final Logger logger = LoggerFactory.getLogger(ScreenWriter.class);
@@ -79,26 +83,44 @@ public abstract class ScreenWriter<T> {
 		}
 	}
 
-	public Color getElementColor(WindowsDriver<?> driver, WebElement element) throws ScriptExecuteException {
-		return getElementColor(driver, element, null);
-	}
-
-	public Color getElementColor(WindowsDriver<?> driver, WebElement element, java.awt.Point displacedPoint) throws ScriptExecuteException {
+	public Color getElementColor(WindowsDriver<?> driver, ElementOffsetUtils.ElementOffsets elementOffsets) throws ScriptExecuteException {
 		try {
-			BufferedImage sourceImage = bytesToImage(driver.getScreenshotAs(OutputType.BYTES));
-			Point p = element.getLocation();
-			Dimension size = element.getSize();
-			int width = getElementScreenshotSize(p.getX(), size.getWidth(), sourceImage.getWidth());
-			int height = getElementScreenshotSize(p.getY(), size.getHeight(), sourceImage.getHeight());
-			BufferedImage elementImage = sourceImage.getSubimage(p.getX(), p.getY(), width, height);
+			BufferedImage elementImage = getSubImage(driver, elementOffsets.element);
+			int width = elementImage.getWidth();
+			int height = elementImage.getHeight();
 
-			if (displacedPoint == null)
+			if (!elementOffsets.hasOffset)
 				return new Color(elementImage.getRGB(width / 2, height / 2)); // get the color of the center pixel
 
-			if (displacedPoint.x > width || displacedPoint.y > height)
+			if (elementOffsets.xOffset > width || elementOffsets.yOffset > height)
 				throw new ScriptExecuteException("The selected point is outside the bounds of the element");
 
-			return new Color(elementImage.getRGB(displacedPoint.x, displacedPoint.y)); // get the color of the displaced pixel
+			return new Color(elementImage.getRGB(elementOffsets.xOffset, elementOffsets.yOffset)); // get the color of the displaced pixel
+		} catch (IOException e) {
+			throw new ScriptExecuteException("Error while extracting color of element", e);
+		}
+	}
+
+	public Set<Color> getElementColors(WindowsDriver<?> driver, WebElement element, Rectangle rectangle) throws ScriptExecuteException {
+		try {
+			BufferedImage elementImage = getSubImage(driver, element);
+			Set<Color> colors = new LinkedHashSet<>();
+
+			int endXCoordinate = rectangle.getWidth() + rectangle.getX();
+			if (elementImage.getWidth() < endXCoordinate)
+				endXCoordinate = elementImage.getWidth();
+
+			int endYCoordinate = rectangle.getHeight() + rectangle.getY();
+			if (elementImage.getHeight() < endYCoordinate)
+				endYCoordinate = elementImage.getHeight();
+
+			for (int i = rectangle.getX(); i <= endXCoordinate; i++) {
+				for (int j = rectangle.getY(); j <= endYCoordinate; j++) {
+					colors.add(new Color(elementImage.getRGB(i, j)));
+				}
+			}
+
+			return colors;
 		} catch (IOException e) {
 			throw new ScriptExecuteException("Error while extracting color of element", e);
 		}
@@ -107,6 +129,12 @@ public abstract class ScreenWriter<T> {
 	public String getScreenshotExtension() {
 		return screenshotExtension;
 	}
+
+
+	public static String convertToHex(Color elementColor) {
+		return String.format("#%02X%02X%02X", elementColor.getRed(), elementColor.getGreen(), elementColor.getBlue());
+	}
+
 
 	protected abstract T processImage(BufferedImage bufferedImage) throws IOException;
 	protected abstract String saveImage(T data, String name) throws IOException;
@@ -146,15 +174,8 @@ public abstract class ScreenWriter<T> {
 	}
 
 	protected T takeAndGetElementScreenshotData(WebDriver webDriver, WebElement element) throws ScriptExecuteException {
-		TakesScreenshot takesScreenshot = (TakesScreenshot)webDriver;
 		try {
-			BufferedImage fullscreen = bytesToImage(takesScreenshot.getScreenshotAs(OutputType.BYTES));
-			Point p = element.getLocation();
-			Dimension size = element.getSize();
-			int width = getElementScreenshotSize(p.getX(), size.getWidth(), fullscreen.getWidth()),
-					height = getElementScreenshotSize(p.getY(), size.getHeight(), fullscreen.getHeight());
-			BufferedImage elementImage = fullscreen.getSubimage(p.getX(), p.getY(),
-					width, height);
+			BufferedImage elementImage = getSubImage((TakesScreenshot) webDriver, element);
 			return processImage(elementImage);
 		} catch (WebDriverException wde) {
 			throw new ScriptExecuteException("Unable to create screenshot of element: " + wde.getMessage(), wde);
@@ -165,5 +186,15 @@ public abstract class ScreenWriter<T> {
 			logger.error(msg, e);
 			throw new ScriptExecuteException(msg, e);
 		}
+	}
+
+	protected <D extends TakesScreenshot> BufferedImage getSubImage(D driver, WebElement element) throws ScriptExecuteException, IOException {
+		BufferedImage sourceImage = bytesToImage(driver.getScreenshotAs(OutputType.BYTES));
+		Point p = element.getLocation();
+		Dimension size = element.getSize();
+		int width = getElementScreenshotSize(p.getX(), size.getWidth(), sourceImage.getWidth());
+		int height = getElementScreenshotSize(p.getY(), size.getHeight(), sourceImage.getHeight());
+
+		return sourceImage.getSubimage(p.getX(), p.getY(), width, height);
 	}
 }
