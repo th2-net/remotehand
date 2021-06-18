@@ -43,8 +43,7 @@ public class ColorsCollector extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
 	                  WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
-
-		WindowsDriver<?> driver = driverWrapper.getDriver();
+		WindowsDriver<?> driver = getDriver(driverWrapper);
 		ElementSearcher es = new ElementSearcher(params, driver, cachedElements);
 		WebElement element = es.searchElement();
 		if (element == null)
