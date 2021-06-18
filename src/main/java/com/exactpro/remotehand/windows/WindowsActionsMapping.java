@@ -43,7 +43,8 @@ public class WindowsActionsMapping {
 		GetScreenshot,
 		GetElementColor,
 		DragAndDropElement,
-		RestartDriver
+		RestartDriver,
+		ColorsCollector
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -78,6 +79,7 @@ public class WindowsActionsMapping {
 			case RestartDriver:			return new RestartDriver();
 			case GetElementColor:		return new GetElementColor();
 			case DragAndDropElement:	return new DragAndDropElement();
+			case ColorsCollector:		return new ColorsCollector();
 			default :
 				throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
