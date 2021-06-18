@@ -20,16 +20,15 @@ import com.exactpro.remotehand.*;
 import com.exactpro.remotehand.http.HttpLogonHandler;
 import com.exactpro.remotehand.sessions.LogonHandler;
 import com.exactpro.remotehand.sessions.SessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.cli.CommandLine;
 
 import java.util.Map;
 
 public class WindowsRemoteHandManager implements IRemoteHandManager {
-	private final DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider;
+	private final DriverPoolProvider<WindowsDriverWrapper> driverPoolProvider;
 	private final WindowsManager windowsManager = new WindowsManager();
 
-	public WindowsRemoteHandManager(DriverPoolProvider<? extends DriverWrapper<WindowsDriver<?>>> driverPoolProvider)
+	public WindowsRemoteHandManager(DriverPoolProvider<WindowsDriverWrapper> driverPoolProvider)
 	{
 		this.driverPoolProvider = driverPoolProvider;
 	}

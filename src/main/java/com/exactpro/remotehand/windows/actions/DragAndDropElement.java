@@ -21,9 +21,11 @@ import com.exactpro.remotehand.windows.ElementOffsetUtils;
 import com.exactpro.remotehand.windows.ElementOffsetUtils.ElementOffsetParams;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.SearchParams;
+import com.exactpro.remotehand.windows.WinActionUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
+import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
@@ -44,7 +46,8 @@ public class DragAndDropElement extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
 
-		ElementSearcher searcher = new ElementSearcher(params, driverWrapper.getDriver(), cachedElements);
+		WindowsDriver<?> driver = getDriver(driverWrapper);
+		ElementSearcher searcher = new ElementSearcher(params, driver, cachedElements);
 		WebElement fromElement = searcher.searchElement();
 		WebElement toElement = searcher.searchElement(new SearchParams.HeaderKeys(TO_PREFIX));
 
@@ -53,7 +56,7 @@ public class DragAndDropElement extends WindowsAction {
 		ElementOffsetUtils.ElementOffsets toOffsets = ElementOffsetUtils.calculateOffset(
 				new ElementOffsetParams(toElement, params.get(TO_OFFSET_X), params.get(TO_OFFSET_Y)));
 
-		Actions actions = new Actions(driverWrapper.getDriver());
+		Actions actions = WinActionUtils.createActionsAndCheck(driver, fromElement, toElement);
 		if (fromOffsets.hasOffset) {
 			actions.moveToElement(fromOffsets.element, fromOffsets.xOffset, fromOffsets.yOffset);
 		} else {
