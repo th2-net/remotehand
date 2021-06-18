@@ -56,6 +56,9 @@ public class ExtendedActions extends Actions {
 	}
 
 	public ExtendedActions applyClickModifiers(Set<CharSequence> modifiers) {
+		if (modifiers == null || modifiers.isEmpty())
+			return this;
+
 		modifiers.forEach(mod -> {
 			if (StringUtils.isNotEmpty(mod))
 				this.keyDown(mod);

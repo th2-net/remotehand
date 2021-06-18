@@ -29,7 +29,7 @@ public class WinActions extends ExtendedActions {
 	@Override
 	protected String[] extractKeys(String modifiers) {
 		String trimModifiers = modifiers.trim();
-		if (!trimModifiers.startsWith(SendKeysHandler.KEY_SIGN) && !trimModifiers.endsWith(SendKeysHandler.KEY_SIGN))
+		if (!trimModifiers.startsWith(SendKeysHandler.KEY_SIGN) || !trimModifiers.endsWith(SendKeysHandler.KEY_SIGN))
 			return new String[] { };
 
 		return trimModifiers.substring(1, trimModifiers.length() - 1).split("\\+");
