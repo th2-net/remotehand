@@ -17,31 +17,25 @@
 package com.exactpro.remotehand.windows.actions;
 
 import com.exactpro.remotehand.ScriptExecuteException;
-import com.exactpro.remotehand.windows.ElementOffsetUtils;
-import org.apache.commons.lang3.StringUtils;
-import com.exactpro.remotehand.windows.ElementSearcher;
-import com.exactpro.remotehand.windows.WinActionUtils;
-import com.exactpro.remotehand.windows.WindowsAction;
-import com.exactpro.remotehand.windows.WindowsDriverWrapper;
-import com.exactpro.remotehand.windows.WindowsSessionContext;
+import com.exactpro.remotehand.windows.*;
 import io.appium.java_client.windows.WindowsDriver;
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 public class Click extends WindowsAction {
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(Click.class);
 
-	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
-			X_OFFSET = "xoffset", Y_OFFSET = "yoffset";
+	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE = "double", BUTTON = "button",
+			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", APPLIED_MODIFIERS = "modifiers";
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-
 		WindowsDriver<?> driver = getDriver(driverWrapper);
 		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement element = es.searchElement();
@@ -49,19 +43,20 @@ public class Click extends WindowsAction {
 		String button = params.get(BUTTON);
 		if (StringUtils.isEmpty(button))
 			button = LEFT;
-		
-		ElementOffsetUtils.ElementOffsetParams elementOffsetParams 
+
+		ElementOffsetUtils.ElementOffsetParams elementOffsetParams
 				= new ElementOffsetUtils.ElementOffsetParams(element, params.get(X_OFFSET), params.get(Y_OFFSET));
 		ElementOffsetUtils.ElementOffsets elementOffsets = ElementOffsetUtils.calculateOffset(elementOffsetParams);
 
-		Actions actions = WinActionUtils.createActionsAndCheck(driver, element);
-		
+		WinActions actions = WinActionUtils.createActionsAndCheck(driver, element);
 
 		if (elementOffsets.hasOffset) {
-			actions = actions.moveToElement(element, elementOffsets.xOffset, elementOffsets.yOffset);
+			actions.moveToElement(element, elementOffsets.xOffset, elementOffsets.yOffset);
 		} else {
-			actions = actions.moveToElement(element);
+			actions.moveToElement(element);
 		}
+
+		Set<CharSequence> appliedModifiers = actions.applyClickModifiers(params.get(APPLIED_MODIFIERS));
 
 		switch (button) {
 			case LEFT:
@@ -79,8 +74,10 @@ public class Click extends WindowsAction {
 				throw new ScriptExecuteException("Button may be only left, right, middle or double (for double click with left button).");
 		}
 
+		actions.resetClickModifiers(appliedModifiers);
+
 		actions.perform();
-		
+
 		return null;
 	}
 

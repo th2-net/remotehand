@@ -16,19 +16,22 @@
 
 package com.exactpro.remotehand.windows;
 
+import com.exactpro.remotehand.ExtendedActions;
+import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.interactions.Actions;
 
-public class WinActions extends Actions {
-	
-	private final WebDriver driver;
-	
+public class WinActions extends ExtendedActions {
 	public WinActions(WebDriver driver) {
 		super(driver);
-		this.driver = driver;
 	}
 
-	public WebDriver getAttachedDriver() {
-		return driver;
+
+	@Override
+	protected String[] extractKeys(String modifiers) {
+		String trimModifiers = modifiers.trim();
+		if (!trimModifiers.startsWith(SendKeysHandler.KEY_SIGN) || !trimModifiers.endsWith(SendKeysHandler.KEY_SIGN))
+			return new String[] { };
+
+		return trimModifiers.substring(1, trimModifiers.length() - 1).split("\\+");
 	}
 }
