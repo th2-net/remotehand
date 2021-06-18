@@ -101,7 +101,8 @@ public class ColorsCollector extends WindowsAction {
 		if (startXCoordinate < 0 || startYCoordinate < 0)
 			throw new ScriptExecuteException("Coordinates cannot be less than zero");
 
-		return new Rectangle(startXCoordinate, startYCoordinate, endYCoordinate, endXCoordinate);
+		return new Rectangle(startXCoordinate, startYCoordinate,
+				endYCoordinate - startYCoordinate, endXCoordinate - startXCoordinate);
 	}
 
 	private boolean isCoordinatesEmpty(Map<String, String> params) {

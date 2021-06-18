@@ -106,11 +106,11 @@ public abstract class ScreenWriter<T> {
 			BufferedImage elementImage = getSubImage(driver, element);
 			Set<Color> colors = new LinkedHashSet<>();
 
-			int endXCoordinate = rectangle.getWidth();
+			int endXCoordinate = rectangle.getWidth() + rectangle.getX();
 			if (elementImage.getWidth() < endXCoordinate)
 				endXCoordinate = elementImage.getWidth();
 
-			int endYCoordinate = rectangle.getHeight();
+			int endYCoordinate = rectangle.getHeight() + rectangle.getY();
 			if (elementImage.getHeight() < endYCoordinate)
 				endYCoordinate = elementImage.getHeight();
 
