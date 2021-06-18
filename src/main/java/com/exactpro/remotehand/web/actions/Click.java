@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
 
 package com.exactpro.remotehand.web.actions;
 
+import com.exactpro.remotehand.ExtendedActions;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebAction;
-import com.exactpro.remotehand.web.utils.SendKeysHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Click extends WebAction
 {
@@ -36,13 +37,7 @@ public class Click extends WebAction
 	
 	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
 			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
-	
-	private static final Map<String, CharSequence> MODIFIER_KEYS = new HashMap<String, CharSequence>() {{
-		put(SendKeysHandler.SHIFT, Keys.SHIFT);
-		put(SendKeysHandler.CTRL, Keys.CONTROL);
-		put(SendKeysHandler.ALT, Keys.ALT);
-	}};
-	
+
 	@Override
 	public boolean isNeedLocator()
 	{
@@ -76,13 +71,13 @@ public class Click extends WebAction
 		if (button == null)
 			button = LEFT;
 		
-		Actions actions = moveToElement(webDriver, element, params.get(X_OFFSET), params.get(Y_OFFSET));
+		ExtendedActions actions = moveToElement(webDriver, element, params.get(X_OFFSET), params.get(Y_OFFSET));
 		logInfo("Moved to element: %s", webLocator);
 		
 		try
 		{
 			//Building sequence of actions to perform
-			Set<CharSequence> mods = applyModifiers(actions, params.get(MODIFIERS));
+			Set<CharSequence> mods = actions.applyClickModifiers(params.get(MODIFIERS));
 			if (button.equals(LEFT))
 				actions.click();
 			else if (button.equals(RIGHT))
@@ -99,8 +94,8 @@ public class Click extends WebAction
 				logError("Button may be only left, right, middle or double (for double click with left button).");
 				return null;
 			}
-			resetModifiers(actions, mods);
-			
+			actions.resetClickModifiers(mods);
+
 			//Performing built sequence of actions
 			actions.perform();
 			
@@ -135,10 +130,10 @@ public class Click extends WebAction
 		}
 		return true;
 	}
-	
-	private Actions moveToElement(WebDriver webDriver, WebElement element, String xOffsetStr, String yOffsetStr)
+
+	private ExtendedActions moveToElement(WebDriver webDriver, WebElement element, String xOffsetStr, String yOffsetStr)
 	{
-		Actions actions = new Actions(webDriver);
+		ExtendedActions actions = new ExtendedActions(webDriver);
 		
 		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr))
 		{
@@ -158,35 +153,8 @@ public class Click extends WebAction
 				xOffset -= element.getSize().getWidth() / 2;
 				yOffset -= element.getSize().getHeight() / 2;
 			}
-			return actions.moveToElement(element, xOffset, yOffset);
+			return (ExtendedActions) actions.moveToElement(element, xOffset, yOffset);
 		}
-		return actions.moveToElement(element);
-	}
-	
-	private Set<CharSequence> applyModifiers(Actions actions, String modifiers)
-	{
-		if (StringUtils.isEmpty(modifiers))
-			return null;
-		
-		Set<CharSequence> result = new LinkedHashSet<>();
-		String[] keys = modifiers.split(",");
-		for (String k : keys)
-		{
-			CharSequence c = MODIFIER_KEYS.get(k.trim());
-			if (c == null || result.contains(c))
-				continue;
-			actions.keyDown(c);
-			result.add(c);
-		}
-		return result;
-	}
-	
-	private void resetModifiers(Actions actions, Set<CharSequence> modifiers)
-	{
-		if (modifiers == null || modifiers.isEmpty())
-			return;
-		
-		for (CharSequence c : modifiers)
-			actions.keyUp(c);
+		return (ExtendedActions) actions.moveToElement(element);
 	}
 }
