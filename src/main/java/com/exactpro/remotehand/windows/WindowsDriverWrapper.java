@@ -71,7 +71,8 @@ public class WindowsDriverWrapper implements DriverCloseable
 	private WindowsDriver<?> createDriverFromHandle(String windowHandle, boolean experimental) {
 		DesiredCapabilities capabilities = this.createCommonCapabilities();
 		capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, windowHandle);
-		return createDriver(capabilities, experimental);
+		logger.debug("Creating experimental-{} driver with handle: {}", experimental, windowHandle);
+		return createDriver(capabilities, experimental, getImplicitlyWaitTimeout(), this::setDriverExp, this::setDriverNotExp);
 	}
 
 	private WindowsDriver<?> createRootDriver(boolean experimental) {
