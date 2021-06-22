@@ -19,6 +19,7 @@ package com.exactpro.remotehand;
 import com.exactpro.remotehand.http.ErrorRespondent;
 import com.exactpro.remotehand.rhdata.RhScriptResult;
 import com.exactpro.remotehand.sessions.SessionContext;
+import com.exactpro.remotehand.utils.RhUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

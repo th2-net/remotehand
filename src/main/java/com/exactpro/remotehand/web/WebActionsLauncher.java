@@ -25,7 +25,7 @@ import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.exactpro.remotehand.RhUtils.isBrowserNotReachable;
+import static com.exactpro.remotehand.utils.RhUtils.isBrowserNotReachable;
 
 public class WebActionsLauncher extends ActionsLauncher
 {
