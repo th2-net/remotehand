@@ -16,7 +16,7 @@
 
 package com.exactpro.remotehand.web.actions;
 
-import com.exactpro.remotehand.RhUtils;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

@@ -16,8 +16,9 @@
 
 package com.exactpro.remotehand.windows.actions;
 
-import com.exactpro.remotehand.RhUtils;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.utils.TableFilter;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
@@ -63,7 +64,7 @@ public class TableSearch extends WindowsAction
 	private int columnIndex;
 	private int firstRowIndex;
 	private boolean saveResult;
-	private List<RhUtils.Filter> filtersMap;
+	private List<TableFilter> filters;
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params,
@@ -88,23 +89,23 @@ public class TableSearch extends WindowsAction
 			while (!rowFound) {
 				row = findRow(table, i + firstRowIndex);
 
-				for (RhUtils.Filter kvFilter : filtersMap) {
-					String rowName = format(rowElementNameFormat, kvFilter.name, i);
+				for (TableFilter currentFilter : filters) {
+					String rowName = format(rowElementNameFormat, currentFilter.name, i);
 					WebElement rowElement;
 					
-					if (kvFilter.index == null) {
+					if (currentFilter.index == null) {
 						rowElement = row.findElement(By.name(rowName));
 					} else {
 						List<WebElement> elements = row.findElements(By.name(rowName));
-						if (elements == null || elements.size() < kvFilter.index) {
-							logger.warn("Not found element with id {} and index {} on row #{}", rowName, kvFilter.index, i + firstRowIndex);
+						if (elements == null || elements.size() < currentFilter.index) {
+							logger.warn("Not found element with id {} and index {} on row #{}", rowName, currentFilter.index, i + firstRowIndex);
 							return NOT_FOUND;
 						}
-						rowElement = elements.get(kvFilter.index);
+						rowElement = elements.get(currentFilter.index);
 					}
 					
 					String attribute = StringUtils.defaultString(rowElement.getAttribute(rowElementValueFormat), StringUtils.EMPTY);
-					rowFound = kvFilter.value.equals(attribute);
+					rowFound = currentFilter.value.equals(attribute);
 					if (!rowFound)
 						break;
 				}
@@ -139,9 +140,11 @@ public class TableSearch extends WindowsAction
 		rowElementValueFormat = params.getOrDefault(ROW_ELEMENT_VALUE_FORMAT, DEFAULT_ELEMENT_VALUE_FORMAT);
 		targetColumnName = params.get(TARGET_COLUMN);
 		saveResult = RhUtils.getBooleanOrDefault(params, SAVE_RESULT, true);
-		filtersMap = RhUtils.buildFilters(params.get(FILTER));
-		if (filtersMap.isEmpty())
+		filters = RhUtils.buildTableFilters(params.get(FILTER));
+		if (filters.isEmpty())
 			throw new ScriptExecuteException("Filter map cannot be empty");
+		if (saveResult && targetColumnName == null)
+			throw new ScriptExecuteException(TARGET_COLUMN + " is not specified");
 	}
 
 	protected WebElement findRow(WebElement table, int index) {

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.exactpro.remotehand;
+package com.exactpro.remotehand.utils;
 
+import com.exactpro.remotehand.ScriptExecuteException;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
@@ -104,12 +105,12 @@ public class RhUtils {
 				|| contains(msg, "not reachable");
 	}
 
-	public static List<Filter> buildFilters(String filters) throws ScriptExecuteException {
+	public static List<TableFilter> buildTableFilters(String filters) throws ScriptExecuteException {
 		if (StringUtils.isEmpty(filters))
 			return Collections.emptyList();
 
 		String[] splitFilters = filters.split(";");
-		List<Filter> result = new ArrayList<>(splitFilters.length);
+		List<TableFilter> result = new ArrayList<>(splitFilters.length);
 		for (String splitFilter : splitFilters) {
 			String[] kvPair = splitFilter.split("=", -1);
 			if (kvPair.length == 3) {
@@ -122,33 +123,14 @@ public class RhUtils {
 				if (index < 0) {
 					throw new ScriptExecuteException("Index cannot be less than 0: " + index);
 				}
-				result.add(new Filter(kvPair[0], index, kvPair[1]));
+				result.add(new TableFilter(kvPair[0], index, kvPair[1]));
 			} else if (kvPair.length == 2) {
-				result.add(new Filter(kvPair[0], kvPair[1]));
+				result.add(new TableFilter(kvPair[0], kvPair[1]));
 			} else {
 				logger.warn("Cannot process filters: {}", splitFilter);
 			}
 		}
 
 		return result;
-	}
-	
-	public static class Filter {
-		
-		public final String name;
-		public final Integer index;
-		public final String value;
-
-		public Filter(String name, Integer index, String value) {
-			this.name = name;
-			this.index = index;
-			this.value = value;
-		}
-
-		public Filter(String name, String value) {
-			this.name = name;
-			this.index = null;
-			this.value = value;
-		}
 	}
 }

@@ -20,6 +20,7 @@ import com.exactpro.remotehand.http.ErrorRespondent;
 import com.exactpro.remotehand.rhdata.RhScriptResult;
 import com.exactpro.remotehand.sessions.SessionContext;
 import com.exactpro.remotehand.utils.ExceptionUtils;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsScriptExecuteException;
 import org.slf4j.Logger;

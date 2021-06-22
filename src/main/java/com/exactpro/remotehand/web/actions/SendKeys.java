@@ -17,7 +17,7 @@
 package com.exactpro.remotehand.web.actions;
 
 import com.exactpro.remotehand.Configuration;
-import com.exactpro.remotehand.RhUtils;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebAction;

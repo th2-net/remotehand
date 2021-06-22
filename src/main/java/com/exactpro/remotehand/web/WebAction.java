@@ -17,7 +17,7 @@
 package com.exactpro.remotehand.web;
 
 import com.exactpro.remotehand.Action;
-import com.exactpro.remotehand.RhUtils;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.webelements.WebLocator;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.exactpro.remotehand.RhUtils.isBrowserNotReachable;
+import static com.exactpro.remotehand.utils.RhUtils.isBrowserNotReachable;
 
 public abstract class WebAction extends Action
 {

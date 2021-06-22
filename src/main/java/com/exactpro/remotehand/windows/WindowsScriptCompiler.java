@@ -18,7 +18,7 @@ package com.exactpro.remotehand.windows;
 
 import com.csvreader.CsvReader;
 import com.exactpro.remotehand.Action;
-import com.exactpro.remotehand.RhUtils;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptCompiler;
 import com.exactpro.remotehand.sessions.SessionContext;
