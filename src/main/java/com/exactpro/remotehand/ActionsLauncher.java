@@ -57,8 +57,8 @@ public class ActionsLauncher
 			try
 			{
 				action.beforeExecute();
-				final String actionResult = action.execute();
-				if (actionResult != null)
+				final ActionResult actionResult = action.execute();
+				if (actionResult != null && actionResult.hasData())
 					processActionResult(result, action, actionResult);
 
 				if (parent != null && parent.isClosing())
@@ -83,7 +83,7 @@ public class ActionsLauncher
 		return result;
 	}
 
-	protected void processActionResult(RhScriptResult scriptResult, Action action, String actionResult) {
+	protected void processActionResult(RhScriptResult scriptResult, Action action, ActionResult actionResult) {
 		switch (action.getOutputType()) {
 			case SCREENSHOT:
 				scriptResult.addScreenshotId(actionResult);
@@ -92,7 +92,7 @@ public class ActionsLauncher
 				scriptResult.addToEncodedOutput(actionResult);
 				break;
 			default:
-				scriptResult.addToTextOutput(actionResult);
+				scriptResult.addToActionResults(actionResult);
 		}
 	}
 	
