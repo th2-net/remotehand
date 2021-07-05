@@ -84,7 +84,6 @@ public class WebConfiguration extends Configuration {
 	private boolean createDownloadSubDir;
 	private boolean readClipboardPermissions;
 	private final boolean enableW3C;
-	private final boolean printWebBrowserLogs;
 
 	private WebConfiguration(CommandLine commandLine) {
 		this(commandLine, Collections.emptyMap());
@@ -126,7 +125,6 @@ public class WebConfiguration extends Configuration {
 		disableLeavePageAlert = this.loadProperty("DisableLeavePageAlert", true, Boolean::parseBoolean);
 		createDownloadSubDir = this.loadProperty("CreateDownloadSubDir", true, Boolean::parseBoolean);
 		enableW3C = loadProperty("EnableW3C", false, Boolean::parseBoolean);
-		printWebBrowserLogs = loadProperty("PrintWebBrowserLogs", false, Boolean::parseBoolean);
 	}
 
 	@Override
@@ -283,11 +281,6 @@ public class WebConfiguration extends Configuration {
 	public boolean isEnableW3C()
 	{
 		return enableW3C;
-	}
-
-	public boolean isPrintWebBrowserLogs()
-	{
-		return printWebBrowserLogs;
 	}
 
 	public static void init(CommandLine commandLine)

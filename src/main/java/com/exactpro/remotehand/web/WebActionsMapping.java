@@ -71,7 +71,8 @@ public class WebActionsMapping
 		DismissAlert,
 		CheckImageAvailability,
 		ExecuteJS,
-		ExecuteJsOnElement;
+		ExecuteJsOnElement,
+		PrintBrowserLogs;
 		
 
 		private static WebActionName getByLabel(String label) throws ScriptCompileException
@@ -130,6 +131,7 @@ public class WebActionsMapping
 		case CheckImageAvailability: return new CheckImageAvailability();
 		case ExecuteJS:            return new ExecuteJS();
 		case ExecuteJsOnElement:   return new ExecuteJsOnElement();
+		case PrintBrowserLogs:     return new PrintBrowserLogs();
 		default : throw new ScriptCompileException("Unknown action name '" + actionName + "'");
 		}
 	}
