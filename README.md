@@ -619,15 +619,17 @@ Executes JavaScript code from `commands` on current page, uses found element as 
 To place element as argument to code, use "@Element@" reference.
 
 
-### PrintBrowserLogs
+### GetBrowserLogs
 ```
 #action
-PrintBrowserLogs
+GetBrowserLogs
 ```
 
-Prints current browser logs in RemoteHand logs. Useful to check page on JavaScript errors.
+Returns string that contains current browser logs. Useful to check page on JavaScript errors.
 
-If no browser logs were found, nothing will be printed.
+Browser logs will not repeat after output, so multiple `GetBrowserLogs` actions can be used in the same RemoteHand script.
+
+If no browser logs are present, action will return empty string.
 
 
 ## Notes

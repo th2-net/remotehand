@@ -27,22 +27,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class PrintBrowserLogs extends WebAction
+public class GetBrowserLogs extends WebAction
 {
-	private static final Logger logger = LoggerFactory.getLogger(PrintBrowserLogs.class);
+	private static final Logger logger = LoggerFactory.getLogger(GetBrowserLogs.class);
 
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
 	{
 		LogEntries logEntries = webDriver.manage().logs().get(LogType.BROWSER);
-		int logsCount = logEntries.getAll().size();
-		if (logsCount > 0)
-		{
-			StringBuilder logs = new StringBuilder("Logs in browser found: ").append(logsCount);
-			logEntries.forEach(entry -> logs.append(System.lineSeparator()).append(entry.toString()));
-			getLogger().warn(logs.toString());
-		}
-		return null;
+		StringBuilder logs = new StringBuilder();
+		logEntries.forEach(entry -> logs.append(entry.toString()).append(System.lineSeparator()));
+		return logs.toString();
 	}
 
 	@Override
