@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package com.exactpro.remotehand.rhdata;
 
+import com.exactpro.remotehand.ActionResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,14 +26,16 @@ import java.util.List;
 
 import static com.exactpro.remotehand.rhdata.RhResponseCode.SUCCESS;
 
-public class RhScriptResult
-{
+public class RhScriptResult {
 	private int code = SUCCESS.getCode();
 	private String errorMessage;
-	private List<String> textOutput;
-	private List<String> screenshotIds;
-	private List<String> encodedOutput;
-	
+	@JsonSerialize(converter = ActionResultsConverter.class)
+	private List<ActionResult> actionResults;
+	@JsonSerialize(converter = ActionResultsConverter.class)
+	private List<ActionResult> screenshotIds;
+	@JsonSerialize(converter = ActionResultsConverter.class)
+	private List<ActionResult> encodedOutput;
+
 	@JsonIgnore
 	public boolean isSuccess()
 	{
@@ -67,56 +71,55 @@ public class RhScriptResult
 	}
 
 	
-	public List<String> getTextOutput()
+	public List<ActionResult> getActionResults()
 	{
-		return textOutput != null ? textOutput : Collections.<String>emptyList();
+		return actionResults != null ? actionResults : Collections.emptyList();
 	}
 
-	public void setTextOutput(List<String> textOutput)
+	public void setActionResults(List<ActionResult> actionResults)
 	{
-		this.textOutput = textOutput;
-	}
-	
-	public void addToTextOutput(String text)
-	{
-		if (textOutput == null)
-			textOutput = new ArrayList<String>();
-		textOutput.add(text);
+		this.actionResults = actionResults;
 	}
 
-	
-	public List<String> getScreenshotIds()
+	public void addToActionResults(ActionResult actionResult)
 	{
-		return screenshotIds != null ? screenshotIds : Collections.<String>emptyList();
+		if (actionResults == null)
+			actionResults = new ArrayList<>();
+		actionResults.add(actionResult);
 	}
 
-	public void setScreenshotIds(List<String> screenshotIds)
+	public List<ActionResult> getScreenshotIds()
+	{
+		return screenshotIds != null ? screenshotIds : Collections.emptyList();
+	}
+
+	public void setScreenshotIds(List<ActionResult> screenshotIds)
 	{
 		this.screenshotIds = screenshotIds;
 	}
 	
-	public void addScreenshotId(String id)
+	public void addScreenshotId(ActionResult id)
 	{
 		if (screenshotIds == null)
-			screenshotIds = new ArrayList<String>();
+			screenshotIds = new ArrayList<>();
 		screenshotIds.add(id);
 	}
 
 
-	public List<String> getEncodedOutput()
+	public List<ActionResult> getEncodedOutput()
 	{
-		return encodedOutput != null ? encodedOutput : Collections.<String>emptyList();
+		return encodedOutput != null ? encodedOutput : Collections.emptyList();
 	}
 
-	public void setEncodedOutput(List<String> encodedOutput)
+	public void setEncodedOutput(List<ActionResult> encodedOutput)
 	{
 		this.encodedOutput = encodedOutput;
 	}
 	
-	public void addToEncodedOutput(String data)
+	public void addToEncodedOutput(ActionResult data)
 	{
 		if (encodedOutput == null)
-			encodedOutput = new ArrayList<String>();
+			encodedOutput = new ArrayList<>();
 		encodedOutput.add(data);
 	}
 
@@ -128,8 +131,8 @@ public class RhScriptResult
 		sb.append("code=").append(code);
 		if (errorMessage != null)
 			sb.append(", errorMessage='").append(errorMessage).append('\'');
-		if (textOutput != null)
-			sb.append(", textOutput=").append(textOutput);
+		if (actionResults != null)
+			sb.append(", actionResults=").append(actionResults);
 		if (screenshotIds != null)
 			sb.append(", screenshotIds=").append(screenshotIds);
 		if (encodedOutput != null)

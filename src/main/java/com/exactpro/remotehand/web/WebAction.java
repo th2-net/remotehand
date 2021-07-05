@@ -17,16 +17,15 @@
 package com.exactpro.remotehand.web;
 
 import com.exactpro.remotehand.Action;
-import com.exactpro.remotehand.utils.RhUtils;
+import com.exactpro.remotehand.ActionResult;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.web.webelements.WebLocator;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Locatable;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -152,7 +151,7 @@ public abstract class WebAction extends Action
 	}
 
 	@Override
-	public String execute() throws ScriptExecuteException
+	public ActionResult execute() throws ScriptExecuteException
 	{
 		try
 		{
@@ -173,12 +172,7 @@ public abstract class WebAction extends Action
 			if (isCanSwitchPage() && isNeedDisableLeavePageAlert())
 				disableLeavePageAlert(webDriver);
 
-			if (!needRun)
-				return null;
-			String result = run(webDriver, locator, params);
-			if (WebConfiguration.getInstance().isPrintWebBrowserLogs())
-				checkBrowserLogs(webDriver);
-			return result;
+			return needRun ? buildResult(run(webDriver, locator, params)) : null;
 		}
 		catch (ScriptExecuteException e)
 		{
@@ -266,18 +260,6 @@ public abstract class WebAction extends Action
 			return Integer.parseInt(m.group());
 		else
 			return -1;
-	}
-
-	protected void checkBrowserLogs(WebDriver webDriver)
-	{
-		LogEntries logEntries = webDriver.manage().logs().get(LogType.BROWSER);
-		int logsCount = logEntries.getAll().size();
-		if (logsCount > 0)
-		{
-			StringBuilder logs = new StringBuilder("Console errors in browser found: ").append(logsCount);
-			logEntries.forEach(entry -> logs.append(System.lineSeparator()).append(entry.toString()));
-			getLogger().warn(logs.toString());
-		}
 	}
 	
 	
