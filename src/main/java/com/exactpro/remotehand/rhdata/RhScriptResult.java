@@ -18,6 +18,7 @@ package com.exactpro.remotehand.rhdata;
 
 import com.exactpro.remotehand.ActionResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +26,14 @@ import java.util.List;
 
 import static com.exactpro.remotehand.rhdata.RhResponseCode.SUCCESS;
 
-public class RhScriptResult
-{
+public class RhScriptResult {
 	private int code = SUCCESS.getCode();
 	private String errorMessage;
+	@JsonSerialize(converter = ActionResultsConverter.class)
 	private List<ActionResult> actionResults;
+	@JsonSerialize(converter = ActionResultsConverter.class)
 	private List<ActionResult> screenshotIds;
+	@JsonSerialize(converter = ActionResultsConverter.class)
 	private List<ActionResult> encodedOutput;
 
 	@JsonIgnore
