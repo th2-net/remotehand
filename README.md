@@ -619,6 +619,19 @@ Executes JavaScript code from `commands` on current page, uses found element as 
 To place element as argument to code, use "@Element@" reference.
 
 
+### GetBrowserLogs
+```
+#action
+GetBrowserLogs
+```
+
+Returns string that contains current browser logs. Useful to check web page for JavaScript errors.
+
+Browser logs will not repeat after output, so multiple `GetBrowserLogs` actions can be used in the same RemoteHand script.
+
+If no browser logs are present, action will return empty string.
+
+
 ## Notes
 
 To set boolean value you can use following aliases:
