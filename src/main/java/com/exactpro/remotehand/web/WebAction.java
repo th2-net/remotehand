@@ -17,9 +17,10 @@
 package com.exactpro.remotehand.web;
 
 import com.exactpro.remotehand.Action;
-import com.exactpro.remotehand.utils.RhUtils;
+import com.exactpro.remotehand.ActionResult;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.web.webelements.WebLocator;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
@@ -150,7 +151,7 @@ public abstract class WebAction extends Action
 	}
 
 	@Override
-	public String execute() throws ScriptExecuteException
+	public ActionResult execute() throws ScriptExecuteException
 	{
 		try
 		{
@@ -171,7 +172,7 @@ public abstract class WebAction extends Action
 			if (isCanSwitchPage() && isNeedDisableLeavePageAlert())
 				disableLeavePageAlert(webDriver);
 
-			return (needRun) ? run(webDriver, locator, params) : null;
+			return needRun ? buildResult(run(webDriver, locator, params)) : null;
 		}
 		catch (ScriptExecuteException e)
 		{

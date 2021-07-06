@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 
-package com.exactpro.remotehand;
+package com.exactpro.remotehand.rhdata;
 
+import com.exactpro.remotehand.ActionResult;
+import com.fasterxml.jackson.databind.util.StdConverter;
 
-import com.exactpro.remotehand.screenwriter.ScreenWriter;
+import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * Created by alexey.karpukhin on 2/1/16.
- */
-public abstract class Action {
-	protected ScreenWriter<?> screenWriter = Configuration.getInstance().getDefaultScreenWriter();
+public class ActionResultsConverter extends StdConverter<List<ActionResult>, List<String>> {
 
-	public abstract ActionResult execute() throws ScriptExecuteException;
-
-	public void beforeExecute() {}
-
-	public String getActionName() {
-		return this.getClass().getSimpleName();
-	}
-
-	public ActionOutputType getOutputType() {
-		return ActionOutputType.TEXT;
-	}
-
-	protected ActionResult buildResult(String data) {
-		return new ActionResult(data);
+	@Override
+	public List<String> convert(List<ActionResult> value) {
+		return value.stream().filter(ActionResult::hasData).map(v -> {
+			if (v.getId() == null)
+				return v.getData();
+			else
+				return v.getId() + "=" + v.getData();
+		}).collect(Collectors.toList());
 	}
 }

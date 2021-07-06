@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.exactpro.remotehand.http;
 
+import com.exactpro.remotehand.ActionResult;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.rhdata.RhResponseCode;
@@ -50,7 +51,7 @@ public class ErrorRespondent
 			ScriptExecuteException see = (ScriptExecuteException) ex;
 			result.setCode(RhResponseCode.EXECUTION_ERROR.getCode());
 			if (see.getScreenshotId() != null)
-				result.addScreenshotId(see.getScreenshotId());
+				result.addScreenshotId(new ActionResult(see.getScreenshotId()));
 		}
 		else
 		{

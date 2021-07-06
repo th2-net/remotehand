@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -502,11 +502,11 @@ public class RemoteHandStarter
 	private static String resultToText(RhScriptResult result)
 	{
 		StringBuilder sb = new StringBuilder();
-		for (String line : result.getTextOutput())
+		for (ActionResult line : result.getActionResults())
 		{
 			sb.append(line).append("\r\n");
 		}
-		for (String line : result.getEncodedOutput())
+		for (ActionResult line : result.getEncodedOutput())
 		{
 			sb.append(line).append("\r\n");
 		}

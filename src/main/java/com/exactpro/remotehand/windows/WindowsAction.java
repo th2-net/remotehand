@@ -17,9 +17,10 @@
 package com.exactpro.remotehand.windows;
 
 import com.exactpro.remotehand.Action;
-import com.exactpro.remotehand.utils.RhUtils;
+import com.exactpro.remotehand.ActionResult;
 import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
+import com.exactpro.remotehand.utils.RhUtils;
 import com.exactpro.remotehand.web.WebScriptCompiler;
 import com.exactpro.remotehand.windows.WindowsSessionContext.CachedWebElements;
 import io.appium.java_client.windows.WindowsDriver;
@@ -91,7 +92,7 @@ public abstract class WindowsAction extends Action {
 	}
 
 	@Override
-	public String execute() throws ScriptExecuteException {
+	public ActionResult execute() throws ScriptExecuteException {
 		this.logger.info("Executing action in line: {} id {}", lineNumber, id);
 		
 		String result = null;
@@ -112,13 +113,7 @@ public abstract class WindowsAction extends Action {
 		} else {
 			this.logger.info("Action was not executed due condition. And will be skipped");
 		}
-		result = this.checkMultiline(result);
-		
-		if (result != null && id != null) {
-			return id + "=" + result;
-		} else {
-			return result;	
-		}
+		return buildResult(this.checkMultiline(result));
 	}
 	
 	//todo this logic should be in common. Check carefully web - part
@@ -151,6 +146,11 @@ public abstract class WindowsAction extends Action {
 		boolean fromRoot = RhUtils.getBooleanOrDefault(params, FROM_ROOT_PARAM, false);
 		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, DEFAULT_EXPERIMENTAL);
 		return driverWrapper.getDriver(fromRoot, experimental);
+	}
+
+	@Override
+	protected ActionResult buildResult(String data) {
+		return new ActionResult(getId(), data);
 	}
 
 	private static String tryExtractErrorMessage(WebDriverException e) {
