@@ -87,8 +87,10 @@ public class WebGridDriverPoolProvider extends BaseGridDriverPoolProvider<WebDri
 	private ChromeOptions buildChromeOptions(WebConfiguration config) {
 		ChromeOptions chromeOptions = new ChromeOptions();
 		chromeOptions.addArguments("--no-sandbox", "--ignore-ssl-errors=yes", "--ignore-certificate-errors");
-		if (config.isHeadlessMode())
+		if (config.isHeadlessMode()) {
+			chromeOptions.addArguments("window-size=1920x1080");
 			chromeOptions.setHeadless(true);
+		}
 
 		Map<String, Object> prefs = new HashMap<>(1);
 		prefs.put("profile.content_settings.exceptions.clipboard",
