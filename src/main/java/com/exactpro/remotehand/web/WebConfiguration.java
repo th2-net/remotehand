@@ -84,6 +84,7 @@ public class WebConfiguration extends Configuration {
 	private boolean createDownloadSubDir;
 	private boolean readClipboardPermissions;
 	private final boolean enableW3C;
+	private final boolean headlessMode;
 
 	private WebConfiguration(CommandLine commandLine) {
 		this(commandLine, Collections.emptyMap());
@@ -125,6 +126,7 @@ public class WebConfiguration extends Configuration {
 		disableLeavePageAlert = this.loadProperty("DisableLeavePageAlert", true, Boolean::parseBoolean);
 		createDownloadSubDir = this.loadProperty("CreateDownloadSubDir", true, Boolean::parseBoolean);
 		enableW3C = loadProperty("EnableW3C", false, Boolean::parseBoolean);
+		headlessMode = loadProperty("WebHeadlessMode", false, Boolean::parseBoolean);
 	}
 
 	@Override
@@ -281,6 +283,10 @@ public class WebConfiguration extends Configuration {
 	public boolean isEnableW3C()
 	{
 		return enableW3C;
+	}
+
+	public boolean isHeadlessMode() {
+		return headlessMode;
 	}
 
 	public static void init(CommandLine commandLine)
