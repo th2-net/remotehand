@@ -625,7 +625,7 @@ To place element as argument to code, use "@Element@" reference.
 GetBrowserLogs
 ```
 
-Returns string that contains current browser logs. Useful to check page on JavaScript errors.
+Returns string that contains current browser logs. Useful to check web page for JavaScript errors.
 
 Browser logs will not repeat after output, so multiple `GetBrowserLogs` actions can be used in the same RemoteHand script.
 
