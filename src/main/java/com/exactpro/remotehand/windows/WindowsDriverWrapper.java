@@ -80,6 +80,10 @@ public class WindowsDriverWrapper implements DriverCloseable
 		Integer timeout = getImplicitlyWaitTimeout();
 		return createDriver(rootCapabilities, experimental, timeout, this::setRootDriverExp, this::setRootDriverNotExp);
 	}
+	
+	public boolean isDriverCreated() {
+		return this.driverExp != null || this.driverNotExp != null;
+	}
 
 	public WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean experimental) {
 		return this.createDriver(capabilities, experimental, getImplicitlyWaitTimeout());

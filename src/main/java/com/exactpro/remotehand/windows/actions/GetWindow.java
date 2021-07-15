@@ -34,7 +34,8 @@ import java.util.Map;
 public class GetWindow extends WindowsAction {
 
 	private static final String WINDOW_NAME_PARAM = "windowname",
-			ACCESSIBILITY_ID_PARAM = "accessibilityid";
+			ACCESSIBILITY_ID_PARAM = "accessibilityid",
+			RESTART_DRIVERS_PARAM = "restartdrivers";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
@@ -60,19 +61,24 @@ public class GetWindow extends WindowsAction {
 			int handleInt = Integer.parseInt(handleString);
 			String handleHex = Integer.toHexString(handleInt);
 			
-			driverWrapper.resetWindowDrivers();
-			
-			DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
-			capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, handleHex);
-			
-			if (driverWrapper.getCreateSessionTimeout() != null) {
-				capabilities.setCapability(WADCapabilityType.CREATE_SESSION_TIMEOUT, driverWrapper.getCreateSessionTimeout());
+			boolean restartDrivers = RhUtils.getBooleanOrDefault(params, RESTART_DRIVERS_PARAM, false);
+			if (!driverWrapper.isDriverCreated() || restartDrivers) {
+				driverWrapper.resetWindowDrivers();
+
+				DesiredCapabilities capabilities = driverWrapper.createCommonCapabilities();
+				capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, handleHex);
+
+				if (driverWrapper.getCreateSessionTimeout() != null) {
+					capabilities.setCapability(WADCapabilityType.CREATE_SESSION_TIMEOUT, driverWrapper.getCreateSessionTimeout());
+				}
+				if (driverWrapper.getNewCommandTimeout() != null) {
+					capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
+				}
+				driverWrapper.createDriver(capabilities, true);
+			} else {
+				driverWrapper.switchDriversTo(handleHex);
 			}
-			if (driverWrapper.getNewCommandTimeout() != null) {
-				capabilities.setCapability(WADCapabilityType.NEW_COMMAND_TIMEOUT, driverWrapper.getNewCommandTimeout());
-			}
-			driverWrapper.createDriver(capabilities, true);
-				
+			
 			return null;
 		} else {
 			String errorText = String.format("Found %s windows with name %s", elements.size(), targetWindowMatcher);
