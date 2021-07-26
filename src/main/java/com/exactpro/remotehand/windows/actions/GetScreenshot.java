@@ -41,8 +41,8 @@ public class GetScreenshot extends WindowsAction {
 		ElementSearcher es = new ElementSearcher(params, driver, cachedElements);
 		WebElement element = es.searchElement();
 		if (element == null) {
-			throw new ScriptExecuteException("Getting screenshot of whole screen is not available, because encoded " + 
-					"screenshot data can be large");
+			throw new ScriptExecuteException("Getting screenshot of the whole screen is not available, because" +
+					" encoded screenshot data can be very large");
 		}
 
 		ScreenWriter<?> screenWriter = new SourceScreenWriter();
