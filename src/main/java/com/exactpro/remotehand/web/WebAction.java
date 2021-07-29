@@ -189,13 +189,15 @@ public abstract class WebAction extends Action
 	
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
 	{
-		String screenshotId = null;
-		try {
-			screenshotId = takeAndSaveScreenshot(null);
-		} catch (ScriptExecuteException e) {
-			logError("Could not create screenshot", e);
+		if (WebConfiguration.getInstance().isScreenshotOnError()) {
+			String screenshotId = null;
+			try {
+				screenshotId = takeAndSaveScreenshot(null);
+			} catch (ScriptExecuteException e) {
+				logError("Could not create screenshot", e);
+			}
+			see.setScreenshotId(screenshotId);
 		}
-		see.setScreenshotId(screenshotId);
 		return see;
 	}
 
