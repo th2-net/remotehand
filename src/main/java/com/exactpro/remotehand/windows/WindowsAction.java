@@ -132,13 +132,15 @@ public abstract class WindowsAction extends Action {
 
 	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
 	{
-		String screenshotId = null;
-		try {
-			screenshotId = takeScreenshot(null);
-		} catch (ScriptExecuteException e) {
-			logger.error("Could not create screenshot", e);
+		if (WindowsConfiguration.getInstance().isScreenshotOnError()) {
+			String screenshotId = null;
+			try {
+				screenshotId = takeScreenshot(null);
+			} catch (ScriptExecuteException e) {
+				logger.error("Could not create screenshot", e);
+			}
+			see.setScreenshotId(screenshotId);
 		}
-		see.setScreenshotId(screenshotId);
 		return see;
 	}
 
