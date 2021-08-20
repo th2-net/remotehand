@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2021-2021 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package com.exactpro.remotehand.windows.actions;
 
+import com.exactpro.remotehand.ActionOutputType;
 import com.exactpro.remotehand.ScriptExecuteException;
-import com.exactpro.remotehand.screenwriter.ScreenWriter;
-import com.exactpro.remotehand.screenwriter.SourceScreenWriter;
 import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
@@ -28,29 +27,32 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Base64;
 import java.util.Map;
 
-public class GetScreenshot extends WindowsAction {
+public class TakeScreenshot extends WindowsAction {
 
-	private static final Logger logger = LoggerFactory.getLogger(GetScreenshot.class);
-
+	private static final Logger loggerInstance = LoggerFactory.getLogger(TakeScreenshot.class);
+	
+	public static final String NAME_PARAM = "name";
+	
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
+		String screenshotName = params.get(NAME_PARAM);
 		WindowsDriver<?> driver = this.getDriver(driverWrapper);
 		ElementSearcher es = new ElementSearcher(params, driver, cachedElements);
 		WebElement element = es.searchElement();
-		if (element == null) {
-			throw new ScriptExecuteException("Getting screenshot of the whole screen is not available, because" +
-					" encoded screenshot data can be very large");
-		}
-
-		ScreenWriter<?> screenWriter = new SourceScreenWriter();
-		return Base64.getEncoder().encodeToString(screenWriter.takeElementScreenshot(driver, element));
+		return element == null
+				? this.takeScreenshot(screenshotName)
+				: screenWriter.takeAndSaveElementScreenshot(screenshotName, driver, element);
 	}
 
 	@Override
 	protected Logger getLoggerInstance() {
-		return logger;
+		return loggerInstance;
+	}
+
+	@Override
+	public ActionOutputType getOutputType() {
+		return ActionOutputType.SCREENSHOT;
 	}
 }

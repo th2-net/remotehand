@@ -66,7 +66,8 @@ public abstract class Configuration
 			PARAM_SEND_KEYS_MAX_RETRIES = "SendKeysMaxRetries",
 			PARAM_WEBP_LIBRARY_PATH = "WebpLibPath",
 			PARAM_WEBP_QUALITY_FACTOR = "WebpQualityFactor",
-			PARAM_WEBP_LOSSLESS_COMPRESSION = "WebpLosslessCompression";
+			PARAM_WEBP_LOSSLESS_COMPRESSION = "WebpLosslessCompression",
+			PARAM_SCREENSHOT_ON_ERROR = "ScreenshotOnError";
 
 	private volatile String host;
 	private volatile int port;
@@ -83,6 +84,7 @@ public abstract class Configuration
 	protected float webpQualityFactor;
 	protected boolean useWebpImageEncoder;
 	protected boolean losslessCompression;
+	protected boolean screenshotOnError;
 
 	protected Map<String, String> options;
 
@@ -147,6 +149,7 @@ public abstract class Configuration
 		this.webpLibraryPath = this.loadProperty(PARAM_WEBP_LIBRARY_PATH, DEF_WEBP_LIBRARY_PATH);
 		this.webpQualityFactor = this.loadProperty(PARAM_WEBP_QUALITY_FACTOR, DEF_WEBP_QUALITY_FACTOR, Float::parseFloat);
 		this.losslessCompression = this.loadProperty(PARAM_WEBP_LOSSLESS_COMPRESSION, Boolean.TRUE, Boolean::parseBoolean);
+		this.screenshotOnError = this.loadProperty(PARAM_SCREENSHOT_ON_ERROR, Boolean.TRUE, Boolean::parseBoolean);
 		this.defaultScreenWriter = createDefaultScreenWriter();
 	}
 
@@ -307,5 +310,9 @@ public abstract class Configuration
 
 	public ScreenWriter<?> getDefaultScreenWriter() {
 		return defaultScreenWriter;
+	}
+
+	public boolean isScreenshotOnError() {
+		return screenshotOnError;
 	}
 }

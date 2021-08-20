@@ -44,7 +44,8 @@ public class WindowsActionsMapping {
 		GetElementColor,
 		DragAndDropElement,
 		RestartDriver,
-		ColorsCollector
+		TakeScreenshot,
+		ColorsCollector;
 	}
 
 	private static WindowsActionName getByLabel(String label) throws ScriptCompileException
@@ -75,6 +76,7 @@ public class WindowsActionsMapping {
 			case GetDataFromClipboard:	return new GetDataFromClipboard();
 			case TableSearch: 			return new TableSearch();
 			case WaitForElement:		return new WaitForElement();
+			case TakeScreenshot:		return new TakeScreenshot();
 			case GetScreenshot:			return new GetScreenshot();
 			case RestartDriver:			return new RestartDriver();
 			case GetElementColor:		return new GetElementColor();
