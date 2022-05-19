@@ -14,6 +14,9 @@ internal class WindowsUtilsTest {
         assertTrue(isSameHandler("0x002E095C", "0x002E095C"))
         assertFalse(isSameHandler("0x002E095C", "0x005E095C"))
 
+        assertFalse(isSameHandler("0x0_NOT_NUMBER", "0x005E095C"))
+        assertFalse(isSameHandler("0x005E095C", "0x0NOT_NUMBER"))
+
         assertTrue(isSameHandler("0xBA21", "0xBA21"))
         assertTrue(isSameHandler("0XBA21", "0xBA21"))
 
