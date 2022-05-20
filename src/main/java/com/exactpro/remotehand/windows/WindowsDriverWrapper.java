@@ -29,7 +29,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static com.exactpro.remotehand.utils.WindowsUtils.isSameHandler;
+import static com.exactpro.remotehand.utils.WindowsUtils.isSameHandle;
 
 public class WindowsDriverWrapper implements DriverCloseable
 {
@@ -175,7 +175,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 		if (driver != null) {
 			driver.switchTo().window(handle);
 			String switchedHandle = driver.getWindowHandle();
-			if (!isSameHandler(handle, switchedHandle)) {
+			if (!isSameHandle(handle, switchedHandle)) {
 				logger.error("Tried to change window handle for {} to {} but current is {}", driverName, handle, switchedHandle);
 				throw new ScriptExecuteException("Couldn't change current window for " + driverName);
 			}
