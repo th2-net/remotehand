@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import static com.exactpro.remotehand.utils.WindowsUtils.isSameHandle;
+
 public class WindowsDriverWrapper implements DriverCloseable
 {
 	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
@@ -38,8 +40,8 @@ public class WindowsDriverWrapper implements DriverCloseable
 	private WindowsDriver<?> rootDriverExp;
 	private WindowsDriver<?> rootDriverNotExp;
 	
-	private URL driverUrl;
-	private WindowsConfiguration windowsConfiguration;
+	final private URL driverUrl;
+	final private WindowsConfiguration windowsConfiguration;
 
 	public WindowsDriverWrapper(URL driverUrl) {
 		this.driverUrl = driverUrl;
@@ -173,7 +175,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 		if (driver != null) {
 			driver.switchTo().window(handle);
 			String switchedHandle = driver.getWindowHandle();
-			if (!handle.equals(switchedHandle)) {
+			if (!isSameHandle(handle, switchedHandle)) {
 				logger.error("Tried to change window handle for {} to {} but current is {}", driverName, handle, switchedHandle);
 				throw new ScriptExecuteException("Couldn't change current window for " + driverName);
 			}
