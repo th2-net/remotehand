@@ -25,6 +25,7 @@ import com.exactpro.remotehand.windows.WindowsSessionContext;
 import io.appium.java_client.windows.WindowsDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,25 @@ public class GetWindow extends WindowsAction {
 
 	private static final String WINDOW_NAME_PARAM = "windowname",
 			ACCESSIBILITY_ID_PARAM = "accessibilityid";
+	private static final String HANDLE_ATTRIBUTE = "NativeWindowHandle";
 
-	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
+	private static final Logger loggerInstance = LoggerFactory.getLogger(GetWindow.class);
+
+	private String getHandleString(final WebElement window) {
+		final String handleString = window.getAttribute(HANDLE_ATTRIBUTE);
+		if (handleString != null) return handleString;
+
+		// trying to workaround problem with getting window handle string
+		if (!(window instanceof RemoteWebElement)) return null;
+
+		final String id = ((RemoteWebElement) window).getId();
+		if (id == null) return null;
+
+		final int handleIdx = id.indexOf('.') + 1;
+		if (handleIdx == 0 || handleIdx == id.length()) return null;
+
+		return id.substring(handleIdx);
+	}
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
@@ -54,9 +72,16 @@ public class GetWindow extends WindowsAction {
 		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, true);
 		WindowsDriver<?> driver1 = driverWrapper.getDriver(true, experimental);
 		List<? extends WebElement> elements = byName ? driver1.findElementsByName(targetWindowMatcher) : driver1.findElementsByAccessibilityId(targetWindowMatcher);
+
 		if (elements.size() == 1) {
-			String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");
+			final String handleString = getHandleString(elements.iterator().next());
+
 			logger.debug("Handle str for window : {} {}", targetWindowMatcher, handleString);
+
+			if (handleString == null) {
+				throw new ScriptExecuteException("Failed to get windows handle.");
+			}
+
 			int handleInt = Integer.parseInt(handleString);
 			String handleHex = Integer.toHexString(handleInt);
 			

@@ -36,7 +36,6 @@ public class SwitchActiveWindow extends WindowsAction {
 	private static final String WINDOW_NAME_PARAM = "windowname",
 			ACCESSIBILITY_ID_PARAM = "accessibilityid",
 			MAX_TIMEOUT_PARAM = "maxtimeout";
-	private static final String HANDLE_ATTRIBUTE = "NativeWindowHandle";
 
 	private static final Logger loggerInstance = LoggerFactory.getLogger(SwitchActiveWindow.class);
 
