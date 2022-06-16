@@ -133,28 +133,24 @@ public class Click extends WebAction
 	}
 
 	private void moveToElement(ExtendedActions actions, WebElement element, String xOffsetStr, String yOffsetStr) {
-		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr))
-		{
-			int xOffset = 0, yOffset = 0;
-			try
-			{
-				xOffset = Integer.parseInt(xOffsetStr);
-				yOffset = Integer.parseInt(yOffsetStr);
-			}
-			catch (NumberFormatException e)
-			{
-				logError("xoffset or yoffset is not integer value");
-			}
+		int xOffset = 0, yOffset = 0;
+		try {
+			xOffset = Integer.parseInt(xOffsetStr);
+			yOffset = Integer.parseInt(yOffsetStr);
+		} catch (NumberFormatException e) {
+			logError("xoffset or yoffset is not integer value");
+		}
 
+		if (xOffset == 0 && yOffset == 0) {
+			actions.moveToElement(element);
+		} else {
 			WebDriver driver = actions.getAttachedDriver();
-			if (driver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) driver) > 74)
-			{
+			if (driver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) driver) > 74) {
 				xOffset -= element.getSize().getWidth() / 2;
 				yOffset -= element.getSize().getHeight() / 2;
 			}
-			actions.moveToElement(element, xOffset, yOffset);;
-			return;
+
+			actions.moveToElement(element, xOffset, yOffset);
 		}
-		actions.moveToElement(element);
 	}
 }
