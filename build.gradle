@@ -87,8 +87,8 @@ jar {
     }
 }
 
-task releaseZip (type: Zip, dependsOn: [jar, configurations.runtimeClasspath]) {
-    archiveAppendix = new Date().format('yyyyMMdd')
+task releaseTar (type: Tar, dependsOn: [jar, configurations.runtimeClasspath]) {
+    archiveAppendix.set('standalone')
     archiveVersion = release_version
     from jar
     from ("${projectDir}") {
