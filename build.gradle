@@ -4,7 +4,12 @@ plugins {
     id 'maven-publish'
     id "org.jetbrains.kotlin.jvm" version "${kotlin_version}"
     id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
+    id "org.owasp.dependencycheck" version "7.4.4"
     id 'signing'
+}
+
+dependencyCheck {
+    formats=['SARIF']
 }
 
 group = 'com.exactpro.remotehand'
