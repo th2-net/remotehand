@@ -204,3 +204,9 @@ clean {
  wrapper {
      gradleVersion = '6.6'
  }
+
+configurations {
+    compileClasspath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
