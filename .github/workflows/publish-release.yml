@@ -70,3 +70,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.create_release.outputs.id }}
+  owasp-scan:
+    uses: th2-net/.github/.github/workflows/owasp-gradle-scan.yml@main
