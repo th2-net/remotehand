@@ -11,8 +11,8 @@ group = 'com.exactpro.remotehand'
 version = release_version
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
     withJavadocJar()
     withSourcesJar()
 }
@@ -50,26 +50,25 @@ repositories {
 }
 
 dependencies {
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.2'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.6.4'
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-    compile group: 'net.sourceforge.javacsv', name: 'javacsv', version: '2.0'
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.7'
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
-    compile group: 'com.jhlabs', name: 'filters', version: '2.0.235'
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.33.Final'
-    compile(group: 'org.seleniumhq.selenium', name: 'selenium-server', version: '3.141.59') {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.slf4j:slf4j-log4j12:2.0.6'
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'net.sourceforge.javacsv:javacsv:2.0'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation 'com.jhlabs:filters:2.0.235'
+    implementation 'io.netty:netty-all:4.1.87.Final'
+    implementation('org.seleniumhq.selenium:selenium-server:3.141.59') {
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-opera-driver'
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-safari-driver'
     }
-    
-    compile 'io.appium:java-client:7.3.0'
-    compile "org.mvel:mvel2:2.4.7.Final"
-    compile 'net.java.dev.jna:jna:5.7.0'
 
-    testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:${kotlin_version}"
+    implementation 'io.appium:java-client:7.3.0'
+    implementation 'org.mvel:mvel2:2.4.14.Final'
+    implementation 'net.java.dev.jna:jna:5.13.0'
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 }
 
 jar {
@@ -197,5 +196,5 @@ clean {
 }
 
  wrapper {
-     gradleVersion = '6.6'
+     gradleVersion = '7.6'
  }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2023 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HttpDownloadHandler implements HttpHandler
-{
+public class HttpDownloadHandler implements HttpHandler {
 	private static final String FILE_TYPE_PARAM = "type",
 			FILE_ID_PARAM = "id",
 			REQUIRED_PARAM_ABSENT = "Required parameter '%s' isn't specified";
@@ -44,8 +44,7 @@ public class HttpDownloadHandler implements HttpHandler
 	
 	
 	@Override
-	public void handle(HttpExchange httpExchange) throws IOException
-	{
+	public void handle(HttpExchange httpExchange) throws IOException {
 		Map<String, String> requestParams = getRequestParams(httpExchange);
 		SessionExchange exchange = new HttpSessionExchange(httpExchange);
 		
@@ -59,20 +58,17 @@ public class HttpDownloadHandler implements HttpHandler
 		downloadHandler.handleDownload(exchange, fileType, fileId);
 	}
 	
-	private Map<String, String> getRequestParams(HttpExchange httpExchange)
-	{
-		List<NameValuePair> pairs = URLEncodedUtils.parse(httpExchange.getRequestURI(), "UTF8");
+	private Map<String, String> getRequestParams(HttpExchange httpExchange) {
+		List<NameValuePair> pairs = URLEncodedUtils.parse(httpExchange.getRequestURI(), StandardCharsets.UTF_8);
 		Map<String, String> params = new HashMap<>(pairs.size());
-		for (NameValuePair pair : pairs)
-		{
+		for (NameValuePair pair : pairs) {
 			params.put(pair.getName(), pair.getValue());
 		}
 		return params;
 	}
 	
 	private String getRequiredParam(Map<String, String> requestParams, SessionExchange exchange, String paramName)
-		throws IOException
-	{
+		throws IOException {
 		String value = requestParams.get(paramName);
 		if (value == null)
 			exchange.sendResponse(SessionHandler.CODE_BAD, String.format(REQUIRED_PARAM_ABSENT, paramName));
