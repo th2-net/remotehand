@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import com.exactpro.remotehand.windows.WindowsDriverPoolProvider;
 import com.exactpro.remotehand.windows.WindowsRemoteHandManager;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +65,6 @@ public class RemoteHandStarter
 	public static void main(String[] args)
 	{
 		String version = getVersion();
-
-		PropertyConfigurator.configureAndWatch("log4j.properties");
 
 		logger.info("Started RemoteHand "+version);
 

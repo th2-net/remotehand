@@ -42,7 +42,6 @@ public class ScriptProcessorThread implements Runnable
 	private final IRemoteHandManager rhmanager;
 	private final ScriptCompiler scriptCompiler;
 	private final SessionContext sessionContext;
-	private static ActionsLogger actionsLogger = new ActionsLogger();
 	private static final String CTH_ACTION_NAME = "ActionName";
 	private static final String SHUTDOWN_SCRIPT_START = "// SHUTDOWN SCRIPT";
 
@@ -100,10 +99,6 @@ public class ScriptProcessorThread implements Runnable
 	{
 		try
 		{
-			String actionName = extractActionName();
-			if (actionName != null)
-				actionsLogger.init(sessionId, actionName);
-
 			List<Action> actions = scriptCompiler.build(script, null, sessionContext);
 			return launcher.runActions(actions, sessionContext);
 		}
