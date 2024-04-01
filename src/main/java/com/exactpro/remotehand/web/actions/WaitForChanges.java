@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.exactpro.remotehand.web.actions;
 
-import com.exactpro.remotehand.ScriptCompileException;
 import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.screenwriter.DefaultScreenWriter;
 import com.exactpro.remotehand.screenwriter.ScreenWriter;
@@ -24,8 +23,6 @@ import com.exactpro.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,52 +31,34 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class WaitForChanges extends WebAction {
-	private static final Logger logger = LoggerFactory.getLogger(WaitForChanges.class);
-	private static final String PARAM_SECONDS = "seconds",
-			PARAM_SCREENSHOTID = "screenshotid",
-			PARAM_CHECKMILLIS = "checkmillis";
+	private static final String PARAM_SECONDS = "seconds";
+	private static final String PARAM_SCREENSHOT_ID = "screenshotid";
+	private static final String PARAM_CHECK_MILLIS = "checkmillis";
 	private static final ScreenWriter<?> screenWriter = new DefaultScreenWriter();
 
+	public WaitForChanges() {
+		super(true, false, PARAM_SECONDS, PARAM_SCREENSHOT_ID, PARAM_CHECK_MILLIS);
+	}
 
 	@Override
-	public boolean isNeedLocator()
-	{
-		return true;
-	}
-	
-	@Override
-	public boolean isCanWait()
-	{
-		return false;
-	}
-	
-	@Override
-	public String[] getMandatoryParams() throws ScriptCompileException
-	{
-		return new String[] {PARAM_SECONDS, PARAM_SCREENSHOTID, PARAM_CHECKMILLIS};
-	}
-	
-	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
-		int seconds = getIntegerParam(params, PARAM_SECONDS),
-				checkMillis = getIntegerParam(params, PARAM_CHECKMILLIS);
-		String id = params.get(PARAM_SCREENSHOTID);
-		
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
+		int seconds = getIntegerParam(params, PARAM_SECONDS);
+		int checkMillis = getIntegerParam(params, PARAM_CHECK_MILLIS);
+		String id = params.get(PARAM_SCREENSHOT_ID);
+
 		Path screenPath = (Path)context.getContextData().get(StoreElementState.buildScreenshotId(id));
 		if (screenPath == null)
-			throw new ScriptExecuteException("No screenshot stored for ID='"+id+"'");
+			throw new ScriptExecuteException("No screenshot stored for ID='" + id + "'");
 
 		byte[] initialState;
 		try {
 			initialState = Files.readAllBytes(screenPath);
 		} catch (Exception e) {
-			throw new ScriptExecuteException("Error retrieving saved screenshot for ID='"+id+"'");
+			throw new ScriptExecuteException("Error retrieving saved screenshot for ID='" + id + "'");
 		}
-		
+
 		long endTime = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(seconds);
-		do
-		{
+		do {
 			WebElement element = findElement(webDriver, webLocator);
 			byte[] currentState = screenWriter.takeElementScreenshot(webDriver, element);
 			if (!compareStates(initialState, currentState))
@@ -88,29 +67,17 @@ public class WaitForChanges extends WebAction {
 			if (System.currentTimeMillis() >= endTime)
 				break;
 			
-			try
-			{
+			try {
 				Thread.sleep(checkMillis);
-			}
-			catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				// do nothing like in WaitForNew
 			}
-		}
-		while (true);
+		} while (true);
 
-		throw new ScriptExecuteException("No changes caught in element during "+seconds+" seconds");
+		throw new ScriptExecuteException("No changes caught in element during " + seconds + " seconds");
 	}
-	
-	@Override
-	protected Logger getLogger()
-	{
-		return logger;
-	}
-	
-	
-	private boolean compareStates(byte[] state1, byte[] state2)
-	{
+
+	private boolean compareStates(byte[] state1, byte[] state2) {
 		return Arrays.equals(state1, state2);
 	}
 }

@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -65,8 +64,7 @@ public class RemoteHandStarter
 	public static void main(String[] args)
 	{
 		String version = getVersion();
-
-		logger.info("Started RemoteHand "+version);
+		logger.info("Started RemoteHand " + version);
 
 		Map<String, Option> optionMap = createOptionMap();
 		Options options = createOptions(optionMap);
@@ -408,14 +406,17 @@ public class RemoteHandStarter
 		return options;
 	}
 
-	private static void processAllScriptsFromDirectory(String input, String output, String inputParams,
-			ActionsLauncher launcher, ScriptCompiler compiler, SessionContext sessionContext)
-	{
-		File[] fileList;
-		File inputFile = new File(input), 
-				outputFile = new File(output);
-		if (!inputFile.exists())
-		{
+	private static void processAllScriptsFromDirectory(
+			String input,
+			String output,
+			String inputParams,
+			ActionsLauncher launcher,
+			ScriptCompiler compiler,
+			SessionContext sessionContext
+	) {
+		File inputFile = new File(input);
+		File outputFile = new File(output);
+		if (!inputFile.exists()) {
 			logger.error("Input file or directory '" + input + "' does not exist");
 			closeApp();
 		}
@@ -424,32 +425,18 @@ public class RemoteHandStarter
 		if (inputParams != null)
 			inputParamsFile = new File(inputParams);
 
-		if (inputFile.isDirectory())
-		{
-			fileList = inputFile.listFiles(new FileFilter()
-			{
-				@Override
-				public boolean accept(File file)
-				{
-					return file.isFile() && file.getName().endsWith(".csv");
-				}
-			});
-		}
-		else
-			fileList = new File[] { inputFile };
+		File[] fileList = inputFile.isDirectory() ?
+				inputFile.listFiles(file -> file.isFile() && file.getName().endsWith(".csv")) :
+				new File[] { inputFile };
 
-		for (File scriptFile : fileList)
-		{
-			try
-			{
+		for (File scriptFile : fileList) {
+			try {
 				final List<Action> actions = compiler.build(scriptFile, inputParamsFile, sessionContext);
 				RhScriptResult result = launcher.runActions(actions, sessionContext);
 
 				TextFileWriter.getInstance().setContent(resultToText(result));
 				TextFileWriter.getInstance().writeFile(outputFile);
-			}
-			catch (Exception ex)
-			{
+			} catch (Exception ex) {
 				logger.error("An error occurred", ex);
 				cleanUpAfterFail(launcher, compiler, sessionContext);
 			}

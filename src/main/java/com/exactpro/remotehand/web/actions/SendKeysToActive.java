@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,8 @@
 
 package com.exactpro.remotehand.web.actions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class SendKeysToActive extends SendKeys
-{
-	private static final Logger logger = LoggerFactory.getLogger(SendKeysToActive.class);
-	
-	@Override
-	public boolean isNeedLocator()
-	{
-		return false;
-	}
-
-	@Override
-	public boolean isCanWait()
-	{
-		return false;
-	}
-
-	@Override
-	protected Logger getLogger()
-	{
-		return logger;
+public class SendKeysToActive extends SendKeys {
+	public SendKeysToActive() {
+		super(false, false);
 	}
 }

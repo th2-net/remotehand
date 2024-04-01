@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,50 +21,24 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class GetScreenshot extends WebAction
-{
-	private static final Logger log = LoggerFactory.getLogger(GetScreenshot.class);
-	
+public class GetScreenshot extends WebAction {
 	public static final String NAME_PARAM = "name";
-	
+
+	public GetScreenshot() {
+		super(false, false);
+		outputType = ActionOutputType.SCREENSHOT;
+	}
+
 	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		return takeAndSaveScreenshot(params.get(NAME_PARAM));
 	}
-	
+
 	@Override
-	public ActionOutputType getOutputType()
-	{
-		return ActionOutputType.SCREENSHOT;
-	}
-	
-	@Override
-	public boolean isNeedLocator()
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean isCanWait()
-	{
-		return false;
-	}
-	
-	@Override
-	protected Logger getLogger()
-	{
-		return log;
-	}
-	
-	@Override
-	protected ScriptExecuteException addScreenshot(ScriptExecuteException see)
-	{
+	protected ScriptExecuteException addScreenshot(ScriptExecuteException see) {
 		return see;
 	}
 }

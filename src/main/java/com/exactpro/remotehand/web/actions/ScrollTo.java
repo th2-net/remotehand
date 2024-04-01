@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,43 +22,22 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Locatable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class ScrollTo extends WebAction
-{
-	private static final Logger logger = LoggerFactory.getLogger(ScrollTo.class);
-	
-	@Override
-	public boolean isNeedLocator()
-	{
-		return true;
-	}
-	
-	@Override
-	public boolean isCanWait()
-	{
-		return true;
+public class ScrollTo extends WebAction {
+	public ScrollTo() {
+		super(true, true);
 	}
 
 	@Override
-	protected Logger getLogger()
-	{
-		return logger;
-	}
-
-	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement element = webDriver.findElement(webLocator);
 		if (!(element instanceof Locatable))
 			throw new ScriptExecuteException(String.format("Can't scroll to the following web element: '%s'", element));
-		
+
 		((Locatable)element).getCoordinates().inViewPort();
-		logInfo("Located on element: '%s'", webLocator);
+		logger.info("Located on element: '{}'", webLocator);
 		return null;
 	}
-
 }

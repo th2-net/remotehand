@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,11 @@ package com.exactpro.remotehand.web.actions;
 
 import org.openqa.selenium.WebElement;
 
-public class GetElementInnerHtml extends GetElement
-{
-	public static final String INNER_HTML = "innerHTML";
-	
+public class GetElementInnerHtml extends GetElement {
+	private static final String INNER_HTML = "innerHTML";
+
 	@Override
-	protected String getElementHtml(WebElement element)
-	{
+	protected String getElementHtml(WebElement element) {
 		return element.getAttribute(INNER_HTML);
 	}
 }

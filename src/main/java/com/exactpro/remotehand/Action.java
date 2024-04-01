@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.exactpro.remotehand.screenwriter.ScreenWriter;
  */
 public abstract class Action {
 	protected ScreenWriter<?> screenWriter = Configuration.getInstance().getDefaultScreenWriter();
+	protected ActionOutputType outputType = ActionOutputType.TEXT;
 
 	public abstract ActionResult execute() throws ScriptExecuteException;
 
@@ -34,7 +35,7 @@ public abstract class Action {
 	}
 
 	public ActionOutputType getOutputType() {
-		return ActionOutputType.TEXT;
+		return outputType;
 	}
 
 	protected ActionResult buildResult(String data) {
