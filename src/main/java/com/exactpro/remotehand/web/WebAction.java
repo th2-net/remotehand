@@ -45,9 +45,8 @@ public abstract class WebAction extends Action {
 	protected final boolean locatorNeeded;
 	protected final boolean canWait;
 	protected final String[] mandatoryParams;
-	protected boolean canSwitchPage = false;
 	protected WebSessionContext context;
-	protected Logger logger;
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private WebLocator webLocator = null;
 	private Map<String, String> params = null;
 
@@ -92,7 +91,7 @@ public abstract class WebAction extends Action {
 	public abstract String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException;
 
 	public boolean isCanSwitchPage() {
-		return canSwitchPage;
+		return false;
 	}
 
 	public boolean isElementMandatory() {
@@ -113,9 +112,7 @@ public abstract class WebAction extends Action {
 			new WebDriverWait(webDriver, seconds).until((ExpectedCondition<Boolean>) webDriver1 ->
 					webDriver1 != null && !webDriver1.findElements(webLocator).isEmpty()
 			);
-			if (logger.isInfoEnabled()) {
-				logger.info("Appeared locator: '{}'", webLocator);
-			}
+			logger.info("Appeared locator: '{}'", webLocator);
 		} catch (TimeoutException ex) {
 			if (isElementMandatory)
 				throw new ScriptExecuteException(String.format("Timed out after %s seconds waiting for '%s'",
@@ -128,29 +125,27 @@ public abstract class WebAction extends Action {
 	@Override
 	public void beforeExecute() {
 		if (context == null || context.getContextData() == null || context.getContextData().isEmpty()) {
-			if (logger.isWarnEnabled()) {
-				if (context == null)
-					logger.warn("Context is null");
-				else if (context.getContextData() == null)
-					logger.warn("ContextData is null");
+			if (context == null) {
+				logger.warn("Context is null");
+			} else if (context.getContextData() == null) {
+				logger.warn("ContextData is null");
 			}
-			return;
-		}
+		} else {
+			for (Map.Entry<String, String> param : params.entrySet()) {
+				int start;
+				String value = param.getValue();
+				if ((start = value.indexOf("@{")) < 0)
+					continue;
 
-		for (Map.Entry<String, String> param : params.entrySet()) {
-			int start;
-			String value = param.getValue();
-			if((start = value.indexOf("@{")) < 0)
-				continue;
+				int end = value.lastIndexOf('}');
+				String name = value.substring(start + 2, end);
+				String contextValue = (String) context.getContextData().get(name);
 
-			int end = value.lastIndexOf('}');
-			String name = value.substring(start + 2, end);
-			String contextValue = (String) context.getContextData().get(name);
+				if (StringUtils.isNotEmpty(contextValue))
+					value = value.substring(0, start) + contextValue + value.substring(end + 1);
 
-			if(StringUtils.isNotEmpty(contextValue))
-				value = value.substring(0, start) + contextValue + value.substring(end + 1);
-
-			param.setValue(value);
+				param.setValue(value);
+			}
 		}
 	}
 

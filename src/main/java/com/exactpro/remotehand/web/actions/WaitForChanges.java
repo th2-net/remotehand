@@ -34,10 +34,11 @@ public class WaitForChanges extends WebAction {
 	private static final String PARAM_SECONDS = "seconds";
 	private static final String PARAM_SCREENSHOT_ID = "screenshotid";
 	private static final String PARAM_CHECK_MILLIS = "checkmillis";
+	private static final String[] MANDATORY_PARAMS = { PARAM_SECONDS, PARAM_SCREENSHOT_ID, PARAM_CHECK_MILLIS };
 	private static final ScreenWriter<?> screenWriter = new DefaultScreenWriter();
 
 	public WaitForChanges() {
-		super(true, false, PARAM_SECONDS, PARAM_SCREENSHOT_ID, PARAM_CHECK_MILLIS);
+		super(true, false, MANDATORY_PARAMS);
 	}
 
 	@Override

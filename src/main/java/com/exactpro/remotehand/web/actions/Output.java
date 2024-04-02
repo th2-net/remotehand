@@ -25,9 +25,10 @@ import java.util.Map;
 
 public class Output extends WebAction {
 	private static final String PARAM_TEXT = "text";
+	private static final String[] MANDATORY_PARAMS = { PARAM_TEXT };
 	
 	public Output() {
-		super(false, false, PARAM_TEXT);
+		super(false, false, MANDATORY_PARAMS);
 	}
 
 	@Override

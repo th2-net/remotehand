@@ -24,7 +24,6 @@ import com.exactpro.remotehand.screenwriter.ScreenWriter;
  */
 public abstract class Action {
 	protected ScreenWriter<?> screenWriter = Configuration.getInstance().getDefaultScreenWriter();
-	protected ActionOutputType outputType = ActionOutputType.TEXT;
 
 	public abstract ActionResult execute() throws ScriptExecuteException;
 
@@ -35,7 +34,7 @@ public abstract class Action {
 	}
 
 	public ActionOutputType getOutputType() {
-		return outputType;
+		return ActionOutputType.TEXT;
 	}
 
 	protected ActionResult buildResult(String data) {

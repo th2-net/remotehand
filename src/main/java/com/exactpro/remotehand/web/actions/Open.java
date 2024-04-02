@@ -24,10 +24,15 @@ import java.util.Map;
 
 public class Open extends WebAction {
 	private static final String PARAM_URL = "url";
+	private static final String[] MANDATORY_PARAMS = { PARAM_URL };
 
 	public Open() {
-		super(false, false, PARAM_URL);
-		super.canSwitchPage = true;
+		super(false, false, MANDATORY_PARAMS);
+	}
+
+	@Override
+	public boolean isCanSwitchPage() {
+		return true;
 	}
 
 	@Override

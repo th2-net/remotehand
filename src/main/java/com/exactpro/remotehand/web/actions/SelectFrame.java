@@ -39,7 +39,9 @@ public class SelectFrame extends WebAction {
 			webDriver.switchTo().defaultContent();
 		} else {
 			WebElement element = webDriver.findElement(webLocator);
-			logger.info("Selecting frame: " + element.getAttribute("name"));
+			if (logger.isInfoEnabled()) {
+				logger.info("Selecting frame: {}", element.getAttribute("name"));
+			}
 			webDriver.switchTo().frame(element);
 		}
 

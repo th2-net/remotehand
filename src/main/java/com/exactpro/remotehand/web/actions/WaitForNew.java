@@ -31,9 +31,9 @@ import java.util.Map;
 public class WaitForNew extends WebAction {
 	private static final String PARAM_SECONDS = "seconds";
 	private static final String PARAM_CHECK_MILLIS = "checkmillis";
-
+	private static final String[] MANDATORY_PARAMS = { PARAM_SECONDS, PARAM_CHECK_MILLIS };
 	public WaitForNew() {
-		super(true, false, PARAM_SECONDS, PARAM_CHECK_MILLIS);
+		super(true, false, MANDATORY_PARAMS);
 	}
 
 	@Override

@@ -58,7 +58,9 @@ public class GetDynamicTable extends WebAction {
 					lastRow = rows.get(rows.size() - 1);
 					((Locatable)lastRow).getCoordinates().inViewPort();
 
-					logger.info("Obtained part of the table until the following row: {}", printTD(lastRow));
+					if (logger.isInfoEnabled()) {
+						logger.info("Obtained part of the table until the following row: {}", printTD(lastRow));
+					}
 				}
 
 				previousRows = rows;

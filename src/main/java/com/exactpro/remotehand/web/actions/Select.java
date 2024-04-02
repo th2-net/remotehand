@@ -26,11 +26,12 @@ import java.util.Map;
 
 public class Select extends WebAction {
 	private static final String TEXT = "text";
+	private static final String[] MANDATORY_PARAMS = { TEXT };
 	private static final String DEFAULT_TEXT = "default";
 	private static final String NO_OPTION_FAIL_PARAM = "nooptionfail";
 
 	public Select() {
-		super(true, true, TEXT);
+		super(true, true, MANDATORY_PARAMS);
 	}
 
 	@Override
@@ -44,9 +45,9 @@ public class Select extends WebAction {
 
 		if (doesOptionExist(dropdown, option) || noOptionFail()) {
 			dropdown.selectByVisibleText(option);
-			logger.info("Option " + option + " is selected in element with locator " + webLocator);
+			logger.info("Option {} is selected in element with locator {}", option, webLocator);
 		} else {
-			logger.info("Option " + option + " doesn't exist. It hasn't been selected");
+			logger.info("Option {} doesn't exist. It hasn't been selected", option);
 		}
 
 		return null;

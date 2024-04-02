@@ -63,19 +63,23 @@ public class Click extends WebAction {
 		try {
 			//Building sequence of actions to perform
 			Set<CharSequence> mods = actions.applyClickModifiers(params.get(MODIFIERS));
-			if (button.equals(LEFT)) {
-				actions.click();
-			} else if (button.equals(RIGHT)) {
-				actions.contextClick();
-			} else if (button.equals(MIDDLE)) {
-				logger.error("Middle click is not implemented.");
-				return null;
-			} else if (button.equals(DOUBLE)) {
-				actions.doubleClick();
-			} else {
-				logger.error("Button may be only left, right, middle or double (for double click with left button).");
-				return null;
-			}
+            switch (button) {
+                case LEFT:
+                    actions.click();
+                    break;
+                case RIGHT:
+                    actions.contextClick();
+                    break;
+                case MIDDLE:
+                    logger.error("Middle click is not implemented.");
+                    return null;
+                case DOUBLE:
+                    actions.doubleClick();
+                    break;
+                default:
+                    logger.error("Button may be only left, right, middle or double (for double click with left button).");
+                    return null;
+            }
 			actions.resetClickModifiers(mods);
 
 			//Performing built sequence of actions

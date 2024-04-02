@@ -28,9 +28,9 @@ import java.util.Map;
 
 public class Wait extends WebAction {
 	private static final String PARAM_SECONDS = "seconds";
-
+	private static final String[] MANDATORY_PARAMS = { PARAM_SECONDS };
 	public Wait() {
-		super(false, false, PARAM_SECONDS);
+		super(false, false, MANDATORY_PARAMS);
 	}
 
 	@Override

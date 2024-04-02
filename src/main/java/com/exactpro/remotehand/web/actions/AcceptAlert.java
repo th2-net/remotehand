@@ -27,8 +27,9 @@ import java.util.Map;
 import static com.exactpro.remotehand.web.WebUtils.waitForAlert;
 
 public class AcceptAlert extends WebAction {
+	private static final String[] MANDATORY_PARAMS = { PARAM_WAIT };
 	public AcceptAlert() {
-		super(false, false, PARAM_WAIT);
+		super(false, false, MANDATORY_PARAMS);
 	}
 
 	@Override

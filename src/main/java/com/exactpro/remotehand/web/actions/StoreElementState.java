@@ -30,11 +30,12 @@ import java.util.Map;
 
 public class StoreElementState extends WebAction {
 	private static final String PARAM_ID = "id";
+	private static final String[] MANDATORY_PARAMS = { PARAM_ID };
 	private static final String SCREENSHOT_NAME = "takeScreenshotAction";
 	private static final ScreenWriter<?> SCREEN_WRITER = new DefaultScreenWriter();
 
 	public StoreElementState() {
-		super(true, true, PARAM_ID);
+		super(true, true, MANDATORY_PARAMS);
 	}
 
 	@Override

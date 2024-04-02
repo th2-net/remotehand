@@ -26,10 +26,11 @@ import java.util.Map;
 public class GetDuration extends WebAction {
 	private static final String PARAM_START_ID = "startid";
 	private static final String PARAM_NAME = "name";
+	private static final String[] MANDATORY_PARAMS = { PARAM_START_ID, PARAM_NAME };
 	private static final String CONTEXT_LAST_GET_DURATION = "LastGetDuration";
 
 	public GetDuration() {
-		super(false, false, PARAM_NAME, PARAM_START_ID);
+		super(false, false, MANDATORY_PARAMS);
 	}
 
 	@Override

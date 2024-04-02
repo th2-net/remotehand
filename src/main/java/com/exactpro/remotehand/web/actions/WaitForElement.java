@@ -25,9 +25,10 @@ import java.util.Map;
 
 public class WaitForElement extends WebAction {
 	private static final String PARAM_SECONDS = "seconds";
+	private static final String[] MANDATORY_PARAMS = { PARAM_SECONDS };
 
 	public WaitForElement() {
-		super(true, false, PARAM_SECONDS);
+		super(true, false, MANDATORY_PARAMS);
 	}
 
 	@Override

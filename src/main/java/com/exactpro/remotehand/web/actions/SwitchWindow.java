@@ -34,9 +34,9 @@ import java.util.Set;
  */
 public class SwitchWindow extends WebAction {
 	private final static String WINDOW = "window";
-
+	private static final String[] MANDATORY_PARAMS = { WINDOW };
 	public SwitchWindow() {
-		super(false, true, WINDOW);
+		super(false, true, MANDATORY_PARAMS);
 	}
 
 	@Override
@@ -53,9 +53,11 @@ public class SwitchWindow extends WebAction {
                 }
             });
 		} catch (TimeoutException ex) {
-			throw new ScriptExecuteException("Timed out after " + seconds +
-					". Actual number of open windows is: " + webDriver.getWindowHandles().size() +
-					". Expected: " + expectedNumber);
+			throw new ScriptExecuteException(
+				"Timed out after " + seconds +
+				". Actual number of open windows is: " + webDriver.getWindowHandles().size() +
+				". Expected: " + expectedNumber
+			);
 		}
 
 		if (!findWindow)

@@ -29,7 +29,11 @@ public class GetScreenshot extends WebAction {
 
 	public GetScreenshot() {
 		super(false, false);
-		outputType = ActionOutputType.SCREENSHOT;
+	}
+
+	@Override
+	public ActionOutputType getOutputType() {
+		return ActionOutputType.SCREENSHOT;
 	}
 
 	@Override

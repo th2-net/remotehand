@@ -38,6 +38,7 @@ public class SendKeys extends WebAction {
 	private static final Pattern HOLD_KEYS_PATTERN = Pattern.compile("\\(#(shift|ctrl|alt)#\\)");
 
 	private static final String PARAM_TEXT = "text";
+	private static final String[] MANDATORY_PARAMS = { PARAM_TEXT };
 	private static final String PARAM_TEXT2 = String.format("%s2", PARAM_TEXT);
 	private static final String PARAM_WAIT2 = String.format("%s2", PARAM_WAIT);
 	private static final String PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR);
@@ -53,8 +54,12 @@ public class SendKeys extends WebAction {
 	private final SendKeysHandler handler = new SendKeysHandler();
 
 	public SendKeys() {
-		super(true, true, PARAM_TEXT);
-		super.canSwitchPage = true;
+		super(true, true, MANDATORY_PARAMS);
+	}
+
+	@Override
+	public boolean isCanSwitchPage() {
+		return true;
 	}
 
 	public SendKeys(boolean locatorNeeded, boolean canWait, String... mandatoryParams) {

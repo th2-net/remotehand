@@ -71,7 +71,8 @@ public class KeyAction extends WebAction {
 		}
 	}
 
-	protected void performKeyAction(WebDriver webDriver, CharSequence key, ActionType actionType) {
+	protected void performKeyAction(WebDriver webDriver, CharSequence key, ActionType actionType)
+			throws ScriptExecuteException {
 		Actions actions = new Actions(webDriver);
 		switch (actionType) {
 			case press:
@@ -83,6 +84,8 @@ public class KeyAction extends WebAction {
 			case up:
 				actions.keyUp(key).perform();
 				break;
+			default:
+				throw new ScriptExecuteException("Unknown action type: " + actionType);
 		}
 	}
 

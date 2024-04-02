@@ -26,10 +26,10 @@ import java.util.Map;
 
 import static com.exactpro.remotehand.web.WebUtils.waitForAlert;
 
-public class DismissAlert extends WebAction
-{
+public class DismissAlert extends WebAction {
+	private static final String[] MANDATORY_PARAMS = { PARAM_WAIT };
 	public DismissAlert() {
-		super(false, false, PARAM_WAIT);
+		super(false, false, MANDATORY_PARAMS);
 	}
 
 	@Override
