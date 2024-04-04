@@ -77,7 +77,7 @@ public class Click extends WebAction {
                     actions.doubleClick();
                     break;
                 default:
-                    logger.error("Button may be only left, right, middle or double (for double click with left button).");
+                    logger.error("Wrong button value ({}). Button may be only left, right, middle or double (for double click with left button).", button);
                     return null;
             }
 			actions.resetClickModifiers(mods);
