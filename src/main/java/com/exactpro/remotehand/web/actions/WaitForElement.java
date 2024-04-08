@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,42 +20,19 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class WaitForElement extends WebAction
-{
-	private static final Logger logger = LoggerFactory.getLogger(WaitForElement.class);
+public class WaitForElement extends WebAction {
 	private static final String PARAM_SECONDS = "seconds";
+	private static final String[] MANDATORY_PARAMS = { PARAM_SECONDS };
 
-	public WaitForElement()
-	{
-		super.mandatoryParams = new String[]{PARAM_SECONDS};
-	}
-	
-	@Override
-	public boolean isNeedLocator()
-	{
-		return true;
-	}
-	
-	@Override
-	public boolean isCanWait()
-	{
-		return false;
+	public WaitForElement() {
+		super(true, false, MANDATORY_PARAMS);
 	}
 
 	@Override
-	protected Logger getLogger()
-	{
-		return logger;
-	}
-	
-	@Override
-	public String run(WebDriver webDriver, final By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, final By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		int seconds = getIntegerParam(params, PARAM_SECONDS);
 		waitForElement(webDriver, seconds, webLocator);
 		return null;

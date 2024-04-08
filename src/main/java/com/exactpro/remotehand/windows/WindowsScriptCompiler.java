@@ -62,8 +62,8 @@ public class WindowsScriptCompiler extends ScriptCompiler {
 		WindowsSessionContext webSessionContext = (WindowsSessionContext) context;
 		String sessionId = webSessionContext.getSessionId();
 		RhUtils.logInfo(logger, sessionId, "Compiling script...");
-		
-		script = script.replace(WebScriptCompiler.SCRIPT_LINE_SEPARATOR, System.getProperty(LINE_SEPARATOR));
+
+		script = script.replace(WebScriptCompiler.SCRIPT_LINE_SEPARATOR, LINE_SEPARATOR);
 
 		CsvReader reader = new CsvReader(new ByteArrayInputStream(script.getBytes()), Charset.defaultCharset());
 		reader.setDelimiter(WebScriptCompiler.DELIMITER);

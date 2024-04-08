@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,27 +22,22 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.Map;
 
-public class GetElementAttribute extends GetElement
-{
+public class GetElementAttribute extends GetElement {
 	private static final String PARAM_ATTRIBUTE = "attribute";
 	private static final String DEFAULT_PARAM = "default";
 
 	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		String attributeName = params.get(PARAM_ATTRIBUTE);
 		if (attributeName == null || attributeName.isEmpty())
 			throw new ScriptExecuteException("Param '" + PARAM_ATTRIBUTE + "' cannot be empty");
 		
 		String attribute = findElement(webDriver, webLocator).getAttribute(attributeName);
-
-		if (attribute == null || attribute.isEmpty())
-		{
-			String defaultAttribute = params.get(DEFAULT_PARAM);
-			attribute = defaultAttribute != null ? defaultAttribute : "";
+		if (attribute == null || attribute.isEmpty()) {
+			attribute = params.getOrDefault(DEFAULT_PARAM, "");
 		}
 
-		logInfo("Attribute '%s' value: %s.", attributeName, attribute);
+		logger.info("Attribute '{}' value: {}.", attributeName, attribute);
 		return attribute;
 	}
 }

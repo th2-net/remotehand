@@ -25,7 +25,7 @@ public class WebScriptChecker
 {
 	public void checkParams(WebAction action, WebLocator webLocator, Map<String, String> params) throws ScriptCompileException
 	{
-		if (action.isNeedLocator() && webLocator == null)
+		if (action.isLocatorNeeded() && webLocator == null)
 			throw new ScriptCompileException("Mandatory parameter '" + WebScriptCompiler.WEB_LOCATOR + "' for action '" + action.getClass().getSimpleName() + "' is not set.");
 
 		final String[] mandatoryParams = action.getMandatoryParams();

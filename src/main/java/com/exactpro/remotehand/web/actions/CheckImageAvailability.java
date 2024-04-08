@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,47 +22,22 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class CheckImageAvailability extends WebAction
-{
-	private static final Logger logger = LoggerFactory.getLogger(CheckImageAvailability.class);
-
-	@Override
-	public boolean isNeedLocator()
-	{
-		return true;
+public class CheckImageAvailability extends WebAction {
+	public CheckImageAvailability() {
+		super(true, true);
 	}
 
 	@Override
-	public boolean isCanWait()
-	{
-		return true;
-	}
-
-	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement image = findElement(webDriver, webLocator);
 		Object result = ((JavascriptExecutor) webDriver).executeScript(
 				"return arguments[0].complete && " +
 						"typeof arguments[0].naturalWidth != \"undefined\" && " +
 						"arguments[0].naturalWidth > 0", image);
 
-		boolean loaded = false;
-		if (result instanceof Boolean)
-		{
-			loaded = (Boolean) result;
-		}
-		return String.valueOf(loaded);
-	}
-
-	@Override
-	protected Logger getLogger()
-	{
-		return logger;
+		return String.valueOf(result instanceof Boolean ? (Boolean) result : false);
 	}
 }

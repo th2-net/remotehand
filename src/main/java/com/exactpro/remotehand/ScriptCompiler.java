@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,49 +19,31 @@ package com.exactpro.remotehand;
 import com.csvreader.CsvReader;
 import com.exactpro.remotehand.sessions.SessionContext;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.nio.file.Files;
 
-/**
- * Created by alexey.karpukhin on 2/1/16.
- */
 public abstract class ScriptCompiler {
-
-	public final String LINE_SEPARATOR = "line.separator";
+	protected final String LINE_SEPARATOR = System.lineSeparator();
 
 	public abstract List<Action> build(String scriptFile, Map<String, String> inputParams, SessionContext context) throws ScriptCompileException;
 
-	public List<Action> build(File scriptFile, File inputParams, SessionContext context) throws IOException, ScriptCompileException
-	{
-		BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
-		StringBuffer sb = new StringBuffer();
-		String separator = System.getProperty(LINE_SEPARATOR);
-		try
-		{
-			String line;
-			while ((line = reader.readLine()) != null)
-			{
-				sb.append(line).append(separator);
-			}
-		}
-		finally
-		{
-			if (reader != null)
-				reader.close();
+	public List<Action> build(File scriptFile, File inputParams, SessionContext context) throws IOException, ScriptCompileException {
+		String script;
+		try (Stream<String> linesStream = Files.lines(scriptFile.toPath())) {
+			script = linesStream.collect(Collectors.joining(LINE_SEPARATOR));
 		}
 
-		String script = sb.toString();
+		Map<String, String> params = inputParams != null && inputParams.exists()
+				? readParamsFromFile(inputParams)
+				: null;
 
-		if (inputParams == null)
-			return build(script, null, context);
-		if (!inputParams.exists())
-			return build(script, null, context);
-		Map<String, String> params = readParamsFromFile(inputParams);
 		return build(script, params, context);
 	}
 
@@ -82,5 +64,4 @@ public abstract class ScriptCompiler {
 				csvReader.close();
 		}
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,141 +28,118 @@ import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SendKeys extends WebAction
-{
-	private static final Logger logger = LoggerFactory.getLogger(SendKeys.class);
-
+public class SendKeys extends WebAction {
 	private static final Pattern HOLD_KEYS_PATTERN = Pattern.compile("\\(#(shift|ctrl|alt)#\\)");
-	
-	private static final String PARAM_TEXT = "text",
-			PARAM_TEXT2 = String.format("%s2", PARAM_TEXT),
-			PARAM_WAIT2 = String.format("%s2", PARAM_WAIT),
-			PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR),
-			PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER),
-			PARAM_CHECKINPUT = "checkinput",
-			PARAM_NEEDCLICK = "needclick",
-			CLEAR_BEFORE = "clear",
-			CAN_BE_DISABLED = "canbedisabled";
+
+	private static final String PARAM_TEXT = "text";
+	private static final String[] MANDATORY_PARAMS = { PARAM_TEXT };
+	private static final String PARAM_TEXT2 = String.format("%s2", PARAM_TEXT);
+	private static final String PARAM_WAIT2 = String.format("%s2", PARAM_WAIT);
+	private static final String PARAM_LOCATOR2 = String.format("%s2", WebScriptCompiler.WEB_LOCATOR);
+	private static final String PARAM_MATCHER2 = String.format("%s2", WebScriptCompiler.WEB_MATCHER);
+	private static final String PARAM_CHECK_INPUT = "checkinput";
+	private static final String PARAM_NEED_CLICK = "needclick";
+	private static final String CLEAR_BEFORE = "clear";
+	private static final String CAN_BE_DISABLED = "canbedisabled";
 
 	private static final int MAX_RETRIES = Configuration.getInstance().getSendKeysMaxRetries();
-	
+
 	private boolean holdShift, holdCtrl, holdAlt;
 	private final SendKeysHandler handler = new SendKeysHandler();
 
-	public SendKeys()
-	{
-		super.mandatoryParams = new String[]{PARAM_TEXT};
+	public SendKeys() {
+		super(true, true, MANDATORY_PARAMS);
 	}
-	
+
 	@Override
-	public boolean isNeedLocator()
-	{
+	public boolean isCanSwitchPage() {
 		return true;
 	}
-	
-	@Override
-	public boolean isCanWait()
-	{
-		return true;
+
+	public SendKeys(boolean locatorNeeded, boolean canWait, String... mandatoryParams) {
+		super(locatorNeeded, canWait, mandatoryParams);
 	}
-	
+
 	@Override
-	public boolean isCanSwitchPage()
-	{
-		return true;
-	}
-	
-	@Override
-	protected Logger getLogger()
-	{
-		return logger;
-	}
-	
-	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement input = webLocator != null ? findElement(webDriver, webLocator) : webDriver.switchTo().activeElement();
 		if (webLocator == null)
-			logInfo("Active element: %s" , input != null ? input.getTagName() : "null");
+			logger.info("Active element: {}" , input != null ? input.getTagName() : "null");
 		if (input == null)
 			throw new ScriptExecuteException("Unable to send keys: input element is null");
 
 		boolean shouldBeEnabled = needEnable(input, params);
-		try
-		{
+		try {
 			if (shouldBeEnabled)
 				enable(webDriver, input);
 
-			if (RhUtils.getBooleanOrDefault(params, CLEAR_BEFORE, false))
-			{
+			if (RhUtils.getBooleanOrDefault(params, CLEAR_BEFORE, false)) {
 				input.clear();
-				logInfo("Text field has been cleared.");
+				logger.info("Text field has been cleared.");
 			}
 
-			boolean checkInput = RhUtils.getBooleanOrDefault(params, PARAM_CHECKINPUT, true);
-			boolean needClick = RhUtils.getBooleanOrDefault(params, PARAM_NEEDCLICK, true);
+			boolean checkInput = RhUtils.getBooleanOrDefault(params, PARAM_CHECK_INPUT, true);
+			boolean needClick = RhUtils.getBooleanOrDefault(params, PARAM_NEED_CLICK, true);
 			String text = replaceConversions(checkHoldKeys(params.get(PARAM_TEXT)));
-			logInfo("Sending text1 (%s) to locator: %s", text, webLocator);
+			logger.info("Sending text1 ({}) to locator: {}", text, webLocator);
 			sendText(input, text, webDriver, webLocator, 0, checkInput, needClick);
-			logInfo("Text '%s' was sent to locator: %s.", text, webLocator);
+			logger.info("Text '{}' was sent to locator: {}.", text, webLocator);
 
 			String text2 = replaceConversions(params.get(PARAM_TEXT2));
-			if (StringUtils.isNotEmpty(text2) && needRun(webDriver, params))
-			{
-				logInfo("Sending text2 to: %s", webLocator);
+			if (StringUtils.isNotEmpty(text2) && needRun(webDriver, params)) {
+				logger.info("Sending text2 to: {}", webLocator);
 				sendText(input, text2, webDriver, webLocator, 0, checkInput, needClick);
-				logInfo("Sent text2 to: %s", webLocator);
+				logger.info("Sent text2 to: {}", webLocator);
 			}
-		}
-		finally
-		{
+		} finally {
 			if (shouldBeEnabled)
 				disable(webDriver, input);
 		}
+
 		return null;
 	}
-	
-	protected void sendText(WebElement input, String text, WebDriver driver, By locator, int retries,
-			boolean checkInput, boolean needClick) throws ScriptExecuteException
-	{
-		
+
+	private void sendText(
+			WebElement input,
+			String text,
+			WebDriver driver,
+			By locator,
+			int retries,
+			boolean checkInput,
+			boolean needClick
+	) throws ScriptExecuteException {
 		List<String> strings = handler.processInputText(text);
-		
-		if (retries > 0)
-		{
-			logInfo("Trying to scroll input element into view...");
+
+		if (retries > 0) {
+			logger.info("Trying to scroll input element into view...");
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", input);
 		}
+
 		Actions actions = new Actions(driver);
-		if (needClick)
-		{
+
+		if (needClick) {
 			doClick(actions, input);
 			// find element again to avoid 'cannot focus element' error
 			input = locator != null ? findElement(driver, locator) : driver.switchTo().activeElement();
 		}
 		doHoldKeys(driver);
-		
-		for (String str : strings)
-		{
-			if (str.startsWith(SendKeysHandler.KEY_SIGN))
-			{
+
+		for (String str : strings) {
+			if (str.startsWith(SendKeysHandler.KEY_SIGN)) {
 				handler.sendSpecialKey(actions, str, locator);
 				continue;
 			}
 
 			String inputAtStart = input.getAttribute("value");
 			handler.doSendKeys(actions, str);
-			if (inputAtStart == null)
-			{
-				logWarn("Input field does not contain value attribute. Sending text as is.");
+			if (inputAtStart == null) {
+				logger.warn("Input field does not contain value attribute. Sending text as is.");
 				continue;
 			}
 
@@ -171,63 +148,55 @@ public class SendKeys extends WebAction
 		}
 		doReleaseKeys(driver);
 	}
-	
-	protected void checkInput(WebElement input, String text, WebDriver driver, By locator, int retries,
-			boolean needClick, String str, String inputAtStart) throws ScriptExecuteException
-	{
+
+	private void checkInput(WebElement input, String text, WebDriver driver, By locator,
+							int retries, boolean needClick, String str, String inputAtStart
+	) throws ScriptExecuteException {
 		String result = input.getAttribute("value");
 		boolean equals = result.equals(str);
 		if (!equals && result.startsWith(inputAtStart))
 			equals = result.replaceFirst(Pattern.quote(inputAtStart), "").equals(str);
-		if (!equals)
-		{
-			if (retries >= MAX_RETRIES)
-			{
-				logWarn("Missed input detected, but too many retries were already done.");
-				logWarn("Unable to send text '{}' to locator '{}'", text, locator);
+		if (!equals) {
+			if (retries >= MAX_RETRIES) {
+				logger.warn("Missed input detected, but too many retries were already done.");
+				logger.warn("Unable to send text '{}' to locator '{}'", text, locator);
 				return;
 			}
 
 			// If field is not filled as expected for current moment, redo the whole operation
-			logInfo("Missed input detected. Trying to resend keys.");
+			logger.info("Missed input detected. Trying to resend keys.");
 			if (!waitForElement(driver, 10, locator))
 				throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
 			input.clear();
 			sendText(input, text, driver, locator, retries + 1, true, needClick);
 		}
 	}
-	
-	protected String checkHoldKeys(String text)
-	{
+
+	private String checkHoldKeys(String text) {
 		if (StringUtils.isEmpty(text))
 			return text;
-		
+
 		Matcher holdMatcher = HOLD_KEYS_PATTERN.matcher(text);
-		while (holdMatcher.find())
-		{
+		while (holdMatcher.find()) {
 			boolean replace = false;
 			String match = holdMatcher.group();
 			String holdKey = holdMatcher.group(1);
-			switch (holdKey)
-			{
+			switch (holdKey) {
 				case SendKeysHandler.SHIFT:
-					if (!holdShift)
-					{
-						logInfo("Shift key will be holded during keys sending");
+					if (!holdShift) {
+						logger.info("Shift key will be held during keys sending");
 						holdShift = replace = true;
 					}
 					break;
 				case SendKeysHandler.CTRL:
-					if (!holdCtrl)
-					{
-						logInfo("Ctrl key will be holded during keys sending");
+					if (!holdCtrl) {
+						logger.info("Ctrl key will be held during keys sending");
 						holdCtrl = replace = true;
 					}
 					break;
 				case SendKeysHandler.ALT:
-					if (!holdAlt)
-					{
-						logInfo("Alt key will be holded during keys sending");
+					if (!holdAlt) {
+						logger.info("Alt key will be held during keys sending");
 						holdAlt = replace = true;
 					}
 					break;
@@ -238,15 +207,13 @@ public class SendKeys extends WebAction
 		return text;
 	}
 
-	protected void doClick(Actions a, WebElement element)
-	{
+	private void doClick(Actions a, WebElement element) {
 		a.moveToElement(element);
 		a.click();
 		a.build().perform();
 	}
-	
-	protected void doHoldKeys(WebDriver driver)
-	{
+
+	private void doHoldKeys(WebDriver driver) {
 		Actions a = new Actions(driver);
 		if (holdShift)
 			a.keyDown(Keys.SHIFT).perform();
@@ -256,8 +223,7 @@ public class SendKeys extends WebAction
 			a.keyDown(Keys.ALT).perform();
 	}
 
-	protected void doReleaseKeys(WebDriver driver)
-	{
+	private void doReleaseKeys(WebDriver driver) {
 		Actions a = new Actions(driver);
 		if (holdShift)
 			a.keyUp(Keys.SHIFT).perform();
@@ -266,56 +232,46 @@ public class SendKeys extends WebAction
 		if (holdAlt)
 			a.keyUp(Keys.ALT).perform();
 	}
-	
-	protected boolean needEnable(WebElement element, Map<String, String> params) throws ScriptExecuteException {
+
+	private boolean needEnable(WebElement element, Map<String, String> params) throws ScriptExecuteException {
 		if (element.isEnabled())
 			return false;
 		return RhUtils.getBooleanOrDefault(params, CAN_BE_DISABLED, false);
 	}
 
-	protected boolean needRun(WebDriver webDriver, Map<String, String> params) throws ScriptExecuteException
-	{
+	private boolean needRun(WebDriver webDriver, Map<String, String> params) throws ScriptExecuteException {
 		if (StringUtils.isEmpty(params.get(PARAM_WAIT2)))
 			return false;
 
 		int wait2 = getIntegerParam(params, PARAM_WAIT2);
 		String locator2Name = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
-		if (StringUtils.isEmpty(locator2Name) || StringUtils.isEmpty(matcher2))
-		{
+		if (StringUtils.isEmpty(locator2Name) || StringUtils.isEmpty(matcher2)) {
 			Wait.webWait(webDriver, wait2);
-		}
-		else
-		{
-			try
-			{
+		} else {
+			try {
 				By locator2 = WebLocatorsMapping.getByName(locator2Name).getWebLocator(webDriver, matcher2);
 				if (!waitForElement(webDriver, wait2, locator2))
 					return false;
-			}
-			catch (ScriptCompileException e)
-			{
+			} catch (ScriptCompileException e) {
 				throw new ScriptExecuteException("Error while resolving locator2", e);
 			}
 		}
 		return true;
 	}
-	
-	protected void enable(WebDriver driver, WebElement input)
-	{
-		logInfo("Trying to enable element");
+
+	private void enable(WebDriver driver, WebElement input) {
+		logger.info("Trying to enable element");
 		((JavascriptExecutor)driver).executeScript("arguments[0].removeAttribute('disabled')", input);
-		logInfo("Element is " + (input.isEnabled() ? "enabled" : "still disabled"));
-	}
-	
-	protected void disable(WebDriver driver, WebElement input)
-	{
-		logInfo("Try to disable element");
-		((JavascriptExecutor)driver).executeScript("arguments[0].setAttribute('disabled', '')", input);
-		logInfo("Now element is " + (input.isEnabled() ? "still enabled" : "disabled"));
+		logger.info("Element is " + (input.isEnabled() ? "enabled" : "still disabled"));
 	}
 
-	protected static String replaceConversions(String src)
-	{
+	private void disable(WebDriver driver, WebElement input) {
+		logger.info("Try to disable element");
+		((JavascriptExecutor)driver).executeScript("arguments[0].setAttribute('disabled', '')", input);
+		logger.info("Now element is " + (input.isEnabled() ? "still enabled" : "disabled"));
+	}
+
+	private static String replaceConversions(String src) {
 		if (StringUtils.isEmpty(src))
 			return "";
 		return src.replace("(","#openbracket#")

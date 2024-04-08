@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,137 +24,113 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Click extends WebAction
-{
-	private static final Logger logger = LoggerFactory.getLogger(Click.class);
-	
-	private static final String LEFT = "left", RIGHT = "right", MIDDLE = "middle", DOUBLE="double", BUTTON = "button",
-			X_OFFSET = "xoffset", Y_OFFSET = "yoffset", MODIFIERS = "modifiers";
+public class Click extends WebAction {
+	private static final String LEFT = "left";
+	private static final String RIGHT = "right";
+	private static final String MIDDLE = "middle";
+	private static final String DOUBLE = "double";
+	private static final String BUTTON = "button";
+	private static final String X_OFFSET = "xoffset";
+	private static final String Y_OFFSET = "yoffset";
+	private static final String MODIFIERS = "modifiers";
+
+	public Click() {
+		super(true, true);
+	}
 
 	@Override
-	public boolean isNeedLocator()
-	{
+	public boolean isCanSwitchPage() {
 		return true;
 	}
 	
 	@Override
-	public boolean isCanWait()
-	{
-		return true;
-	}
-	
-	@Override
-	public boolean isCanSwitchPage()
-	{
-		return true;
-	}
-	
-	@Override
-	protected Logger getLogger()
-	{
-		return logger;
-	}
-	
-	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		WebElement element = findElement(webDriver, webLocator);
-		
+
 		String button = params.get(BUTTON);
 		if (button == null)
 			button = LEFT;
-		
+
 		ExtendedActions actions = new ExtendedActions(webDriver);
 		moveToElement(actions, element, params.get(X_OFFSET), params.get(Y_OFFSET));
-		logInfo("Moved to element: %s", webLocator);
-		
-		try
-		{
+		logger.info("Moved to element: {}", webLocator);
+
+		try {
 			//Building sequence of actions to perform
 			Set<CharSequence> mods = actions.applyClickModifiers(params.get(MODIFIERS));
-			if (button.equals(LEFT))
-				actions.click();
-			else if (button.equals(RIGHT))
-				actions.contextClick();
-			else if (button.equals(MIDDLE))
-			{
-				logError("Middle click is not implemented.");
-				return null;
-			}
-			else if (button.equals(DOUBLE))
-				actions.doubleClick();
-			else
-			{
-				logError("Button may be only left, right, middle or double (for double click with left button).");
-				return null;
-			}
+            switch (button) {
+                case LEFT:
+                    actions.click();
+                    break;
+                case RIGHT:
+                    actions.contextClick();
+                    break;
+                case MIDDLE:
+                    logger.error("Middle click is not implemented.");
+                    return null;
+                case DOUBLE:
+                    actions.doubleClick();
+                    break;
+                default:
+                    logger.error("Wrong button value ({}). Button may be only left, right, middle or double (for double click with left button).", button);
+                    return null;
+            }
 			actions.resetClickModifiers(mods);
 
 			//Performing built sequence of actions
 			actions.perform();
-			
-			logInfo("Clicked %s button on: '%s'.", button, webLocator);
-		}
-		catch (ElementNotVisibleException e)
-		{
-			logError("Element is not visible. Executing click by JavaScript command" ,e);
+
+			logger.info("Clicked {} button on: '{}'.", button, webLocator);
+		} catch (ElementNotVisibleException e) {
+			logger.error("Element is not visible. Executing click by JavaScript command", e);
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 			js.executeScript("arguments[0].click();", element);
 		}
 		return null;
 	}
-	
+
 	@Override
-	protected boolean waitForElement(WebDriver driver, int waitDuration, By locator) throws ScriptExecuteException
-	{
-		try
-		{
+	protected boolean waitForElement(WebDriver driver, int waitDuration, By locator) throws ScriptExecuteException {
+		try {
 			new WebDriverWait(driver, waitDuration).until(ExpectedConditions.elementToBeClickable(locator));
-			logInfo("Appeared locator: '%s'.", locator);
-		}
-		catch (TimeoutException ex)
-		{
+			logger.info("Appeared locator: '{}'.", locator);
+		} catch (TimeoutException ex) {
 			List<WebElement> elements = driver.findElements(locator);
-			if (elements.size() > 0)
-				logWarn("Element is not clickable, but will try to click on it anyway");
-			else if (isElementMandatory())
+			if (!elements.isEmpty()) {
+				logger.warn("Element is not clickable, but will try to click on it anyway");
+			} else if (isElementMandatory()) {
 				throw new ScriptExecuteException("Timed out after " + waitDuration + " seconds waiting for '" + locator.toString() + "'");
-			else
+			} else {
 				return false;
+			}
 		}
 		return true;
 	}
 
 	private void moveToElement(ExtendedActions actions, WebElement element, String xOffsetStr, String yOffsetStr) {
-		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr))
-		{
-			int xOffset = 0, yOffset = 0;
-			try
-			{
+		if (StringUtils.isNotBlank(xOffsetStr) && StringUtils.isNotBlank(yOffsetStr)) {
+			int xOffset = 0;
+			int yOffset = 0;
+			try {
 				xOffset = Integer.parseInt(xOffsetStr);
 				yOffset = Integer.parseInt(yOffsetStr);
-			}
-			catch (NumberFormatException e)
-			{
-				logError("xoffset or yoffset is not integer value");
+			} catch (NumberFormatException e) {
+				logger.error("xoffset or yoffset is not integer value");
 			}
 
 			WebDriver driver = actions.getAttachedDriver();
-			if (driver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) driver) > 74)
-			{
+			if (driver instanceof ChromeDriver && getChromeDriverVersion((ChromeDriver) driver) > 74) {
 				xOffset -= element.getSize().getWidth() / 2;
 				yOffset -= element.getSize().getHeight() / 2;
 			}
-			actions.moveToElement(element, xOffset, yOffset);;
-			return;
+			actions.moveToElement(element, xOffset, yOffset);
+		} else {
+			actions.moveToElement(element);
 		}
-		actions.moveToElement(element);
 	}
 }
