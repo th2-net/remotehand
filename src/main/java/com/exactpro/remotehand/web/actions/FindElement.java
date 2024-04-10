@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,62 +20,38 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-public class FindElement extends WebAction
-{
-	private static final Logger logger = LoggerFactory.getLogger(FindElement.class);
-	
-	public static final String PARAM_ID = "id",
-			RESULT_FOUND = "found",
-			RESULT_NOTFOUND = "notfound";
-	
-	@Override
-	public boolean isNeedLocator()
-	{
-		return true;
+public class FindElement extends WebAction {
+	public static final String PARAM_ID = "id";
+	public static final String RESULT_FOUND = "found";
+	public static final String RESULT_NOT_FOUND = "notfound";
+
+	public FindElement() {
+		super(true, false); // Action implements the waiting logic by itself
 	}
-	
-	@Override
-	public boolean isCanWait()
-	{
-		return false;  //Action implements the waiting logic by itself
+
+	public FindElement(boolean locatorNeeded, boolean canWait, String... mandatoryParams) {
+		super(locatorNeeded, canWait, mandatoryParams);
 	}
 
 	@Override
-	protected Logger getLogger()
-	{
-		return logger;
-	}
-	
-	@Override
-	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-	{
-		int waitDuration;
-		if ((params.containsKey(PARAM_WAIT)) && (!params.get(PARAM_WAIT).isEmpty()))
-			waitDuration = getIntegerParam(params, PARAM_WAIT);
-		else
-			waitDuration = 0;
-		
-		String id = params.get(PARAM_ID);
-		if (id == null)
-			id = "";
-		else if (!id.isEmpty())
+	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
+		int waitDuration = params.containsKey(PARAM_WAIT) && !params.get(PARAM_WAIT).isEmpty()
+				? getIntegerParam(params, PARAM_WAIT) : 0;
+
+		String id = params.getOrDefault(PARAM_ID, "");
+		if (!id.isEmpty())
 			id += "=";
-		
-		String result;
-		try
-		{
-			boolean found = waitForElement(webDriver, waitDuration, webLocator);
-			result = (found) ? RESULT_FOUND : RESULT_NOTFOUND;
+
+		boolean isFound;
+		try {
+			isFound = waitForElement(webDriver, waitDuration, webLocator);
+		} catch (ScriptExecuteException e) {
+			isFound = false;
 		}
-		catch (ScriptExecuteException e)
-		{
-			result = RESULT_NOTFOUND;
-		}
-		return id+result;
+
+		return id + (isFound ? RESULT_FOUND : RESULT_NOT_FOUND);
 	}
 }

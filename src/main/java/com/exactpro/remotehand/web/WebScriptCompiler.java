@@ -69,7 +69,7 @@ public class WebScriptCompiler extends ScriptCompiler
 			return new ArrayList<Action>();
 		}
 
-		script = script.replace(SCRIPT_LINE_SEPARATOR, System.getProperty(LINE_SEPARATOR));
+		script = script.replace(SCRIPT_LINE_SEPARATOR, LINE_SEPARATOR);
 
 		CsvReader reader = new CsvReader(new ByteArrayInputStream(script.getBytes()), Charset.defaultCharset());
 		reader.setDelimiter(DELIMITER);
@@ -183,7 +183,7 @@ public class WebScriptCompiler extends ScriptCompiler
 		webAction = WebActionsMapping.getInstance().getByName(params.get(WEB_ACTION));
 		if (params.get(WEB_LOCATOR) != null)
 			webLocator = WebLocatorsMapping.getByName(params.get(WEB_LOCATOR));
-		else if (webAction.isNeedLocator())
+		else if (webAction.isLocatorNeeded())
 			webLocator = WebLocatorsMapping.getByName(WebConfiguration.getInstance().getDefaultLocator());
 		params.remove(WEB_ACTION);
 		params.remove(WEB_LOCATOR);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,22 +41,12 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * Created by alexey.karpukhin on 9/18/17.
  */
 public class DownloadFile extends WebAction {
-	
-	public static final String
-			FILES_KEY = "DownloadDirFiles",
-			FILE_NAME = "filename",
-			LOCAL_PATH = "localpath";
+	private static final String FILES_KEY = "DownloadDirFiles";
+	private static final String FILE_NAME = "filename";
+	private static final String LOCAL_PATH = "localpath";
 
-	private static final Logger logger = LoggerFactory.getLogger(DownloadFile.class);
-
-	@Override
-	public boolean isNeedLocator() {
-		return false;
-	}
-
-	@Override
-	public boolean isCanWait() {
-		return false;
+	public DownloadFile() {
+		super(false, false);
 	}
 
 	@Override
@@ -68,7 +56,7 @@ public class DownloadFile extends WebAction {
 		if ("snapshot".equalsIgnoreCase(type)) {
 			String[] fileList = downloadDir.list();
 			context.getContextData().put(FILES_KEY, fileList);
-			getLogger().debug("Snapshot file list: " + Arrays.toString(fileList));
+			logger.debug("Snapshot file list: " + Arrays.toString(fileList));
 			return null;
 		} else if ("download".equalsIgnoreCase(type)) {
 			File file;
@@ -87,7 +75,7 @@ public class DownloadFile extends WebAction {
 					else if(file == null)
 						return "";
 
-					getLogger().debug("Selected file: " + file.getName());
+					logger.debug("Selected file: " + file.getName());
 					isTemp = this.isTempFile(file);
 					String timeoutParam = params.get(PARAM_WAIT);
 					int timeout = Integer.parseInt(isEmpty(timeoutParam) ? "10" : timeoutParam) * 1000 - 1000;
@@ -112,8 +100,7 @@ public class DownloadFile extends WebAction {
 		throw new ScriptExecuteException("Unknown actionType: " + type);
 	}
 
-	private File renameFile(File file, Map<String,String> params) throws ScriptExecuteException
-	{
+	private File renameFile(File file, Map<String,String> params) throws ScriptExecuteException {
 		String newFileName = params.get(FILE_NAME);
 		if(isEmpty(newFileName))
 			return file;
@@ -122,28 +109,23 @@ public class DownloadFile extends WebAction {
 		if(isEmpty(extension))
 			newFileName = newFileName + "." + FilenameUtils.getExtension(file.getName());
 
-		try
-		{
+		try {
 			Path newFile = Paths.get(file.getParent(), newFileName);
 			Files.createDirectories(newFile.getParent());
 			logger.trace("Old file name: {}", file.getAbsoluteFile());
 			logger.trace("New file name: {}", newFile.toAbsolutePath());
 			return Files.move(file.toPath(), newFile).toFile();
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			throw new ScriptExecuteException("Cannot rename file to " + newFileName, e);
 		}
 	}
 
-	private String createUrl(File file) throws ScriptExecuteException
-	{
+	private String createUrl(File file) throws ScriptExecuteException {
 		File configDownloadDir = WebConfiguration.getInstance().getDownloadsDir();
 		String filePath = file.getPath().substring(configDownloadDir.getPath().length());
-		try
-		{
+		try {
 			return URLEncoder.encode(filePath, "UTF-8");
-		} catch (UnsupportedEncodingException e)
-		{
+		} catch (UnsupportedEncodingException e) {
 			throw new ScriptExecuteException("Cannot create URL for path: " + filePath, e);
 		}
 	}
@@ -164,8 +146,8 @@ public class DownloadFile extends WebAction {
 		}
 		return null;
 	}
-	
-	protected boolean isTempFile(File file) {
+
+	private boolean isTempFile(File file) {
 		String filename = file.getName();
 		return filename.endsWith(".crdownload") || filename.endsWith(".tmp");
 	}
@@ -187,11 +169,5 @@ public class DownloadFile extends WebAction {
 				Thread.sleep(250);
 		}
 		return (count == iteration);
-		
-	}
-
-	@Override
-	protected Logger getLogger() {
-		return logger;
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,50 +20,28 @@ import com.exactpro.remotehand.ScriptExecuteException;
 import com.exactpro.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by alexey.suknatov on 4/6/17.
- */
-public class CloseWindow extends WebAction
-{
-    @Override
-    public boolean isNeedLocator()
-    {
-        return false;
+public class CloseWindow extends WebAction {
+    public CloseWindow() {
+        super(false, false);
     }
 
     @Override
-    public boolean isCanWait()
-    {
-        return false;
-    }
-
-    @Override
-    public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException
-    {
+    public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
         Set<String> windowHandles = webDriver.getWindowHandles();
         Iterator<String> iterator = windowHandles.iterator();
         String parentWindowHandle = null;
-        if (iterator.hasNext())
-        {
+        if (iterator.hasNext()) {
             parentWindowHandle = iterator.next();
         }
         webDriver.close();
-        if (windowHandles.size() > 1)
-        {
+        if (windowHandles.size() > 1) {
            webDriver.switchTo().window(parentWindowHandle);
         }
-        return null;
-    }
-
-    @Override
-    protected Logger getLogger()
-    {
         return null;
     }
 }
