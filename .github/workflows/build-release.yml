@@ -1,4 +1,4 @@
-name: Build and publish dev-release Java distributions to sonatype.
+name: Build and publish release jar to sonatype repository
 
 on: workflow_dispatch
 
@@ -7,9 +7,7 @@ jobs:
     uses: th2-net/.github/.github/workflows/compound-java.yml@main
     with:
       build-target: 'Sonatype'
-      runsOn: ubuntu-latest
-      gradleVersion: '7'
-      devRelease: true
+      devRelease: false
       createTag: true
     secrets:
       sonatypeUsername: ${{ secrets.SONATYPE_NEXUS_USERNAME }}
@@ -17,3 +15,6 @@ jobs:
       sonatypeSigningKey: ${{ secrets.SONATYPE_GPG_ARMORED_KEY }}
       sonatypeSigningPassword: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
       nvd-api-key: ${{ secrets.NVD_APIKEY }}
+      cisa-domain: ${{ secrets.CISA_DOMAIN }}
+      cisa-user: ${{ secrets.CISA_USER }}
+      cisa-password: ${{ secrets.CISA_PWD }}
