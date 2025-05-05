@@ -1,0 +1,14 @@
+[versions]
+
+[libraries]
+javacsv = { group = "net.sourceforge.javacsv", name = "javacsv", version = "2.0" }
+httpclient = { group = "org.apache.httpcomponents", name = "httpclient", version = "4.5.14" }
+filters = { group = "com.jhlabs", name = "filters", version = "2.0.235-1" }
+selenium-server = { group = "org.seleniumhq.selenium", name = "selenium-server", version = "3.141.59" }
+java-client = { group = "io.appium", name = "java-client", version = "7.6.0" }
+mvel2 = { group = "org.mvel", name = "mvel2", version = "2.5.2.Final" }
+jna = { group = "net.java.dev.jna", name = "jna", version = "5.17.0" }
+
+[plugins]
+th2-publish = { id = "com.exactpro.th2.gradle.publish", version = "0.2.4" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "1.8.22" }
