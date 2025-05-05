@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ public class WindowsDriverWrapper implements DriverCloseable
 {
 	private static final Logger logger = LoggerFactory.getLogger(WindowsDriverWrapper.class);
 	
-	private WindowsDriver<?> driverExp;
-	private WindowsDriver<?> driverNotExp;
-	private WindowsDriver<?> rootDriverExp;
-	private WindowsDriver<?> rootDriverNotExp;
+	private WindowsDriver driverExp;
+	private WindowsDriver driverNotExp;
+	private WindowsDriver rootDriverExp;
+	private WindowsDriver rootDriverNotExp;
 	
 	final private URL driverUrl;
 	final private WindowsConfiguration windowsConfiguration;
@@ -48,8 +48,8 @@ public class WindowsDriverWrapper implements DriverCloseable
 		this.windowsConfiguration = WindowsConfiguration.getInstance();
 	}
 
-	public WindowsDriver<?> getDriver(boolean root, boolean experimental) throws ScriptExecuteException {
-		WindowsDriver<?> driver;
+	public WindowsDriver getDriver(boolean root, boolean experimental) throws ScriptExecuteException {
+		WindowsDriver driver;
 		if (root) {
 			driver = experimental ? rootDriverExp : rootDriverNotExp;
 			if (driver == null) {
@@ -60,7 +60,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 			driver = experimental ? driverExp : driverNotExp;
 			if (driver == null) {
 				logger.debug("Creating experimental-{} driver from other driver handleId", experimental);
-				WindowsDriver<?> opposite = experimental ? driverNotExp : driverExp;
+				WindowsDriver opposite = experimental ? driverNotExp : driverExp;
 				if (opposite == null) {
 					throw new ScriptExecuteException("Driver was not created. Driver creating action was not performed");
 				}
@@ -70,35 +70,35 @@ public class WindowsDriverWrapper implements DriverCloseable
 		return driver;
 	}
 	
-	private WindowsDriver<?> createDriverFromHandle(String windowHandle, boolean experimental) {
+	private WindowsDriver createDriverFromHandle(String windowHandle, boolean experimental) {
 		DesiredCapabilities capabilities = this.createCommonCapabilities();
 		capabilities.setCapability(WADCapabilityType.APP_TOP_LEVEL, windowHandle);
 		logger.debug("Creating experimental-{} driver with handle: {}", experimental, windowHandle);
 		return createDriver(capabilities, experimental, getImplicitlyWaitTimeout(), this::setDriverExp, this::setDriverNotExp);
 	}
 
-	private WindowsDriver<?> createRootDriver(boolean experimental) {
+	private WindowsDriver createRootDriver(boolean experimental) {
 		DesiredCapabilities rootCapabilities = createRootCapabilities();
 		Integer timeout = getImplicitlyWaitTimeout();
 		return createDriver(rootCapabilities, experimental, timeout, this::setRootDriverExp, this::setRootDriverNotExp);
 	}
 
-	public WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean experimental) {
+	public WindowsDriver createDriver(DesiredCapabilities capabilities, boolean experimental) {
 		return this.createDriver(capabilities, experimental, getImplicitlyWaitTimeout());
 	}
 	
-	public WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean experimental, Integer timeout) {
+	public WindowsDriver createDriver(DesiredCapabilities capabilities, boolean experimental, Integer timeout) {
 		logger.debug("Creating experimental-{} driver with specified capabilities", experimental);
 		logger.trace("Specified capabilities: {}", capabilities);
 		this.resetWindowDrivers();
 		return createDriver(capabilities, experimental, timeout, this::setDriverExp, this::setDriverNotExp);
 	}
 
-	private WindowsDriver<?> createDriver(DesiredCapabilities capabilities, boolean isExperimental, Integer timeout,
-	                                      Consumer<WindowsDriver<?>> driverExpConsumer,
-	                                      Consumer<WindowsDriver<?>> driverNotExpConsumer) {
+	private WindowsDriver createDriver(DesiredCapabilities capabilities, boolean isExperimental, Integer timeout,
+	                                      Consumer<WindowsDriver> driverExpConsumer,
+	                                      Consumer<WindowsDriver> driverNotExpConsumer) {
 		this.setExperimentalCapability(capabilities, isExperimental);
-		WindowsDriver<?> windowsDriver = this.newDriver(capabilities, timeout);
+		WindowsDriver windowsDriver = this.newDriver(capabilities, timeout);
 		if (isExperimental)
 			driverExpConsumer.accept(windowsDriver);
 		else
@@ -125,12 +125,12 @@ public class WindowsDriverWrapper implements DriverCloseable
 		return capabilities;
 	}
 
-	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities) {
+	public WindowsDriver newDriver(DesiredCapabilities capabilities) {
 		return newDriver(capabilities, getImplicitlyWaitTimeout());
 	}
 	
-	public WindowsDriver<?> newDriver(DesiredCapabilities capabilities, Integer implTimeout) {
-		WindowsDriver<WebElement> driver = new WindowsLoggingDriver<>(driverUrl, capabilities);
+	public WindowsDriver newDriver(DesiredCapabilities capabilities, Integer implTimeout) {
+		WindowsDriver driver = new WindowsLoggingDriver<>(driverUrl, capabilities);
 		if (implTimeout != null) {
 			driver.manage().timeouts().implicitlyWait(implTimeout, TimeUnit.SECONDS);
 		}
@@ -153,7 +153,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 		return windowsConfiguration.getImplicitlyWaitTimeout();
 	}
 	
-	private void closeDriver(WindowsDriver<?> driver, String name) {
+	private void closeDriver(WindowsDriver driver, String name) {
 		if (driver == null)
 			return;
 		
@@ -171,7 +171,7 @@ public class WindowsDriverWrapper implements DriverCloseable
 		this.driverNotExp = null;
 	}
 	
-	private void switchDriver(WindowsDriver<?> driver, String handle, String driverName) throws ScriptExecuteException {
+	private void switchDriver(WindowsDriver driver, String handle, String driverName) throws ScriptExecuteException {
 		if (driver != null) {
 			driver.switchTo().window(handle);
 			String switchedHandle = driver.getWindowHandle();
@@ -191,30 +191,30 @@ public class WindowsDriverWrapper implements DriverCloseable
 	public void restartDriver(boolean root, boolean experimental) {
 		logger.debug("Restarting driver root: {} experimental: {}", root, experimental);
 		if (root) {
-			WindowsDriver<?> driver = experimental ? this.rootDriverExp : this.rootDriverNotExp;
+			WindowsDriver driver = experimental ? this.rootDriverExp : this.rootDriverNotExp;
 			closeDriver(driver, "root exp: " + experimental);
 			this.createRootDriver(experimental);
 		} else {
-			WindowsDriver<?> driver = experimental ? this.driverExp : this.driverNotExp;
+			WindowsDriver driver = experimental ? this.driverExp : this.driverNotExp;
 			String handle = driver.getWindowHandle();
 			closeDriver(driver, "exp: " + experimental);
 			this.createDriverFromHandle(handle, experimental);
 		}
 	}
 	
-	private void setDriverExp(WindowsDriver<?> driver) {
+	private void setDriverExp(WindowsDriver driver) {
 		this.driverExp = driver;
 	}
 
-	private void setDriverNotExp(WindowsDriver<?> driver) {
+	private void setDriverNotExp(WindowsDriver driver) {
 		this.driverNotExp = driver;
 	}
 
-	private void setRootDriverExp(WindowsDriver<?> driver) {
+	private void setRootDriverExp(WindowsDriver driver) {
 		this.rootDriverExp = driver;
 	}
 
-	private void setRootDriverNotExp(WindowsDriver<?> driver) {
+	private void setRootDriverNotExp(WindowsDriver driver) {
 		this.rootDriverNotExp = driver;
 	}
 	

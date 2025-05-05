@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.httpclient) // FIXME: org.apache.httpcomponents.client5 » httpclient5
     implementation(libs.filters)
     implementation "io.netty:netty-all"
-    implementation(libs.selenium.server) {
+    implementation(libs.selenium) {
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-opera-driver'
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-safari-driver'
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public class ScrollToElement extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
 
-		WindowsDriver<?> driver = getDriver(driverWrapper);
+		WindowsDriver driver = getDriver(driverWrapper);
 		this.elementSearcher = new ElementSearcher(params, driver, cachedElements);
 		boolean elementInTree = RhUtils.getBooleanOrDefault(params, ELEMENT_IN_TREE_PARAM, true);
 		boolean elementShouldDisplayed = RhUtils.getBooleanOrDefault(params, ELEMENT_SHOULD_BE_DISPLAYED, true);
@@ -100,7 +100,7 @@ public class ScrollToElement extends WindowsAction {
 		return element.element != null && (!elementShouldDisplayed || element.element.isDisplayed());
 	}
 	
-	private ScrollPerformer clickPerformer(WindowsDriver<?> driver, Map<String, String> params,
+	private ScrollPerformer clickPerformer(WindowsDriver driver, Map<String, String> params,
 										   SearchParams.HeaderKeys keys) throws ScriptExecuteException {
 		final WebElement element = elementSearcher.searchElement(keys);
 		ElementOffsetUtils.ElementOffsetParams elementOffsetParams = new ElementOffsetUtils.ElementOffsetParams(element,
@@ -117,7 +117,7 @@ public class ScrollToElement extends WindowsAction {
 		};
 	}
 
-	private ScrollPerformer textPerformer(WindowsDriver<?> driver, Map<String, String> params,
+	private ScrollPerformer textPerformer(WindowsDriver driver, Map<String, String> params,
 										  SearchParams.HeaderKeys keys) throws ScriptExecuteException {
 		String textValue = params.get(TEXT_VALUE_PARAM);
 		if (StringUtils.isEmpty(textValue)) {

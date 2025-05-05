@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,25 +99,25 @@ public abstract class WebAction extends Action {
 		return !params.containsKey(PARAM_NOT_FOUND_FAIL) || RhUtils.YES.contains(params.get(PARAM_NOT_FOUND_FAIL));
 	}
 
-	protected boolean waitForElement(WebDriver webDriver, int seconds, By webLocator) throws ScriptExecuteException {
-		return waitForElement(webDriver, seconds, webLocator, isElementMandatory());
+	protected boolean waitForElement(WebDriver webDriver, Duration wait, By webLocator) throws ScriptExecuteException {
+		return waitForElement(webDriver, wait, webLocator, isElementMandatory());
 	}
 
 	protected boolean waitForElement(
 			WebDriver webDriver,
-			int seconds,
+			Duration wait,
 			By webLocator,
 			boolean isElementMandatory
 	) throws ScriptExecuteException {
 		try {
-			new WebDriverWait(webDriver, seconds).until((ExpectedCondition<Boolean>) webDriver1 ->
+			new WebDriverWait(webDriver, wait).until((ExpectedCondition<Boolean>) webDriver1 ->
 					webDriver1 != null && !webDriver1.findElements(webLocator).isEmpty()
 			);
 			logger.info("Appeared locator: '{}'", webLocator);
 		} catch (TimeoutException ex) {
 			if (isElementMandatory)
-				throw new ScriptExecuteException(String.format("Timed out after %s seconds waiting for '%s'",
-						seconds, webLocator), ex);
+				throw new ScriptExecuteException(String.format("Timed out after %s waiting for '%s'",
+						wait, webLocator), ex);
 			return false;
 		}
 		return true;
@@ -161,7 +162,7 @@ public abstract class WebAction extends Action {
 			boolean needRun = true;
 			if (isCanWait()) {
 				int waitSecs = getIntegerParam(params, PARAM_WAIT, 0);
-				if (waitSecs != 0 && !waitForElement(webDriver, waitSecs, locator))
+				if (waitSecs != 0 && !waitForElement(webDriver, Duration.ofSeconds(waitSecs), locator))
 					needRun = false;
 			}
 

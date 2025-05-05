@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ public class SwitchActiveWindow extends WindowsAction {
 		else
 			byName = true;
 		
-		WindowsDriver<?> driver = this.getDriver(driverWrapper);
+		WindowsDriver driver = this.getDriver(driverWrapper);
 		
 		long startTime = System.currentTimeMillis();
 		boolean firstIt = true;
@@ -122,7 +122,7 @@ public class SwitchActiveWindow extends WindowsAction {
 				(byName ? "name" : "accessibilityId") + " '" + targetWindowMatcher + "'");
 	}
 	
-	private boolean isCurrentWindowExpected(WindowsDriver<?> root, String matcher, boolean byName) {
+	private boolean isCurrentWindowExpected(WindowsDriver root, String matcher, boolean byName) {
 		if (byName) {
 			return matcher.equals(root.getTitle());
 		} else {

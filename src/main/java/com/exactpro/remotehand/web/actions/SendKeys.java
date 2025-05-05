@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -165,7 +166,7 @@ public class SendKeys extends WebAction {
 
 			// If field is not filled as expected for current moment, redo the whole operation
 			logger.info("Missed input detected. Trying to resend keys.");
-			if (!waitForElement(driver, 10, locator))
+			if (!waitForElement(driver, Duration.ofSeconds(10), locator))
 				throw new ScriptExecuteException("Current locator specifies non-interactive element. Input couldn't be resend");
 			input.clear();
 			sendText(input, text, driver, locator, retries + 1, true, needClick);
@@ -246,11 +247,11 @@ public class SendKeys extends WebAction {
 		int wait2 = getIntegerParam(params, PARAM_WAIT2);
 		String locator2Name = params.get(PARAM_LOCATOR2), matcher2 = params.get(PARAM_MATCHER2);
 		if (StringUtils.isEmpty(locator2Name) || StringUtils.isEmpty(matcher2)) {
-			Wait.webWait(webDriver, wait2);
+			Wait.webWait(webDriver, Duration.ofSeconds(wait2));
 		} else {
 			try {
 				By locator2 = WebLocatorsMapping.getByName(locator2Name).getWebLocator(webDriver, matcher2);
-				if (!waitForElement(webDriver, wait2, locator2))
+				if (!waitForElement(webDriver, Duration.ofSeconds(wait2), locator2))
 					return false;
 			} catch (ScriptCompileException e) {
 				throw new ScriptExecuteException("Error while resolving locator2", e);

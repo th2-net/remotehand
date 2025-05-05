@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.exactpro.remotehand.web.WebAction;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import java.time.Duration;
 import java.util.Map;
 
 public class FindElement extends WebAction {
@@ -47,7 +48,7 @@ public class FindElement extends WebAction {
 
 		boolean isFound;
 		try {
-			isFound = waitForElement(webDriver, waitDuration, webLocator);
+			isFound = waitForElement(webDriver, Duration.ofSeconds(waitDuration), webLocator);
 		} catch (ScriptExecuteException e) {
 			isFound = false;
 		}

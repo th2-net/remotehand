@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,7 +268,7 @@ public class WebDriverPoolProvider implements DriverPoolProvider<WebDriverWrappe
 			dc.setCapability(CapabilityType.PROXY, createProxySettings(cfg));
 		
 		if (cfg.isDriverLoggingEnabled())
-			dc.setCapability(CapabilityType.LOGGING_PREFS, createLoggingPreferences(cfg));
+			dc.setCapability("loggingPrefs", createLoggingPreferences(cfg));
 		
 		return dc;
 	}

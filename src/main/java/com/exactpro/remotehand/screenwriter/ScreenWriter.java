@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2021-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public abstract class ScreenWriter<T> {
 		}
 	}
 
-	public Color getElementColor(WindowsDriver<?> driver, ElementOffsetUtils.ElementOffsets elementOffsets) throws ScriptExecuteException {
+	public Color getElementColor(WindowsDriver driver, ElementOffsetUtils.ElementOffsets elementOffsets) throws ScriptExecuteException {
 		try {
 			BufferedImage elementImage = getSubImage(driver, elementOffsets.element);
 			int width = elementImage.getWidth();
@@ -101,7 +101,7 @@ public abstract class ScreenWriter<T> {
 		}
 	}
 
-	public Set<Color> getElementColors(WindowsDriver<?> driver, WebElement element, Rectangle rectangle) throws ScriptExecuteException {
+	public Set<Color> getElementColors(WindowsDriver driver, WebElement element, Rectangle rectangle) throws ScriptExecuteException {
 		try {
 			BufferedImage elementImage = getSubImage(driver, element);
 			Set<Color> colors = new LinkedHashSet<>();

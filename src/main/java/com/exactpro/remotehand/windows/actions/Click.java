@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class Click extends WindowsAction {
 
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedWebElements) throws ScriptExecuteException {
-		WindowsDriver<?> driver = getDriver(driverWrapper);
+		WindowsDriver driver = getDriver(driverWrapper);
 		ElementSearcher es = new ElementSearcher(params, driver, cachedWebElements);
 		WebElement element = es.searchElement();
 

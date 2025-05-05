@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,8 +87,8 @@ public class Click extends WebAction {
 			actions.perform();
 
 			logger.info("Clicked {} button on: '{}'.", button, webLocator);
-		} catch (ElementNotVisibleException e) {
-			logger.error("Element is not visible. Executing click by JavaScript command", e);
+		} catch (ElementNotInteractableException e) {
+			logger.error("Element is not interactable. Executing click by JavaScript command", e);
 			JavascriptExecutor js = (JavascriptExecutor) webDriver;
 			js.executeScript("arguments[0].click();", element);
 		}
@@ -95,7 +96,7 @@ public class Click extends WebAction {
 	}
 
 	@Override
-	protected boolean waitForElement(WebDriver driver, int waitDuration, By locator) throws ScriptExecuteException {
+	protected boolean waitForElement(WebDriver driver, Duration waitDuration, By locator) throws ScriptExecuteException {
 		try {
 			new WebDriverWait(driver, waitDuration).until(ExpectedConditions.elementToBeClickable(locator));
 			logger.info("Appeared locator: '{}'.", locator);

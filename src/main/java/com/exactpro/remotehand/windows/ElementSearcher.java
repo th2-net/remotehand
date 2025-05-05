@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ public class ElementSearcher {
 	private static final Logger logger = LoggerFactory.getLogger(ElementSearcher.class);
 	
 	protected final Map<String, String> record;
-	protected final WindowsDriver<?> driver;
+	protected final WindowsDriver driver;
 	protected final CachedWebElements webElements;
 
-	public ElementSearcher(Map<String, String> record, WindowsDriver<?> driver, CachedWebElements webElements) {
+	public ElementSearcher(Map<String, String> record, WindowsDriver driver, CachedWebElements webElements) {
 		this.record = record;
 		this.driver = driver;
 		this.webElements = webElements;
