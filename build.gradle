@@ -42,11 +42,19 @@ dependencies {
     api "commons-cli:commons-cli"
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "org.apache.commons:commons-lang3"
-    implementation "org.apache.logging.log4j:log4j-core"
-    implementation "org.apache.logging.log4j:log4j-slf4j2-impl"
-    implementation "org.apache.logging.log4j:log4j-jcl"
+    implementation("org.apache.logging.log4j:log4j-core") {
+        because("Project is compiled to application")
+    }
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl") {
+        because("Project is compiled to application")
+    }
+    implementation("org.apache.logging.log4j:log4j-jcl") {
+        because("Project is compiled to application")
+    }
+    implementation('org.slf4j:jul-to-slf4j') {
+        because("Project is compiled to application")
+    }
     implementation "org.slf4j:slf4j-api"
-    implementation 'org.slf4j:jul-to-slf4j'
     implementation "commons-io:commons-io"
     implementation(libs.javacsv)
     implementation(libs.httpclient) // FIXME: org.apache.httpcomponents.client5 » httpclient5
