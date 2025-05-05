@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -40,11 +41,11 @@ public class SwitchWindow extends WebAction {
 	}
 
 	@Override
-	protected boolean waitForElement(WebDriver webDriver, int seconds, By webLocator) throws ScriptExecuteException {
+	protected boolean waitForElement(WebDriver webDriver, Duration wait, By webLocator) throws ScriptExecuteException {
 		final int expectedNumber = getIntegerParam(getParams(), WINDOW) + 1;
 		Boolean findWindow;
 		try {
-			findWindow = (new WebDriverWait(webDriver, seconds)).until((ExpectedCondition<Boolean>) driver -> {
+			findWindow = (new WebDriverWait(webDriver, wait)).until((ExpectedCondition<Boolean>) driver -> {
                 try {
                     return driver.getWindowHandles().size() >= expectedNumber;
                 } catch (WebDriverException e) {
@@ -54,7 +55,7 @@ public class SwitchWindow extends WebAction {
             });
 		} catch (TimeoutException ex) {
 			throw new ScriptExecuteException(
-				"Timed out after " + seconds +
+				"Timed out after " + wait +
 				". Actual number of open windows is: " + webDriver.getWindowHandles().size() +
 				". Expected: " + expectedNumber
 			);

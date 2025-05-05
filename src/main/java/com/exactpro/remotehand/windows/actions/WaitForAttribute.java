@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.exactpro.remotehand.windows.ElementSearcher;
 import com.exactpro.remotehand.windows.WindowsAction;
 import com.exactpro.remotehand.windows.WindowsDriverWrapper;
 import com.exactpro.remotehand.windows.WindowsSessionContext;
-import io.appium.java_client.windows.WindowsDriver;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
@@ -48,7 +47,6 @@ public class WaitForAttribute extends WindowsAction {
 		String timeout = params.get(MAX_TIMEOUT_PARAM);
 		String checkIntervalStr = params.getOrDefault(CHECK_INTERVAL_PARAM, "1000");
 		
-		WindowsDriver<?> driver = null;
 		try {
 
 			ElementSearcher elementSearcher = new ElementSearcher(params, this.getDriver(driverWrapper), cachedElements);

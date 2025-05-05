@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class GetWindow extends WindowsAction {
 			byName = true;
 
 		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, true);
-		WindowsDriver<?> driver1 = driverWrapper.getDriver(true, experimental);
+		WindowsDriver driver1 = driverWrapper.getDriver(true, experimental);
 		List<? extends WebElement> elements = byName ? driver1.findElementsByName(targetWindowMatcher) : driver1.findElementsByAccessibilityId(targetWindowMatcher);
 		if (elements.size() == 1) {
 			String handleString = elements.iterator().next().getAttribute("NativeWindowHandle");

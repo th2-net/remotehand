@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ public abstract class WindowsAction extends Action {
 	}
 
 	protected String takeScreenshot(String name) throws ScriptExecuteException {
-		WindowsDriver<?> driver = windowsSessionContext.getCurrentDriver().getDriver(false, true);
+		WindowsDriver driver = windowsSessionContext.getCurrentDriver().getDriver(false, true);
 		return screenWriter.takeAndSaveScreenshot(name, driver);
 	}
 
@@ -144,7 +144,7 @@ public abstract class WindowsAction extends Action {
 		return see;
 	}
 
-	protected WindowsDriver<?> getDriver(WindowsDriverWrapper driverWrapper) throws ScriptExecuteException {
+	protected WindowsDriver getDriver(WindowsDriverWrapper driverWrapper) throws ScriptExecuteException {
 		boolean fromRoot = RhUtils.getBooleanOrDefault(params, FROM_ROOT_PARAM, false);
 		boolean experimental = RhUtils.getBooleanOrDefault(params, EXPERIMENTAL_PARAM, DEFAULT_EXPERIMENTAL);
 		return driverWrapper.getDriver(fromRoot, experimental);

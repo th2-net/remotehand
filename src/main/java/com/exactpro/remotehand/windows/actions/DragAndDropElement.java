@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class DragAndDropElement extends WindowsAction {
 	@Override
 	public String run(WindowsDriverWrapper driverWrapper, Map<String, String> params, WindowsSessionContext.CachedWebElements cachedElements) throws ScriptExecuteException {
 
-		WindowsDriver<?> driver = getDriver(driverWrapper);
+		WindowsDriver driver = getDriver(driverWrapper);
 		ElementSearcher searcher = new ElementSearcher(params, driver, cachedElements);
 		WebElement fromElement = searcher.searchElement();
 		WebElement toElement = searcher.searchElement(new SearchParams.HeaderKeys(TO_PREFIX));

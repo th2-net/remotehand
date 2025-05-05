@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.Map;
 
 public class ScrollDivTo extends ScrollTo {
@@ -55,7 +56,7 @@ public class ScrollDivTo extends ScrollTo {
 		logger.info("Waiting for element by {}: '{}'", locator2, matcher2);
 		try {
 			By webLocator2 = WebLocatorsMapping.getByName(locator2).getWebLocator(webDriver, matcher2);
-			if (!waitForElement(webDriver, wait2, webLocator2, false))
+			if (!waitForElement(webDriver, Duration.ofSeconds(wait2), webLocator2, false))
 				return null;
 			return webLocator2;
 		} catch (ScriptCompileException e) {

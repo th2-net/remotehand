@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class WaitForNew extends WebAction {
 		int checkMillis = getIntegerParam(params, PARAM_CHECK_MILLIS);
 
 		try {
-			new WebDriverWait(webDriver, seconds).until(new ExpectedCondition<Boolean>() {
+			new WebDriverWait(webDriver, Duration.ofSeconds(seconds)).until(new ExpectedCondition<Boolean>() {
 				List<WebElement> previousElements = null;
 
 				@Override

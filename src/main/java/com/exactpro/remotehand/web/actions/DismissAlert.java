@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static com.exactpro.remotehand.web.WebUtils.waitForAlert;
@@ -35,7 +36,7 @@ public class DismissAlert extends WebAction {
 	@Override
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		int wait = getIntegerParam(params, PARAM_WAIT);
-		Alert alert = waitForAlert(webDriver, wait);
+		Alert alert = waitForAlert(webDriver, Duration.ofSeconds(wait));
 		try {
 			alert.dismiss();
 		} catch (Exception e) {

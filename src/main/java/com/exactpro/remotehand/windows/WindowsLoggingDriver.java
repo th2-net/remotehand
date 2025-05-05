@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Map;
 
-public class WindowsLoggingDriver<T extends WebElement> extends WindowsDriver<T> {
+public class WindowsLoggingDriver<T extends WebElement> extends WindowsDriver {
 
 	private static final Logger logger = LoggerFactory.getLogger(WindowsLoggingDriver.class);
 	

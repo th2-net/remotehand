@@ -1,20 +1,16 @@
 plugins {
-    id "java"
-    id 'application'
-    id 'maven-publish'
-    id "org.jetbrains.kotlin.jvm" version "${kotlin_version}"
-    id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
-    id 'signing'
+    id "java-library"
+    id "application"
+    id "maven-publish"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.th2.publish)
 }
 
 group = 'com.exactpro.remotehand'
 version = release_version
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-    withJavadocJar()
-    withSourcesJar()
+th2JavaRelease {
+    targetJavaVersion.set(JavaVersion.VERSION_11)
 }
 
 test {
@@ -24,10 +20,6 @@ test {
     }
 }
 
-ext {
-    sharedDir = file("${project.rootDir}/shared")
-}
-
 application {
     mainClassName = "com.exactpro.remotehand.RemoteHandStarter"
 }
@@ -35,13 +27,10 @@ application {
 repositories {
     mavenCentral()
     maven {
-            name 'Sonatype_snapshots'
-            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-    }
-    maven {
             name 'Sonatype_releases'
             url 'https://s01.oss.sonatype.org/content/repositories/releases/'
     }
+    mavenLocal()
 
     configurations.configureEach {
         resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
@@ -50,23 +39,27 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation 'org.slf4j:slf4j-api'
-    implementation 'commons-io:commons-io:2.11.0'
-    implementation 'net.sourceforge.javacsv:javacsv:2.0'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
-    api 'commons-cli:commons-cli:1.5.0'
-    implementation 'com.jhlabs:filters:2.0.235'
-    implementation 'io.netty:netty-all:4.1.87.Final'
-    implementation('org.seleniumhq.selenium:selenium-server:3.141.59') {
+    api "commons-cli:commons-cli"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "org.apache.commons:commons-lang3"
+    implementation "org.apache.logging.log4j:log4j-core"
+    implementation "org.apache.logging.log4j:log4j-slf4j2-impl"
+    implementation "org.apache.logging.log4j:log4j-jcl"
+    implementation "org.slf4j:slf4j-api"
+    implementation 'org.slf4j:jul-to-slf4j'
+    implementation "commons-io:commons-io"
+    implementation(libs.javacsv)
+    implementation(libs.httpclient) // FIXME: org.apache.httpcomponents.client5 » httpclient5
+    implementation(libs.filters)
+    implementation "io.netty:netty-all"
+    implementation(libs.selenium) {
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-opera-driver'
         exclude group: 'org.seleniumhq.selenium', module: 'selenium-safari-driver'
     }
 
-    implementation 'io.appium:java-client:7.3.0'
-    implementation 'org.mvel:mvel2:2.4.14.Final'
-    implementation 'net.java.dev.jna:jna:5.13.0'
+    implementation(libs.java.client)
+    implementation(libs.mvel2)
+    implementation(libs.jna)
 
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 }
@@ -86,115 +79,18 @@ jar {
     }
 }
 
-task releaseTar (type: Tar, dependsOn: [jar, configurations.runtimeClasspath]) {
+tasks.register('releaseTar', Tar) {
+    dependsOn jar
+    dependsOn configurations.runtimeClasspath
     archiveAppendix.set('standalone')
     archiveVersion = release_version
     from jar
-    from ("${projectDir}") {
+    from("${projectDir}") {
         include "config.ini"
-        include "log4j.properties"
+        include "log4j2.properties"
         include "README.md"
     }
-    into ("lib/") {
+    into("lib/") {
         from configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { it }
     }
 }
-
-// conditionals for publications
-tasks.withType(PublishToMavenRepository) {
-    onlyIf {
-        (repository == publishing.repositories.nexusRepository &&
-            project.hasProperty('nexus_user') &&
-            project.hasProperty('nexus_password') &&
-            project.hasProperty('nexus_url')) ||
-        (repository == publishing.repositories.sonatype &&
-            project.hasProperty('sonatypeUsername') &&
-            project.hasProperty('sonatypePassword')) ||
-        (repository == publishing.repositories.localRepo)
-    }
-}
-tasks.withType(Sign) {
-    onlyIf { project.hasProperty('signingKey') &&
-        project.hasProperty('signingPassword')
-    }
-}
-// disable running task 'initializeSonatypeStagingRepository' on a gitlab
-tasks.whenTaskAdded {task ->
-    if(task.name.equals('initializeSonatypeStagingRepository') &&
-        !(project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword'))
-    ) {
-        task.enabled = false
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from(components.java)
-            pom {
-              name = rootProject.name
-              packaging = 'jar'
-              description = rootProject.description
-              url = vcs_url
-              scm {
-                url = vcs_url
-              }
-              licenses {
-                license {
-                  name = 'The Apache License, Version 2.0'
-                  url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                }
-              }
-              developers {
-                developer {
-                  id = 'developer'
-                  name = 'developer'
-                  email = 'developer@exactpro.com'
-                }
-              }
-              scm {
-                url = vcs_url
-              }
-            }
-        }
-    }
-    repositories {
-        maven {
-            name = 'localRepo'
-            url = sharedDir
-        }
-//Nexus repo to publish from gitlab
-        maven {
-            name = 'nexusRepository'
-            credentials {
-                username = project.findProperty('nexus_user')
-                password = project.findProperty('nexus_password')
-            }
-            url = project.findProperty('nexus_url')
-        }
-    }
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
-}
-
-signing {
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.mavenJava
-}
-
-clean {
-    delete sharedDir
-}
-
- wrapper {
-     gradleVersion = '7.6'
- }

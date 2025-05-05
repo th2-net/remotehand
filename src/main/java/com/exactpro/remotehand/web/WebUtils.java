@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 
 import static java.lang.String.format;
 
@@ -56,16 +57,16 @@ public class WebUtils {
 			downloadDir.delete();
 	}
 	
-	public static Alert waitForAlert(WebDriver webDriver, int timeoutSec) throws ScriptExecuteException
+	public static Alert waitForAlert(WebDriver webDriver, Duration timeout) throws ScriptExecuteException
 	{
 		try
 		{
-			WebDriverWait wait = new WebDriverWait(webDriver, timeoutSec);
+			WebDriverWait wait = new WebDriverWait(webDriver, timeout);
 			return wait.until(ExpectedConditions.alertIsPresent());
 		}
 		catch (TimeoutException e)
 		{
-			throw new ScriptExecuteException(format("Timed out after %s seconds waiting for alert.", timeoutSec), e);
+			throw new ScriptExecuteException(format("Timed out after %s waiting for alert.", timeout), e);
 		}
 		catch (WebDriverException e)
 		{

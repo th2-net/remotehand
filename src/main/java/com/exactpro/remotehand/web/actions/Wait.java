@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 Exactpro (Exactpro Systems Limited)
+ * Copyright 2020-2025 Exactpro (Exactpro Systems Limited)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.Map;
 
 public class Wait extends WebAction {
@@ -37,14 +38,14 @@ public class Wait extends WebAction {
 	public String run(WebDriver webDriver, By webLocator, Map<String, String> params) throws ScriptExecuteException {
 		int secs = getIntegerParam(params, PARAM_SECONDS);
 		logger.info("Pause for " + secs + " second(s)");
-		webWait(webDriver, secs);
+		webWait(webDriver, Duration.ofSeconds(secs));
 
 		return null;
 	}
 
-	public static void webWait(WebDriver webDriver, int seconds) {
+	public static void webWait(WebDriver webDriver, Duration wait) {
 		try {
-			new WebDriverWait(webDriver, seconds).until((ExpectedCondition<Boolean>) driver -> false);
+			new WebDriverWait(webDriver, wait).until((ExpectedCondition<Boolean>) driver -> false);
 		} catch (TimeoutException ex) {
 			// Nothing should happen, it's normal to have timeout here
 		}
